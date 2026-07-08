@@ -1,7 +1,9 @@
+import { Card } from '../components/ui'
+
 const Dashboard = () => {
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-      <div className="bg-white rounded-lg shadow-md p-12 text-center">
+    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <Card className="text-center" padding="p-12">
         <div className="mb-6">
           <div className="inline-block p-6 bg-blue-100 rounded-full mb-4">
             <svg
@@ -19,15 +21,15 @@ const Dashboard = () => {
             </svg>
           </div>
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
           ResumeAI Dashboard
         </h1>
-        <p className="text-2xl text-gray-600 mb-8">Coming Soon</p>
-        <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+        <p className="text-xl text-gray-600 mb-6">Coming Soon</p>
+        <p className="text-base text-gray-500 max-w-2xl mx-auto">
           We're working hard to bring you an amazing dashboard experience. 
           Stay tuned for resume uploads, AI analysis, and personalized recommendations!
         </p>
-      </div>
+      </Card>
     </div>
   )
 }

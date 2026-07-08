@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react'
-import healthService from '../services/healthService'
+import { healthService } from '../services'
 
 const BackendStatus = () => {
   const [status, setStatus] = useState({
     isConnected: false,
     isLoading: true,
-    error: null,
-    message: '',
   })
 
   useEffect(() => {
@@ -16,32 +14,12 @@ const BackendStatus = () => {
   const checkBackendHealth = async () => {
     setStatus((prev) => ({ ...prev, isLoading: true }))
 
-    try {
-      const result = await healthService.checkHealth()
-
-      if (result.success) {
-        setStatus({
-          isConnected: true,
-          isLoading: false,
-          error: null,
-          message: result.data.message || 'Connected',
-        })
-      } else {
-        setStatus({
-          isConnected: false,
-          isLoading: false,
-          error: result.error,
-          message: 'Offline',
-        })
-      }
-    } catch (error) {
-      setStatus({
-        isConnected: false,
-        isLoading: false,
-        error: error.message,
-        message: 'Offline',
-      })
-    }
+    const result = await healthService.checkHealth()
+    
+    setStatus({
+      isConnected: result.success,
+      isLoading: false,
+    })
   }
 
   return (
@@ -65,7 +43,6 @@ const BackendStatus = () => {
         </div>
       )}
 
-      {/* Refresh Button */}
       <button
         onClick={checkBackendHealth}
         disabled={status.isLoading}

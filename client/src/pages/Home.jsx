@@ -1,83 +1,82 @@
 import BackendStatus from '../components/BackendStatus'
+import FeatureSection from '../components/FeatureSection'
+import { Button } from '../components/ui'
 
 const Home = () => {
+  const features = [
+    {
+      icon: '📄',
+      title: 'Resume Upload',
+      description: 'Upload your resume in PDF or DOCX format for instant analysis',
+    },
+    {
+      icon: '📊',
+      title: 'ATS Analysis',
+      description: 'Check if your resume passes Applicant Tracking Systems',
+    },
+    {
+      icon: '🤖',
+      title: 'AI Resume Feedback',
+      description: 'Get intelligent feedback powered by advanced AI algorithms',
+    },
+    {
+      icon: '💬',
+      title: 'Resume Chat',
+      description: 'Interactive chat to improve your resume with AI assistance',
+    },
+    {
+      icon: '🎯',
+      title: 'Job Match Analysis',
+      description: 'Match your resume with job descriptions and get compatibility scores',
+    },
+    {
+      icon: '📚',
+      title: 'Resume History',
+      description: 'Track and manage multiple resume versions and analysis results',
+    },
+  ]
+
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-      {/* Backend Status Section */}
+    <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      {/* Backend Status */}
       <div className="flex justify-center mb-8">
         <BackendStatus />
       </div>
 
       {/* Hero Section */}
-      <div className="text-center mb-16">
-        <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+      <div className="text-center mb-12">
+        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
           Welcome to <span className="text-blue-600">ResumeAI</span>
         </h1>
-        <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
           AI-Powered Resume Analysis Platform
-        </p>
-        <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-          Optimize your resume with advanced AI technology and increase your chances of landing your dream job
         </p>
       </div>
 
       {/* Features Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-        <FeatureCard
-          icon="📄"
-          title="Resume Upload"
-          description="Upload your resume in PDF or DOCX format for instant analysis"
-        />
-        <FeatureCard
-          icon="🤖"
-          title="AI Analysis"
-          description="Get intelligent feedback powered by advanced AI algorithms"
-        />
-        <FeatureCard
-          icon="📊"
-          title="ATS Check"
-          description="Ensure your resume passes Applicant Tracking Systems"
-        />
-        <FeatureCard
-          icon="💡"
-          title="Smart Tips"
-          description="Receive personalized recommendations to improve your resume"
-        />
-        <FeatureCard
-          icon="🎯"
-          title="Keyword Match"
-          description="Match your resume with job description keywords"
-        />
-        <FeatureCard
-          icon="📈"
-          title="Score & Track"
-          description="Track your progress with detailed scoring metrics"
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        {features.map((feature) => (
+          <FeatureSection
+            key={feature.title}
+            icon={feature.icon}
+            title={feature.title}
+            description={feature.description}
+          />
+        ))}
       </div>
 
       {/* CTA Section */}
-      <div className="text-center bg-blue-600 rounded-lg p-12 text-white">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <div className="text-center bg-blue-600 rounded-lg p-8 text-white">
+        <h2 className="text-2xl md:text-3xl font-bold mb-3">
           Ready to Optimize Your Resume?
         </h2>
-        <p className="text-lg mb-8 opacity-90">
+        <p className="text-base mb-6">
           Get started with ResumeAI and take your career to the next level
         </p>
-        <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-gray-100 transition duration-200">
+        <Button variant="secondary" size="md">
           Get Started
-        </button>
+        </Button>
       </div>
-    </div>
-  )
-}
-
-// Feature Card Component
-const FeatureCard = ({ icon, title, description }) => {
-  return (
-    <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-200">
-      <div className="text-4xl mb-4">{icon}</div>
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
-      <p className="text-gray-600">{description}</p>
     </div>
   )
 }
