@@ -17,14 +17,20 @@ const config = {
 
   // CORS Configuration
   cors: {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3002',
     credentials: true,
+  },
+
+  // JWT Configuration
+  jwt: {
+    secret: process.env.JWT_SECRET || 'your-secret-key',
+    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
 };
 
 // Validate required environment variables
 const validateConfig = () => {
-  const required = ['MONGODB_URI'];
+  const required = ['MONGODB_URI', 'JWT_SECRET'];
   const missing = required.filter((key) => !process.env[key]);
 
   if (missing.length > 0 && process.env.NODE_ENV === 'production') {

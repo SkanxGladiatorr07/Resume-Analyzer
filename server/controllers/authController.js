@@ -1,12 +1,5 @@
 import User from '../models/User.js';
-import jwt from 'jsonwebtoken';
-
-// Generate JWT token
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET || 'your-secret-key', {
-    expiresIn: '7d',
-  });
-};
+import { generateToken } from '../utils/jwt.js';
 
 // @desc    Register a new user
 // @route   POST /api/auth/register
@@ -123,6 +116,32 @@ export const login = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error during login',
+    });
+  }
+};
+
+// @desc    Get current user profile
+// @route   GET /api/auth/profile
+// @access  Private
+export const getProfile = async (req, res) => {
+  try {
+    // User is already attached to req by authenticate middleware
+    res.status(200).json({
+      success: true,
+      data: {
+        user: {
+          id: req.user._id,
+          name: req.user.name,
+          email: req.user.email,
+          createdAt: req.user.createdAt,
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Get profile error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching profile',
     });
   }
 };
