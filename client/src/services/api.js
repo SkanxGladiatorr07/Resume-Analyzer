@@ -1,4 +1,5 @@
 import axios from 'axios';
+import authService from './authService';
 
 // Get base URL from environment variables
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
@@ -12,14 +13,17 @@ const apiClient = axios.create({
   },
 });
 
-// Request interceptor for adding auth tokens, logging, etc.
+// Request interceptor for adding auth tokens
 apiClient.interceptors.request.use(
   (config) => {
-    // Future: Add auth token here
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    // Get token from authService (will be defined later)
+    const token = typeof authService !== 'undefined' && authService.getToken 
+      ? authService.getToken() 
+      : localStorage.getItem('token');
+    
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {

@@ -5,11 +5,7 @@
 
 import apiClient from './api';
 import healthService from './healthService';
+import authService from './authService';
 
 // Export individual services
-export { apiClient, healthService };
-
-// Future services can be added here:
-// export { default as authService } from './authService';
-// export { default as resumeService } from './resumeService';
-// export { default as userService } from './userService';
+export { apiClient, healthService, authService };
