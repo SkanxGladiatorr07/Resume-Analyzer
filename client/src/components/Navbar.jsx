@@ -2,11 +2,27 @@ import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
+/**
+ * Navbar Component
+ * 
+ * Main navigation bar that adapts based on authentication status.
+ * Shows different links for authenticated and unauthenticated users.
+ * Includes responsive mobile menu.
+ * 
+ * Logged Out: Home, Login, Sign Up
+ * Logged In: Home, Dashboard, User Name, Logout
+ * 
+ * @returns {JSX.Element} Navigation bar
+ */
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { isAuthenticated, logout, user } = useAuth()
   const navigate = useNavigate()
 
+  /**
+   * Handle user logout
+   * Clears auth state and redirects to login page
+   */
   const handleLogout = () => {
     logout()
     navigate('/login')
@@ -16,6 +32,7 @@ const Navbar = () => {
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
+          {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <div className="flex items-center justify-center w-10 h-10 bg-blue-600 rounded-lg">
               <span className="text-white font-bold text-xl">R</span>
@@ -25,6 +42,7 @@ const Navbar = () => {
             </span>
           </Link>
 
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <NavLink
               to="/"
@@ -39,6 +57,7 @@ const Navbar = () => {
             
             {isAuthenticated ? (
               <>
+                {/* Authenticated User Navigation */}
                 <NavLink
                   to="/dashboard"
                   className={({ isActive }) =>
@@ -62,23 +81,27 @@ const Navbar = () => {
                 </div>
               </>
             ) : (
-              <div className="flex items-center space-x-4">
-                <Link
-                  to="/login"
-                  className="text-lg font-medium text-gray-700 hover:text-blue-600"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-                >
-                  Sign Up
-                </Link>
-              </div>
+              <>
+                {/* Unauthenticated User Navigation */}
+                <div className="flex items-center space-x-4">
+                  <Link
+                    to="/login"
+                    className="text-lg font-medium text-gray-700 hover:text-blue-600"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              </>
             )}
           </div>
 
+          {/* Mobile Menu Button */}
           <div className="md:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -97,6 +120,7 @@ const Navbar = () => {
           </div>
         </div>
 
+        {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200">
             <div className="px-2 pt-2 pb-3 space-y-1">
@@ -116,6 +140,7 @@ const Navbar = () => {
               
               {isAuthenticated ? (
                 <>
+                  {/* Authenticated Mobile Navigation */}
                   <NavLink
                     to="/dashboard"
                     onClick={() => setIsMobileMenuOpen(false)}
@@ -144,6 +169,7 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
+                  {/* Unauthenticated Mobile Navigation */}
                   <Link
                     to="/login"
                     onClick={() => setIsMobileMenuOpen(false)}
