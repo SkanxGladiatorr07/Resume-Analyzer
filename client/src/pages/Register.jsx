@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
-import { authService } from '../services'
+import { useAuth } from '../context/AuthContext'
 import { Button, Card, Input, Loader } from '../components/ui'
 
 const Register = () => {
   const navigate = useNavigate()
+  const { register: registerUser } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [apiError, setApiError] = useState('')
 
@@ -26,12 +27,7 @@ const Register = () => {
       // Remove confirmPassword before sending to API
       const { confirmPassword, ...registerData } = data
       
-      const response = await authService.register(registerData)
-      
-      // Store token
-      authService.setToken(response.data.token)
-      
-      // Redirect to dashboard
+      await registerUser(registerData)
       navigate('/dashboard')
     } catch (error) {
       if (error.response) {

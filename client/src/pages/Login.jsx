@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
-import { authService } from '../services'
+import { useAuth } from '../context/AuthContext'
 import { Button, Card, Input, Loader } from '../components/ui'
 
 const Login = () => {
   const navigate = useNavigate()
+  const { login } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [apiError, setApiError] = useState('')
 
@@ -20,12 +21,7 @@ const Login = () => {
     setApiError('')
 
     try {
-      const response = await authService.login(data)
-      
-      // Store token
-      authService.setToken(response.data.token)
-      
-      // Redirect to dashboard
+      await login(data)
       navigate('/dashboard')
     } catch (error) {
       if (error.response) {
