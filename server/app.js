@@ -1,7 +1,9 @@
 import express from 'express';
 import cors from 'cors';
+import multer from 'multer';
 import config from './config/index.js';
 import authRoutes from './routes/authRoutes.js';
+import resumeRoutes from './routes/resumeRoutes.js';
 
 const app = express();
 
@@ -39,6 +41,7 @@ app.get('/api/health', (req, res) => {
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/resumes', resumeRoutes);
 
 // 404 Handler
 app.use((req, res) => {
@@ -52,6 +55,28 @@ app.use((req, res) => {
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err.stack);
+
+  // Handle Multer errors
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        success: false,
+        message: 'File size exceeds 5MB limit',
+      });
+    }
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+
+  // Handle file type errors
+  if (err.message && err.message.includes('Invalid file type')) {
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
   
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal server error';

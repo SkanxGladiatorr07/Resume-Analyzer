@@ -125,18 +125,39 @@ The application will run on `http://localhost:3000`
 ### Health Check
 - `GET /api/health` - Check API status
 
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login user
+- `GET /api/auth/profile` - Get user profile (Protected)
+
+### Resume Management
+- `POST /api/resumes/upload` - Upload resume (Protected)
+- `GET /api/resumes` - Get all user resumes (Protected)
+- `DELETE /api/resumes/:id` - Delete resume (Protected)
+
+> For detailed API documentation, see [RESUME_UPLOAD_IMPLEMENTATION.md](./RESUME_UPLOAD_IMPLEMENTATION.md)
+
 ## Development Status
 
-🚧 **Project is currently in initial setup phase**
+🚀 **Project is actively under development**
 
 - [x] Project structure created
 - [x] Frontend setup with React + Vite + Tailwind
 - [x] Backend setup with Node.js + Express
-- [ ] MongoDB connection
-- [ ] User authentication
-- [ ] Resume upload functionality
+- [x] MongoDB connection
+- [x] User authentication (JWT-based)
+- [x] Protected routes (Frontend & Backend)
+- [x] Resume upload functionality (PDF & DOCX)
+- [x] File validation & size limits
+- [x] Secure file storage
+- [x] **Frontend upload UI with drag-and-drop**
+- [x] **Resume list display and management**
+- [x] **Delete resume functionality**
+- [ ] Resume parsing & text extraction
 - [ ] AI analysis integration
-- [ ] UI/UX implementation
+- [ ] Analysis results display
+- [ ] Dashboard enhancements
+- [ ] ATS compatibility scoring
 
 ## Contributing
 

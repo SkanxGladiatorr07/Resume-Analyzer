@@ -6,6 +6,7 @@
 import apiClient from './api';
 import healthService from './healthService';
 import authService from './authService';
+import * as resumeService from './resumeService';
 
 // Export individual services
-export { apiClient, healthService, authService };
+export { apiClient, healthService, authService, resumeService };
