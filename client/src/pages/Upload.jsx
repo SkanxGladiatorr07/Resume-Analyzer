@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Card } from '../components/ui';
@@ -15,6 +15,11 @@ const Upload = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  
+  // Resume list state
+  const [resumes, setResumes] = useState([]);
+  const [isLoadingResumes, setIsLoadingResumes] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   // File validation constants
   const ACCEPTED_TYPES = ['.pdf', '.docx'];
@@ -23,6 +28,28 @@ const Upload = () => {
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   ];
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+  /**
+   * Fetch resumes on component mount
+   */
+  useEffect(() => {
+    fetchResumes();
+  }, []);
+
+  /**
+   * Fetch all resumes
+   */
+  const fetchResumes = async () => {
+    try {
+      setIsLoadingResumes(true);
+      const response = await resumeService.getResumes();
+      setResumes(response.data || []);
+    } catch (error) {
+      console.error('Error fetching resumes:', error);
+    } finally {
+      setIsLoadingResumes(false);
+    }
+  };
 
   /**
    * Validate selected file
@@ -147,24 +174,36 @@ const Upload = () => {
 
       // Show success message
       setSuccessMessage(
-        `${selectedFile.name} uploaded successfully! Redirecting to dashboard...`
+        `${selectedFile.name} uploaded successfully!`
       );
 
       // Clear selected file
       setSelectedFile(null);
 
-      // Redirect to dashboard after 2 seconds
+      // Automatically refresh resume list
+      await fetchResumes();
+
+      // Clear success message after 5 seconds
       setTimeout(() => {
-        navigate('/dashboard');
-      }, 2000);
+        setSuccessMessage('');
+      }, 5000);
     } catch (error) {
       console.error('Upload error:', error);
       setUploadProgress(0);
       
-      // Display backend error message
-      const backendError = error.response?.data?.message || 
-                          'Failed to upload resume. Please try again.';
-      setErrorMessage(backendError);
+      // Handle different types of errors
+      if (error.response) {
+        // Backend validation error
+        const backendError = error.response?.data?.message || 
+                            'Failed to upload resume. Please try again.';
+        setErrorMessage(backendError);
+      } else if (error.request) {
+        // Network error - no response received
+        setErrorMessage('Network error. Please check your connection and try again.');
+      } else {
+        // Other errors
+        setErrorMessage('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setIsUploading(false);
     }
@@ -178,6 +217,39 @@ const Upload = () => {
     setErrorMessage('');
     setSuccessMessage('');
     setUploadProgress(0);
+  };
+
+  /**
+   * Handle resume delete
+   */
+  const handleDeleteResume = async (resumeId, fileName) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${fileName}"? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    setDeletingId(resumeId);
+    try {
+      await resumeService.deleteResume(resumeId);
+      
+      // Show success message
+      setSuccessMessage(`${fileName} deleted successfully!`);
+      
+      // Refresh resume list
+      await fetchResumes();
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+    } catch (error) {
+      console.error('Delete error:', error);
+      const errorMsg = error.response?.data?.message || 'Failed to delete resume. Please try again.';
+      setErrorMessage(errorMsg);
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   /**
@@ -440,6 +512,159 @@ const Upload = () => {
             </div>
           </div>
         </Card>
+
+        {/* Resume List Table */}
+        {resumes.length > 0 && (
+          <Card className="mt-8">
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Your Uploaded Resumes
+              </h2>
+              <p className="text-sm text-gray-600 mt-1">
+                {resumes.length} {resumes.length === 1 ? 'resume' : 'resumes'} uploaded
+              </p>
+            </div>
+
+            {/* Table for Desktop */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      File Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      File Type
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Upload Date
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {resumes.map((resume) => (
+                    <tr key={resume._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10">
+                            {resume.fileType === 'pdf' ? (
+                              <svg className="h-10 w-10 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                              </svg>
+                            ) : (
+                              <svg className="h-10 w-10 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {resume.originalName}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {resumeService.formatFileSize(resume.fileSize)}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          resume.fileType === 'pdf' 
+                            ? 'bg-red-100 text-red-800' 
+                            : 'bg-blue-100 text-blue-800'
+                        }`}>
+                          {resume.fileType.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {resumeService.formatDate(resume.createdAt)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button
+                          onClick={() => handleDeleteResume(resume._id, resume.originalName)}
+                          disabled={deletingId === resume._id}
+                          className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {deletingId === resume._id ? (
+                            <span className="flex items-center">
+                              <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-red-600 mr-1"></div>
+                              Deleting...
+                            </span>
+                          ) : (
+                            'Delete'
+                          )}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Card View for Mobile */}
+            <div className="md:hidden space-y-4">
+              {resumes.map((resume) => (
+                <div key={resume._id} className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center">
+                      {resume.fileType === 'pdf' ? (
+                        <svg className="h-8 w-8 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                        </svg>
+                      ) : (
+                        <svg className="h-8 w-8 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        resume.fileType === 'pdf' 
+                          ? 'bg-red-100 text-red-800' 
+                          : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {resume.fileType.toUpperCase()}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mb-3">
+                    <p className="text-sm font-medium text-gray-900 mb-1">
+                      {resume.originalName}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {resumeService.formatFileSize(resume.fileSize)} • {resumeService.formatDate(resume.createdAt)}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteResume(resume._id, resume.originalName)}
+                    disabled={deletingId === resume._id}
+                    className="w-full px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {deletingId === resume._id ? (
+                      <span className="flex items-center justify-center">
+                        <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Deleting...
+                      </span>
+                    ) : (
+                      'Delete'
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* Loading State for Resume List */}
+        {isLoadingResumes && resumes.length === 0 && (
+          <Card className="mt-8">
+            <div className="text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <p className="mt-2 text-sm text-gray-600">Loading your resumes...</p>
+            </div>
+          </Card>
+        )}
 
         {/* Back to Dashboard Link */}
         <div className="mt-6 text-center">
