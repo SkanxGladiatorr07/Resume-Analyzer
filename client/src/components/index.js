@@ -1,0 +1,28 @@
+/**
+ * Components Index
+ * Central export point for all reusable components
+ */
+
+// UI Components
+export * from './ui';
+
+// Layout Components
+export { default as Navbar } from './Navbar';
+export { default as Footer } from './Footer';
+
+// Feature Components
+export { BackendStatus } from './BackendStatus';
+export { FeatureSection } from './FeatureSection';
+export { ResumeUpload } from './ResumeUpload';
+export { ResumeList } from './ResumeList';
+export { ResumeCard } from './ResumeCard';
+
+// Utility Components
+export { ConfirmDialog } from './ConfirmDialog';
+export { EmptyState } from './EmptyState';
+export { LoadingSpinner } from './LoadingSpinner';
+export { NotificationBanner } from './NotificationBanner';
+
+// Route Components
+export { default as ProtectedRoute } from './ProtectedRoute';
+export { default as PublicRoute } from './PublicRoute';
