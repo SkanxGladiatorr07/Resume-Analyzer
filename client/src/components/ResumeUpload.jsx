@@ -4,8 +4,7 @@
  */
 
 import { useState, useRef } from 'react';
-import { Button } from './ui/Button';
-import { Loader } from './ui/Loader';
+import { Button, Loader } from './ui';
 
 export const ResumeUpload = ({ onUploadSuccess, onUploadError }) => {
   const [isDragging, setIsDragging] = useState(false);

@@ -4,8 +4,7 @@
  */
 
 import { useState } from 'react';
-import { Button } from './ui/Button';
-import { Card } from './ui/Card';
+import { Button, Card } from './ui';
 import { formatFileSize, formatDate } from '../services/resumeService';
 
 export const ResumeList = ({ resumes, onDelete, isLoading }) => {
