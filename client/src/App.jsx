@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import PublicRoute from './components/PublicRoute'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
+import Upload from './pages/Upload'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import NotFound from './pages/NotFound'
@@ -29,6 +30,18 @@ function App() {
             }
           >
             <Route index element={<Dashboard />} />
+          </Route>
+
+          {/* Upload page - protected route with main layout */}
+          <Route
+            path="/upload"
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Upload />} />
           </Route>
 
           {/* Auth routes (redirect if already logged in) */}

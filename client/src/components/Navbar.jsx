@@ -68,6 +68,16 @@ const Navbar = () => {
                 >
                   Dashboard
                 </NavLink>
+                <NavLink
+                  to="/upload"
+                  className={({ isActive }) =>
+                    `text-lg font-medium ${
+                      isActive ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'
+                    }`
+                  }
+                >
+                  Upload
+                </NavLink>
                 <div className="flex items-center space-x-4">
                   <span className="text-sm text-gray-600">
                     {user?.name}
@@ -153,6 +163,19 @@ const Navbar = () => {
                     }
                   >
                     Dashboard
+                  </NavLink>
+                  <NavLink
+                    to="/upload"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `block px-3 py-2 rounded-md text-base font-medium ${
+                        isActive
+                          ? 'bg-blue-100 text-blue-600'
+                          : 'text-gray-700 hover:bg-gray-100'
+                      }`
+                    }
+                  >
+                    Upload
                   </NavLink>
                   <div className="px-3 py-2">
                     <p className="text-sm text-gray-600 mb-2">{user?.name}</p>
