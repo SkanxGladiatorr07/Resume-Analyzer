@@ -32,6 +32,26 @@ const resumeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // Extracted text content
+    extractedText: {
+      type: String,
+      default: null,
+    },
+    // Parsing status
+    parsingStatus: {
+      type: String,
+      enum: ['pending', 'success', 'failed'],
+      default: 'pending',
+    },
+    parsingError: {
+      type: String,
+      default: null,
+    },
+    // Text metadata
+    wordCount: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt
