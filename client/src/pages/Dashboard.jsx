@@ -115,6 +115,13 @@ const Dashboard = () => {
   };
 
   /**
+   * Handle view details
+   */
+  const handleViewDetails = (resumeId) => {
+    navigate(`/resume/${resumeId}`);
+  };
+
+  /**
    * Confirm delete action
    */
   const handleConfirmDelete = async () => {
@@ -357,6 +364,7 @@ const Dashboard = () => {
                 key={resume._id}
                 resume={resume}
                 onDelete={handleDeleteClick}
+                onViewDetails={handleViewDetails}
                 isDeleting={false}
               />
             ))}
