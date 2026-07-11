@@ -1,7 +1,6 @@
 import Resume from '../models/Resume.js';
 import path from 'path';
-import * as resumeParserService from '../services/resumeParserService.js';
-import * as resumeStructuredParser from '../services/resumeStructuredParser.js';
+import * as parsingPipeline from '../services/parsingPipeline.js';
 
 /**
  * @desc    Upload resume
@@ -36,13 +35,19 @@ export const uploadResume = async (req, res) => {
       parsingStatus: 'pending',
     });
 
-    // Parse resume asynchronously (don't wait for it to complete)
-    parseResumeAsync(resume);
+    console.log(`📤 Resume uploaded: ${originalname} (ID: ${resume._id})`);
+
+    // Start parsing immediately (non-blocking)
+    // Don't await - let it run in background
+    parsingPipeline.startParsing(resume._id.toString())
+      .catch(err => {
+        console.error('Background parsing error:', err);
+      });
 
     // Return success response immediately
     res.status(201).json({
       success: true,
-      message: 'Resume uploaded successfully. Text extraction in progress.',
+      message: 'Resume uploaded successfully. Parsing started.',
       data: {
         id: resume._id,
         fileName: resume.fileName,
@@ -59,63 +64,6 @@ export const uploadResume = async (req, res) => {
       success: false,
       message: 'Server error during upload',
     });
-  }
-};
-
-/**
- * Parse resume asynchronously
- * @param {Object} resume - Resume document
- */
-const parseResumeAsync = async (resume) => {
-  try {
-    // Validate file is parseable
-    const isValid = await resumeParserService.validateParseableFile(
-      resume.filePath,
-      resume.fileType
-    );
-
-    if (!isValid) {
-      throw new Error('File is corrupted or unreadable');
-    }
-
-    // Extract text from the resume
-    const extractedText = await resumeParserService.parseResume(
-      resume.filePath,
-      resume.fileType
-    );
-
-    // Check if parsing was successful
-    const isSuccess = resumeParserService.isParsingSuccessful(extractedText);
-
-    if (!isSuccess) {
-      throw new Error('Extracted text is too short or empty');
-    }
-
-    // Get word count
-    const wordCount = resumeParserService.getWordCount(extractedText);
-
-    // Parse structured data from the extracted text
-    const structuredData = resumeStructuredParser.parseStructuredData(extractedText);
-
-    // Validate structured data
-    const isStructuredValid = resumeStructuredParser.validateStructuredData(structuredData);
-
-    // Update resume with extracted text and structured data
-    resume.extractedText = extractedText;
-    resume.wordCount = wordCount;
-    resume.structuredData = structuredData;
-    resume.parsingStatus = 'success';
-    resume.parsingError = null;
-    await resume.save();
-
-    console.log(`✅ Successfully parsed resume: ${resume.originalName} (${wordCount} words, structured: ${isStructuredValid})`);
-  } catch (error) {
-    console.error(`❌ Error parsing resume ${resume.originalName}:`, error.message);
-
-    // Update resume with error status
-    resume.parsingStatus = 'failed';
-    resume.parsingError = error.message;
-    await resume.save();
   }
 };
 
@@ -208,11 +156,13 @@ export const getResumeRawText = async (req, res) => {
     }
 
     // Check parsing status
-    if (resume.parsingStatus === 'pending') {
+    if (resume.parsingStatus === 'pending' || resume.parsingStatus === 'processing') {
       return res.status(202).json({
         success: false,
-        message: 'Text extraction is still in progress. Please try again in a moment.',
-        parsingStatus: 'pending',
+        message: resume.parsingStatus === 'processing'
+          ? 'Text extraction is in progress. Please wait a moment.'
+          : 'Text extraction has not started yet. Please try again in a moment.',
+        parsingStatus: resume.parsingStatus,
       });
     }
 
@@ -270,11 +220,13 @@ export const getResumeParsedData = async (req, res) => {
     }
 
     // Check parsing status
-    if (resume.parsingStatus === 'pending') {
+    if (resume.parsingStatus === 'pending' || resume.parsingStatus === 'processing') {
       return res.status(202).json({
         success: false,
-        message: 'Resume parsing is still in progress. Please try again in a moment.',
-        parsingStatus: 'pending',
+        message: resume.parsingStatus === 'processing' 
+          ? 'Resume is currently being parsed. Please wait a moment.'
+          : 'Resume parsing has not started yet. Please try again in a moment.',
+        parsingStatus: resume.parsingStatus,
       });
     }
 
@@ -311,6 +263,60 @@ export const getResumeParsedData = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error fetching parsed data',
+    });
+  }
+};
+
+/**
+ * @desc    Get resume parsing status
+ * @route   GET /api/resumes/:id/status
+ * @access  Private
+ */
+export const getParsingStatus = async (req, res) => {
+  try {
+    const resume = await Resume.findById(req.params.id).select(
+      'originalName parsingStatus parsingError parsingStartedAt parsingCompletedAt wordCount user'
+    );
+
+    if (!resume) {
+      return res.status(404).json({
+        success: false,
+        message: 'Resume not found',
+      });
+    }
+
+    // Check if resume belongs to user
+    if (resume.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to access this resume',
+      });
+    }
+
+    // Calculate duration if available
+    let duration = null;
+    if (resume.parsingStartedAt && resume.parsingCompletedAt) {
+      duration = resume.parsingCompletedAt - resume.parsingStartedAt;
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        resumeId: resume._id,
+        originalName: resume.originalName,
+        parsingStatus: resume.parsingStatus,
+        parsingError: resume.parsingError,
+        startedAt: resume.parsingStartedAt,
+        completedAt: resume.parsingCompletedAt,
+        duration,
+        wordCount: resume.wordCount,
+      },
+    });
+  } catch (error) {
+    console.error('Get parsing status error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching parsing status',
     });
   }
 };

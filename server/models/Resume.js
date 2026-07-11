@@ -40,11 +40,19 @@ const resumeSchema = new mongoose.Schema(
     // Parsing status
     parsingStatus: {
       type: String,
-      enum: ['pending', 'success', 'failed'],
+      enum: ['pending', 'processing', 'completed', 'failed'],
       default: 'pending',
     },
     parsingError: {
       type: String,
+      default: null,
+    },
+    parsingStartedAt: {
+      type: Date,
+      default: null,
+    },
+    parsingCompletedAt: {
+      type: Date,
       default: null,
     },
     // Text metadata
