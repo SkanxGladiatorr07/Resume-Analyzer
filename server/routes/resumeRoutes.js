@@ -4,6 +4,7 @@ import {
   getResumes,
   deleteResume,
   getResumeRawText,
+  getResumeParsedData,
 } from '../controllers/resumeController.js';
 import { authenticate } from '../middleware/auth.js';
 import upload from '../config/multer.js';
@@ -40,5 +41,12 @@ router.delete('/:id', deleteResume);
  * @access  Private
  */
 router.get('/:id/raw-text', getResumeRawText);
+
+/**
+ * @route   GET /api/resumes/:id/parsed
+ * @desc    Get structured parsed data from a resume
+ * @access  Private
+ */
+router.get('/:id/parsed', getResumeParsedData);
 
 export default router;

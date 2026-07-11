@@ -43,6 +43,26 @@ export const deleteResume = async (resumeId) => {
 };
 
 /**
+ * Get raw extracted text from a resume
+ * @param {string} resumeId - The ID of the resume
+ * @returns {Promise} API response with extracted text
+ */
+export const getResumeRawText = async (resumeId) => {
+  const response = await apiClient.get(`/resumes/${resumeId}/raw-text`);
+  return response.data;
+};
+
+/**
+ * Get structured parsed data from a resume
+ * @param {string} resumeId - The ID of the resume
+ * @returns {Promise} API response with structured data
+ */
+export const getResumeParsedData = async (resumeId) => {
+  const response = await apiClient.get(`/resumes/${resumeId}/parsed`);
+  return response.data;
+};
+
+/**
  * Format file size to human-readable format
  * @param {number} bytes - File size in bytes
  * @returns {string} Formatted file size

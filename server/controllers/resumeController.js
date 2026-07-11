@@ -1,6 +1,7 @@
 import Resume from '../models/Resume.js';
 import path from 'path';
 import * as resumeParserService from '../services/resumeParserService.js';
+import * as resumeStructuredParser from '../services/resumeStructuredParser.js';
 
 /**
  * @desc    Upload resume
@@ -93,14 +94,21 @@ const parseResumeAsync = async (resume) => {
     // Get word count
     const wordCount = resumeParserService.getWordCount(extractedText);
 
-    // Update resume with extracted text
+    // Parse structured data from the extracted text
+    const structuredData = resumeStructuredParser.parseStructuredData(extractedText);
+
+    // Validate structured data
+    const isStructuredValid = resumeStructuredParser.validateStructuredData(structuredData);
+
+    // Update resume with extracted text and structured data
     resume.extractedText = extractedText;
     resume.wordCount = wordCount;
+    resume.structuredData = structuredData;
     resume.parsingStatus = 'success';
     resume.parsingError = null;
     await resume.save();
 
-    console.log(`✅ Successfully parsed resume: ${resume.originalName} (${wordCount} words)`);
+    console.log(`✅ Successfully parsed resume: ${resume.originalName} (${wordCount} words, structured: ${isStructuredValid})`);
   } catch (error) {
     console.error(`❌ Error parsing resume ${resume.originalName}:`, error.message);
 
@@ -233,6 +241,76 @@ export const getResumeRawText = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error fetching resume text',
+    });
+  }
+};
+
+/**
+ * @desc    Get resume parsed structured data
+ * @route   GET /api/resumes/:id/parsed
+ * @access  Private
+ */
+export const getResumeParsedData = async (req, res) => {
+  try {
+    const resume = await Resume.findById(req.params.id);
+
+    if (!resume) {
+      return res.status(404).json({
+        success: false,
+        message: 'Resume not found',
+      });
+    }
+
+    // Check if resume belongs to user
+    if (resume.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to access this resume',
+      });
+    }
+
+    // Check parsing status
+    if (resume.parsingStatus === 'pending') {
+      return res.status(202).json({
+        success: false,
+        message: 'Resume parsing is still in progress. Please try again in a moment.',
+        parsingStatus: 'pending',
+      });
+    }
+
+    if (resume.parsingStatus === 'failed') {
+      return res.status(422).json({
+        success: false,
+        message: `Resume parsing failed: ${resume.parsingError || 'Unknown error'}`,
+        parsingStatus: 'failed',
+        error: resume.parsingError,
+      });
+    }
+
+    // Return structured data
+    res.status(200).json({
+      success: true,
+      data: {
+        resumeId: resume._id,
+        originalName: resume.originalName,
+        wordCount: resume.wordCount,
+        parsingStatus: resume.parsingStatus,
+        structuredData: resume.structuredData || {
+          contactInfo: {},
+          skills: [],
+          education: [],
+          experience: [],
+          projects: [],
+          certifications: [],
+          languages: [],
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Get parsed data error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error fetching parsed data',
     });
   }
 };

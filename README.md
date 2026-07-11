@@ -134,8 +134,13 @@ The application will run on `http://localhost:3000`
 - `POST /api/resumes/upload` - Upload resume (Protected)
 - `GET /api/resumes` - Get all user resumes (Protected)
 - `DELETE /api/resumes/:id` - Delete resume (Protected)
+- `GET /api/resumes/:id/raw-text` - Get extracted text (Protected) ⭐
+- `GET /api/resumes/:id/parsed` - Get structured data (Protected) ⭐ NEW
 
-> For detailed API documentation, see [RESUME_UPLOAD_IMPLEMENTATION.md](./RESUME_UPLOAD_IMPLEMENTATION.md)
+> For detailed API documentation, see:
+> - [RESUME_UPLOAD_IMPLEMENTATION.md](./RESUME_UPLOAD_IMPLEMENTATION.md)
+> - [RESUME_PARSING_COMPLETE.md](./RESUME_PARSING_COMPLETE.md) ⭐
+> - [STRUCTURED_PARSING_COMPLETE.md](./STRUCTURED_PARSING_COMPLETE.md) ⭐ NEW
 
 ## Development Status
 
@@ -150,14 +155,23 @@ The application will run on `http://localhost:3000`
 - [x] Resume upload functionality (PDF & DOCX)
 - [x] File validation & size limits
 - [x] Secure file storage
-- [x] **Frontend upload UI with drag-and-drop**
-- [x] **Resume list display and management**
-- [x] **Delete resume functionality**
-- [ ] Resume parsing & text extraction
+- [x] Frontend upload UI with drag-and-drop
+- [x] Resume list display and management
+- [x] Delete resume functionality
+- [x] **Resume parsing & text extraction (PDF & DOCX)** ⭐
+- [x] **Structured data parsing (no AI)** ⭐ NEW
+  - Contact information (name, email, phone, LinkedIn, GitHub)
+  - Skills extraction
+  - Education history
+  - Work experience
+  - Projects
+  - Certifications
+  - Languages
+- [ ] Frontend UI for parsed data display
 - [ ] AI analysis integration
+- [ ] ATS compatibility scoring
 - [ ] Analysis results display
 - [ ] Dashboard enhancements
-- [ ] ATS compatibility scoring
 
 ## Contributing
 
