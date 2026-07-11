@@ -99,22 +99,8 @@ export const getResumes = async (req, res) => {
  */
 export const deleteResume = async (req, res) => {
   try {
+    // Resume ownership already verified by middleware
     const resume = await Resume.findById(req.params.id);
-
-    if (!resume) {
-      return res.status(404).json({
-        success: false,
-        message: 'Resume not found',
-      });
-    }
-
-    // Check if resume belongs to user
-    if (resume.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to delete this resume',
-      });
-    }
 
     await resume.deleteOne();
 
@@ -138,22 +124,8 @@ export const deleteResume = async (req, res) => {
  */
 export const getResumeRawText = async (req, res) => {
   try {
+    // Resume ownership already verified by middleware
     const resume = await Resume.findById(req.params.id);
-
-    if (!resume) {
-      return res.status(404).json({
-        success: false,
-        message: 'Resume not found',
-      });
-    }
-
-    // Check if resume belongs to user
-    if (resume.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to access this resume',
-      });
-    }
 
     // Check parsing status
     if (resume.parsingStatus === 'pending' || resume.parsingStatus === 'processing') {
@@ -202,22 +174,8 @@ export const getResumeRawText = async (req, res) => {
  */
 export const getResumeParsedData = async (req, res) => {
   try {
+    // Resume ownership already verified by middleware
     const resume = await Resume.findById(req.params.id);
-
-    if (!resume) {
-      return res.status(404).json({
-        success: false,
-        message: 'Resume not found',
-      });
-    }
-
-    // Check if resume belongs to user
-    if (resume.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to access this resume',
-      });
-    }
 
     // Check parsing status
     if (resume.parsingStatus === 'pending' || resume.parsingStatus === 'processing') {
@@ -274,24 +232,10 @@ export const getResumeParsedData = async (req, res) => {
  */
 export const getParsingStatus = async (req, res) => {
   try {
+    // Resume ownership already verified by middleware
     const resume = await Resume.findById(req.params.id).select(
-      'originalName parsingStatus parsingError parsingStartedAt parsingCompletedAt wordCount user'
+      'originalName parsingStatus parsingError parsingStartedAt parsingCompletedAt wordCount'
     );
-
-    if (!resume) {
-      return res.status(404).json({
-        success: false,
-        message: 'Resume not found',
-      });
-    }
-
-    // Check if resume belongs to user
-    if (resume.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to access this resume',
-      });
-    }
 
     // Calculate duration if available
     let duration = null;

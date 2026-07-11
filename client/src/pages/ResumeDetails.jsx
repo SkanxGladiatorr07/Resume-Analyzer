@@ -53,8 +53,8 @@ export const ResumeDetails = () => {
 
         if (status === 202) {
           // Parsing still in progress
-          setParsingStatus('pending');
-          setError('Resume is still being parsed. Please wait a moment and refresh the page.');
+          setParsingStatus(message.includes('processing') ? 'processing' : 'pending');
+          setError(message || 'Resume is still being parsed. Please wait and refresh the page.');
         } else if (status === 422) {
           // Parsing failed
           setParsingStatus('failed');

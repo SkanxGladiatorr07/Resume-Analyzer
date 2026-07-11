@@ -6,6 +6,8 @@
 import Resume from '../models/Resume.js';
 import * as resumeParserService from './resumeParserService.js';
 import * as resumeStructuredParser from './resumeStructuredParser.js';
+import { validateStructuredData } from '../utils/dataValidator.js';
+import { calculateConfidence } from '../utils/parserUtils.js';
 
 /**
  * Start parsing process for a resume
@@ -71,13 +73,17 @@ export const startParsing = async (resumeId) => {
 
     // Step 5: Parse structured data
     console.log(`  ↳ Parsing structured data...`);
-    const structuredData = resumeStructuredParser.parseStructuredData(extractedText);
+    const rawStructuredData = resumeStructuredParser.parseStructuredData(extractedText);
 
-    // Step 6: Validate structured data
-    const isStructuredValid = resumeStructuredParser.validateStructuredData(structuredData);
-    console.log(`  ↳ Structured data valid: ${isStructuredValid}`);
+    // Step 6: Validate and sanitize structured data
+    console.log(`  ↳ Validating structured data...`);
+    const structuredData = validateStructuredData(rawStructuredData);
+    
+    // Step 7: Calculate confidence score
+    const confidenceScore = calculateConfidence(structuredData);
+    console.log(`  ↳ Confidence score: ${confidenceScore}%`);
 
-    // Step 7: Update resume with all parsed data
+    // Step 8: Update resume with all parsed data
     resume.extractedText = extractedText;
     resume.wordCount = wordCount;
     resume.structuredData = structuredData;
@@ -89,14 +95,14 @@ export const startParsing = async (resumeId) => {
     const duration = resume.parsingCompletedAt - resume.parsingStartedAt;
     console.log(`✅ Successfully parsed resume: ${resume.originalName}`);
     console.log(`   • Words: ${wordCount}`);
-    console.log(`   • Structured: ${isStructuredValid ? 'Yes' : 'Partial'}`);
+    console.log(`   • Confidence: ${confidenceScore}%`);
     console.log(`   • Duration: ${duration}ms`);
 
     return {
       success: true,
       resumeId: resume._id,
       wordCount,
-      structuredDataValid: isStructuredValid,
+      confidenceScore,
     };
 
   } catch (error) {

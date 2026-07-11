@@ -5,8 +5,10 @@ import {
   deleteResume,
   getResumeRawText,
   getResumeParsedData,
+  getParsingStatus,
 } from '../controllers/resumeController.js';
 import { authenticate } from '../middleware/auth.js';
+import { validateResumeId, checkResumeOwnership } from '../middleware/resumeAuth.js';
 import upload from '../config/multer.js';
 
 const router = express.Router();
@@ -33,20 +35,27 @@ router.get('/', getResumes);
  * @desc    Delete a resume
  * @access  Private
  */
-router.delete('/:id', deleteResume);
+router.delete('/:id', validateResumeId, checkResumeOwnership, deleteResume);
 
 /**
  * @route   GET /api/resumes/:id/raw-text
  * @desc    Get extracted text from a resume
  * @access  Private
  */
-router.get('/:id/raw-text', getResumeRawText);
+router.get('/:id/raw-text', validateResumeId, checkResumeOwnership, getResumeRawText);
 
 /**
  * @route   GET /api/resumes/:id/parsed
  * @desc    Get structured parsed data from a resume
  * @access  Private
  */
-router.get('/:id/parsed', getResumeParsedData);
+router.get('/:id/parsed', validateResumeId, checkResumeOwnership, getResumeParsedData);
+
+/**
+ * @route   GET /api/resumes/:id/status
+ * @desc    Get parsing status of a resume
+ * @access  Private
+ */
+router.get('/:id/status', validateResumeId, checkResumeOwnership, getParsingStatus);
 
 export default router;

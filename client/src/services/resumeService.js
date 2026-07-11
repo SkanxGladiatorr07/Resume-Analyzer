@@ -63,6 +63,16 @@ export const getResumeParsedData = async (resumeId) => {
 };
 
 /**
+ * Get parsing status of a resume
+ * @param {string} resumeId - The ID of the resume
+ * @returns {Promise} API response with parsing status
+ */
+export const getParsingStatus = async (resumeId) => {
+  const response = await apiClient.get(`/resumes/${resumeId}/status`);
+  return response.data;
+};
+
+/**
  * Format file size to human-readable format
  * @param {number} bytes - File size in bytes
  * @returns {string} Formatted file size
