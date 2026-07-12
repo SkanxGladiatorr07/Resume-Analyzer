@@ -26,6 +26,13 @@ const config = {
     secret: process.env.JWT_SECRET || 'your-secret-key',
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   },
+
+  // AI Configuration
+  ai: {
+    geminiApiKey: process.env.GEMINI_API_KEY,
+    model: 'gemini-1.5-flash', // Fast and efficient model
+    maxRetries: 1,
+  },
 };
 
 // Validate required environment variables
@@ -36,6 +43,11 @@ const validateConfig = () => {
   if (missing.length > 0 && process.env.NODE_ENV === 'production') {
     console.warn(`⚠️  Missing environment variables: ${missing.join(', ')}`);
     console.warn('Using default values for development');
+  }
+
+  // Warn if Gemini API key is missing
+  if (!process.env.GEMINI_API_KEY) {
+    console.warn('⚠️  GEMINI_API_KEY not set. AI features will not work.');
   }
 };
 

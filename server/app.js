@@ -4,6 +4,7 @@ import multer from 'multer';
 import config from './config/index.js';
 import authRoutes from './routes/authRoutes.js';
 import resumeRoutes from './routes/resumeRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.get('/api/health', (req, res) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/resumes', resumeRoutes);
+app.use('/api/ai', aiRoutes);
 
 // 404 Handler
 app.use((req, res) => {
