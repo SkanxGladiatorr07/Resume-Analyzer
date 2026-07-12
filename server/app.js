@@ -5,6 +5,7 @@ import config from './config/index.js';
 import authRoutes from './routes/authRoutes.js';
 import resumeRoutes from './routes/resumeRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import analysisRoutes from './routes/analysisRoutes.js';
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/resumes', resumeRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/analysis', analysisRoutes);
 
 // 404 Handler
 app.use((req, res) => {
