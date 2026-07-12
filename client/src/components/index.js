@@ -29,3 +29,7 @@ export { default as PublicRoute } from './PublicRoute';
 
 // Parsed Section Components
 export * from './ParsedSection';
+
+// Analysis Components
+export { default as ATSScoreCard } from './ATSScoreCard';
+export { default as AnalysisSection } from './AnalysisSection';

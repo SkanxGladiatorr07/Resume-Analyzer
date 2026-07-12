@@ -7,6 +7,7 @@ import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import Upload from './pages/Upload'
 import { ResumeDetails } from './pages/ResumeDetails'
+import Analysis from './pages/Analysis'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import NotFound from './pages/NotFound'
@@ -55,6 +56,18 @@ function App() {
             }
           >
             <Route index element={<ResumeDetails />} />
+          </Route>
+
+          {/* Analysis page - protected route with main layout */}
+          <Route
+            path="/analysis/:id"
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Analysis />} />
           </Route>
 
           {/* Auth routes (redirect if already logged in) */}

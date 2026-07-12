@@ -166,28 +166,30 @@ export const ResumeCard = ({ resume, onDelete, onViewDetails, isDeleting = false
             </Button>
           )}
 
-          {/* Analyze Button (Coming Soon) */}
-          <Button
-            variant="primary"
-            size="small"
-            disabled
-            title="Coming Soon"
-          >
-            <svg
-              className="h-4 w-4 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          {/* Analyze Button */}
+          {resume.parsingStatus === 'completed' && (
+            <Button
+              variant="primary"
+              size="small"
+              onClick={() => window.location.href = `/analysis/${resume._id}`}
+              title="View AI Analysis"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-              />
-            </svg>
-            Analyze
-          </Button>
+              <svg
+                className="h-4 w-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
+              </svg>
+              Analyze
+            </Button>
+          )}
 
           {/* Delete Button */}
           <Button
