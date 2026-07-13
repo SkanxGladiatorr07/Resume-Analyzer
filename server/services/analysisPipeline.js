@@ -2,94 +2,14 @@
  * Analysis Pipeline Service
  * Orchestrates the analysis generation workflow
  * Handles automatic triggering, status tracking, and error recovery
+ * Uses aiValidator for comprehensive validation and sanitization
  */
 
 import Analysis from '../models/Analysis.js';
 import Resume from '../models/Resume.js';
 import * as geminiService from './geminiService.js';
-import * as prompts from '../prompts/resumeAnalysisPrompts.js';
-
-/**
- * Validate analysis response structure
- * @param {Object} data - Analysis data to validate
- * @returns {Object} Validation result
- */
-const validateAnalysisStructure = (data) => {
-  const errors = [];
-
-  // Check required fields
-  if (typeof data.atsScore !== 'number') {
-    errors.push('atsScore must be a number');
-  } else if (data.atsScore < 0 || data.atsScore > 100) {
-    errors.push('atsScore must be between 0 and 100');
-  }
-
-  if (typeof data.summary !== 'string' || data.summary.trim() === '') {
-    errors.push('summary must be a non-empty string');
-  }
-
-  // Check arrays
-  const arrayFields = [
-    'strengths',
-    'weaknesses',
-    'missingSkills',
-    'grammarFeedback',
-    'formattingFeedback',
-    'suggestions',
-  ];
-
-  for (const field of arrayFields) {
-    if (!Array.isArray(data[field])) {
-      errors.push(`${field} must be an array`);
-    } else {
-      const nonStrings = data[field].filter(item => typeof item !== 'string');
-      if (nonStrings.length > 0) {
-        errors.push(`${field} must contain only strings`);
-      }
-    }
-  }
-
-  return {
-    valid: errors.length === 0,
-    errors,
-  };
-};
-
-/**
- * Sanitize and normalize analysis data
- * @param {Object} data - Raw analysis data
- * @returns {Object} Sanitized data
- */
-const sanitizeAnalysisData = (data) => {
-  return {
-    atsScore: Math.round(Math.max(0, Math.min(100, Number(data.atsScore)))),
-    summary: String(data.summary || '').trim(),
-    strengths: (Array.isArray(data.strengths) ? data.strengths : [])
-      .filter(item => typeof item === 'string' && item.trim())
-      .map(item => item.trim())
-      .slice(0, 20),
-    weaknesses: (Array.isArray(data.weaknesses) ? data.weaknesses : [])
-      .filter(item => typeof item === 'string' && item.trim())
-      .map(item => item.trim())
-      .slice(0, 20),
-    missingSkills: (Array.isArray(data.missingSkills) ? data.missingSkills : [])
-      .filter(item => typeof item === 'string' && item.trim())
-      .map(item => item.trim())
-      .slice(0, 20),
-    grammarFeedback: (Array.isArray(data.grammarFeedback) ? data.grammarFeedback : [])
-      .filter(item => typeof item === 'string' && item.trim())
-      .map(item => item.trim())
-      .slice(0, 20),
-    formattingFeedback: (Array.isArray(data.formattingFeedback) ? data.formattingFeedback : [])
-      .filter(item => typeof item === 'string' && item.trim())
-      .map(item => item.trim())
-      .slice(0, 20),
-    suggestions: (Array.isArray(data.suggestions) ? data.suggestions : [])
-      .filter(item => typeof item === 'string' && item.trim())
-      .map(item => item.trim())
-      .slice(0, 20),
-  };
-};
+import { generateStructuredAnalysisPrompt } from '../prompts/index.js';
+import * as aiValidator from '../utils/aiValidator.js';
 
 /**
  * Create a pending analysis entry
@@ -192,23 +112,44 @@ const generateAnalysisAsync = async (resumeId, userId) => {
 
     // Generate prompt
     console.log(`📝 Generating analysis prompt...`);
-    const prompt = prompts.generateStructuredAnalysisPrompt(resume.structuredData);
+    const prompt = generateStructuredAnalysisPrompt(resume.structuredData);
 
     // Call Gemini AI
     console.log(`🤖 Calling Gemini AI...`);
     const aiResponse = await geminiService.generateContent(prompt, true);
 
-    // Validate response
-    console.log(`✔️  Validating AI response...`);
-    const validation = validateAnalysisStructure(aiResponse);
+    // Validate response structure
+    console.log(`✔️  Validating AI response structure...`);
+    const validation = aiValidator.validateStructuredAnalysis(aiResponse);
     
     if (!validation.valid) {
-      throw new Error(`Invalid AI response: ${validation.errors.join(', ')}`);
+      const errorMsg = `Invalid AI response structure: ${validation.errors.join(', ')}`;
+      console.error(`❌ ${errorMsg}`);
+      throw new Error(errorMsg);
+    }
+
+    // Log warnings if any
+    if (validation.warnings.length > 0) {
+      console.warn(`⚠️  Validation warnings:`, validation.warnings);
+    }
+
+    // Perform content safety check
+    console.log(`🛡️  Checking content safety...`);
+    const safetyCheck = aiValidator.checkContentSafety(aiResponse);
+    
+    if (!safetyCheck.safe) {
+      const safetyMsg = `Content safety issues detected: ${safetyCheck.issues.join(', ')}`;
+      console.error(`❌ ${safetyMsg}`);
+      throw new Error(safetyMsg);
     }
 
     // Sanitize data
     console.log(`🧹 Sanitizing analysis data...`);
-    const sanitizedData = sanitizeAnalysisData(aiResponse);
+    const sanitizedData = aiValidator.sanitizeStructuredAnalysis(aiResponse);
+
+    // Calculate confidence score
+    const confidenceScore = aiValidator.calculateAnalysisConfidence(sanitizedData);
+    console.log(`📊 Analysis confidence score: ${confidenceScore}%`);
 
     // Update analysis with results
     analysis.analysisStatus = 'completed';
@@ -220,6 +161,7 @@ const generateAnalysisAsync = async (resumeId, userId) => {
     analysis.grammarFeedback = sanitizedData.grammarFeedback;
     analysis.formattingFeedback = sanitizedData.formattingFeedback;
     analysis.suggestions = sanitizedData.suggestions;
+    analysis.confidenceScore = confidenceScore; // Store confidence score
     analysis.generatedAt = new Date();
     analysis.analysisCompletedAt = new Date();
     analysis.errorMessage = null;
@@ -227,9 +169,11 @@ const generateAnalysisAsync = async (resumeId, userId) => {
 
     await analysis.save();
 
+    const duration = analysis.analysisCompletedAt - analysis.analysisStartedAt;
     console.log(`✅ Analysis completed successfully for resume ${resumeId}`);
     console.log(`   ATS Score: ${analysis.atsScore}`);
-    console.log(`   Duration: ${analysis.analysisCompletedAt - analysis.analysisStartedAt}ms\n`);
+    console.log(`   Confidence: ${confidenceScore}%`);
+    console.log(`   Duration: ${duration}ms\n`);
 
   } catch (error) {
     console.error(`❌ Analysis generation failed for resume ${resumeId}:`, error);

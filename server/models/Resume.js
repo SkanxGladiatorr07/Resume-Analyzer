@@ -98,6 +98,20 @@ const resumeSchema = new mongoose.Schema(
         proficiency: { type: String, default: null },
       }],
     },
+    // Job Description Matching (Future Feature)
+    // Optional: User can provide a job description to match resume against
+    targetJobDescription: {
+      type: String,
+      default: null,
+    },
+    targetJobTitle: {
+      type: String,
+      default: null,
+    },
+    targetCompany: {
+      type: String,
+      default: null,
+    },
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt

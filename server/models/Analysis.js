@@ -80,6 +80,13 @@ const analysisSchema = new mongoose.Schema(
       default: [],
     },
 
+    // Confidence score (0-100) for analysis quality
+    confidenceScore: {
+      type: Number,
+      min: 0,
+      max: 100,
+    },
+
     // Error information (if failed)
     errorMessage: {
       type: String,

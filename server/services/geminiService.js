@@ -2,10 +2,12 @@
  * Gemini AI Service
  * Handles all interactions with Google Gemini API
  * Ensures clean architecture and separation of concerns
+ * Includes optimization for API usage and token management
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import config from '../config/index.js';
+import { estimateTokenCount, checkPromptSize } from '../utils/aiValidator.js';
 
 // Initialize Gemini AI
 let genAI = null;
@@ -88,6 +90,15 @@ export const generateContent = async (prompt, expectJSON = true) => {
   if (!isGeminiAvailable()) {
     throw new Error('Gemini AI is not available. API key not configured.');
   }
+
+  // Check prompt size to optimize API usage
+  const sizeCheck = checkPromptSize(prompt);
+  if (!sizeCheck.withinLimit) {
+    console.warn(`⚠️  Prompt is too large: ${sizeCheck.estimatedTokens} tokens (max: ${sizeCheck.maxTokens})`);
+    throw new Error(`Prompt exceeds token limit. Estimated: ${sizeCheck.estimatedTokens}, Max: ${sizeCheck.maxTokens}`);
+  }
+  
+  console.log(`📊 Prompt size: ~${sizeCheck.estimatedTokens} tokens (${sizeCheck.percentUsed.toFixed(1)}% of limit)`);
 
   const aiModel = initializeGemini();
   const maxRetries = config.ai.maxRetries;
