@@ -21,6 +21,8 @@ const Analysis = () => {
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState(null);
   const [cached, setCached] = useState(false);
+  const [status, setStatus] = useState(null); // pending, processing, completed, failed
+  const [pollingInterval, setPollingInterval] = useState(null);
 
   // Fetch resume details
   const fetchResume = async () => {
@@ -45,10 +47,29 @@ const Analysis = () => {
       const response = await analysisService.generateAnalysis(id, forceRegenerate);
       
       if (response.success) {
-        setAnalysis(response.data);
-        setCached(response.cached);
+        const analysisStatus = response.status || response.data?.analysisStatus;
+        setStatus(analysisStatus);
+
+        if (analysisStatus === 'completed') {
+          // Analysis is ready
+          setAnalysis(response.data);
+          setCached(response.cached || false);
+          setLoading(false);
+          setGenerating(false);
+        } else if (analysisStatus === 'processing' || analysisStatus === 'pending') {
+          // Analysis is being generated, start polling
+          setLoading(false);
+          startPolling();
+        } else if (analysisStatus === 'failed') {
+          // Analysis failed
+          setError(response.data?.errorMessage || 'Analysis generation failed');
+          setLoading(false);
+          setGenerating(false);
+        }
       } else {
         setError(response.message || 'Failed to generate analysis');
+        setLoading(false);
+        setGenerating(false);
       }
     } catch (err) {
       console.error('Error fetching analysis:', err);
@@ -69,11 +90,63 @@ const Analysis = () => {
       } else {
         setError('Network error. Please check your connection and try again.');
       }
-    } finally {
+      
       setLoading(false);
       setGenerating(false);
     }
   };
+
+  // Start polling for analysis status
+  const startPolling = () => {
+    // Clear any existing interval
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
+    }
+
+    console.log('🔄 Starting analysis status polling...');
+
+    const interval = setInterval(async () => {
+      try {
+        const response = await analysisService.getAnalysis(id);
+        const analysisStatus = response.status || response.data?.analysisStatus;
+        
+        console.log(`📊 Analysis status: ${analysisStatus}`);
+        setStatus(analysisStatus);
+
+        if (analysisStatus === 'completed') {
+          // Analysis completed
+          console.log('✅ Analysis completed');
+          setAnalysis(response.data);
+          setCached(false);
+          setGenerating(false);
+          clearInterval(interval);
+          setPollingInterval(null);
+        } else if (analysisStatus === 'failed') {
+          // Analysis failed
+          console.error('❌ Analysis failed');
+          setError(response.data?.errorMessage || 'Analysis generation failed');
+          setGenerating(false);
+          clearInterval(interval);
+          setPollingInterval(null);
+        }
+        // Keep polling if still processing or pending
+      } catch (err) {
+        console.error('Polling error:', err);
+        // Don't stop polling on error, might be temporary
+      }
+    }, 2000); // Poll every 2 seconds
+
+    setPollingInterval(interval);
+  };
+
+  // Stop polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingInterval) {
+        clearInterval(pollingInterval);
+      }
+    };
+  }, [pollingInterval]);
 
   // Handle regenerate
   const handleRegenerate = () => {
@@ -92,16 +165,33 @@ const Analysis = () => {
   }, [id]);
 
   // Loading state
-  if (loading && !generating) {
+  if (loading && !generating && !analysis) {
     return (
       <div className="analysis-page">
         <div className="loading-container">
           <LoadingSpinner />
           <p className="loading-text">
-            {generating ? 'Generating AI analysis...' : 'Loading analysis...'}
+            Loading analysis...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Processing state (analysis being generated)
+  if (status === 'processing' || status === 'pending' || generating) {
+    return (
+      <div className="analysis-page">
+        <div className="loading-container">
+          <LoadingSpinner />
+          <p className="loading-text">
+            {status === 'pending' ? 'Analysis queued for generation...' : 'Generating AI analysis...'}
           </p>
           <p className="loading-subtext">
-            {generating && 'This may take 5-10 seconds'}
+            This may take 5-10 seconds. Please wait...
+          </p>
+          <p className="loading-hint">
+            💡 Analysis will automatically appear when ready
           </p>
         </div>
       </div>
@@ -122,6 +212,24 @@ const Analysis = () => {
             <button onClick={() => fetchAnalysis()} className="btn btn-primary">
               Try Again
             </button>
+            {status === 'failed' && (
+              <button 
+                onClick={async () => {
+                  try {
+                    setError(null);
+                    setGenerating(true);
+                    await analysisService.retryAnalysis(id);
+                    startPolling();
+                  } catch (err) {
+                    setError(err.response?.data?.message || 'Failed to retry analysis');
+                    setGenerating(false);
+                  }
+                }} 
+                className="btn btn-secondary"
+              >
+                🔄 Retry Failed Analysis
+              </button>
+            )}
             <button onClick={handleBack} className="btn btn-secondary">
               Back to Dashboard
             </button>
@@ -176,11 +284,11 @@ const Analysis = () => {
       </div>
 
       {/* Generating overlay */}
-      {generating && (
+      {generating && analysis && (
         <div className="generating-overlay">
           <div className="generating-content">
             <LoadingSpinner />
-            <p className="generating-text">Generating fresh analysis...</p>
+            <p className="generating-text">Regenerating analysis...</p>
             <p className="generating-subtext">This may take 5-10 seconds</p>
           </div>
         </div>
