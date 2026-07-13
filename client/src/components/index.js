@@ -33,3 +33,7 @@ export * from './ParsedSection';
 // Analysis Components
 export { default as ATSScoreCard } from './ATSScoreCard';
 export { default as AnalysisSection } from './AnalysisSection';
+
+// Job Match Components
+export { default as MatchScoreCard } from './MatchScoreCard';
+export { default as MatchSection } from './MatchSection';

@@ -8,6 +8,16 @@ import healthService from './healthService';
 import authService from './authService';
 import * as resumeService from './resumeService';
 import analysisService from './analysisService';
+import * as jobDescriptionService from './jobDescriptionService';
+import * as jobMatchService from './jobMatchService';
 
 // Export individual services
-export { apiClient, healthService, authService, resumeService, analysisService };
+export { 
+  apiClient, 
+  healthService, 
+  authService, 
+  resumeService, 
+  analysisService,
+  jobDescriptionService,
+  jobMatchService
+};

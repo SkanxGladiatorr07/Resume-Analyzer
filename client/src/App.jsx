@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard'
 import Upload from './pages/Upload'
 import { ResumeDetails } from './pages/ResumeDetails'
 import Analysis from './pages/Analysis'
+import JobMatch from './pages/JobMatch'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import NotFound from './pages/NotFound'
@@ -68,6 +69,18 @@ function App() {
             }
           >
             <Route index element={<Analysis />} />
+          </Route>
+
+          {/* Job Match page - protected route with main layout */}
+          <Route
+            path="/job-match"
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<JobMatch />} />
           </Route>
 
           {/* Auth routes (redirect if already logged in) */}
