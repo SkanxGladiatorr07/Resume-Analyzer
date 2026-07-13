@@ -3,7 +3,8 @@
  * Handles HTTP requests for resume analysis
  */
 
-import * as analysisService from '../services/analysisService.js';
+import * as analysisPipeline from '../services/analysisPipeline.js';
+import Analysis from '../models/Analysis.js';
 
 /**
  * @desc    Generate or retrieve analysis for a resume
@@ -19,35 +20,128 @@ export const generateAnalysis = async (req, res) => {
 
     console.log(`📊 Analysis request for resume: ${resumeId}, force: ${forceRegenerate}`);
 
-    // Generate or retrieve analysis
-    const result = await analysisService.generateAnalysis(
-      resumeId,
-      userId,
-      forceRegenerate
-    );
+    // Check if analysis exists
+    const existingAnalysis = await Analysis.findByResumeId(resumeId);
 
-    // Determine status code
-    const statusCode = result.cached && !forceRegenerate ? 200 : 201;
+    if (forceRegenerate) {
+      // Force regeneration
+      if (!existingAnalysis) {
+        // Create and trigger
+        await analysisPipeline.createPendingAnalysis(resumeId, userId);
+        await analysisPipeline.triggerAnalysisGeneration(resumeId, userId);
+        
+        const analysis = await Analysis.findByResumeId(resumeId);
+        
+        return res.status(202).json({
+          success: true,
+          status: 'processing',
+          message: 'Analysis generation started',
+          data: {
+            analysisId: analysis._id,
+            resumeId: analysis.resume,
+            analysisStatus: analysis.analysisStatus,
+          },
+        });
+      }
 
-    res.status(statusCode).json({
-      success: true,
-      cached: result.cached,
-      message: result.message,
-      data: {
-        analysisId: result.analysis._id,
-        resumeId: result.analysis.resume,
-        atsScore: result.analysis.atsScore,
-        summary: result.analysis.summary,
-        strengths: result.analysis.strengths,
-        weaknesses: result.analysis.weaknesses,
-        missingSkills: result.analysis.missingSkills,
-        grammarFeedback: result.analysis.grammarFeedback,
-        formattingFeedback: result.analysis.formattingFeedback,
-        suggestions: result.analysis.suggestions,
-        generatedAt: result.analysis.generatedAt,
-        aiModel: result.analysis.aiModel,
-      },
-    });
+      // Regenerate existing
+      const analysis = await analysisPipeline.regenerateAnalysis(resumeId, userId);
+      
+      return res.status(202).json({
+        success: true,
+        status: 'processing',
+        message: 'Analysis regeneration started',
+        data: {
+          analysisId: analysis._id,
+          resumeId: analysis.resume,
+          analysisStatus: analysis.analysisStatus,
+        },
+      });
+    }
+
+    // Not forcing regeneration
+    if (!existingAnalysis) {
+      // No analysis exists, create and trigger
+      await analysisPipeline.createPendingAnalysis(resumeId, userId);
+      await analysisPipeline.triggerAnalysisGeneration(resumeId, userId);
+      
+      const analysis = await Analysis.findByResumeId(resumeId);
+      
+      return res.status(202).json({
+        success: true,
+        status: 'processing',
+        message: 'Analysis generation started',
+        data: {
+          analysisId: analysis._id,
+          resumeId: analysis.resume,
+          analysisStatus: analysis.analysisStatus,
+        },
+      });
+    }
+
+    // Analysis exists, return based on status
+    if (existingAnalysis.analysisStatus === 'completed') {
+      // Return completed analysis
+      return res.status(200).json({
+        success: true,
+        status: 'completed',
+        cached: true,
+        message: 'Using existing analysis. Use force=true to regenerate.',
+        data: {
+          analysisId: existingAnalysis._id,
+          resumeId: existingAnalysis.resume,
+          analysisStatus: existingAnalysis.analysisStatus,
+          atsScore: existingAnalysis.atsScore,
+          summary: existingAnalysis.summary,
+          strengths: existingAnalysis.strengths,
+          weaknesses: existingAnalysis.weaknesses,
+          missingSkills: existingAnalysis.missingSkills,
+          grammarFeedback: existingAnalysis.grammarFeedback,
+          formattingFeedback: existingAnalysis.formattingFeedback,
+          suggestions: existingAnalysis.suggestions,
+          generatedAt: existingAnalysis.generatedAt,
+          aiModel: existingAnalysis.aiModel,
+        },
+      });
+    } else if (existingAnalysis.analysisStatus === 'processing') {
+      // Still processing
+      return res.status(202).json({
+        success: true,
+        status: 'processing',
+        message: 'Analysis is currently being generated',
+        data: {
+          analysisId: existingAnalysis._id,
+          resumeId: existingAnalysis.resume,
+          analysisStatus: existingAnalysis.analysisStatus,
+          analysisStartedAt: existingAnalysis.analysisStartedAt,
+        },
+      });
+    } else if (existingAnalysis.analysisStatus === 'failed') {
+      // Failed, offer retry
+      return res.status(500).json({
+        success: false,
+        status: 'failed',
+        message: 'Analysis generation failed. Use force=true to retry.',
+        data: {
+          analysisId: existingAnalysis._id,
+          resumeId: existingAnalysis.resume,
+          analysisStatus: existingAnalysis.analysisStatus,
+          errorMessage: existingAnalysis.errorMessage,
+        },
+      });
+    } else {
+      // Pending
+      return res.status(202).json({
+        success: true,
+        status: 'pending',
+        message: 'Analysis is queued for generation',
+        data: {
+          analysisId: existingAnalysis._id,
+          resumeId: existingAnalysis.resume,
+          analysisStatus: existingAnalysis.analysisStatus,
+        },
+      });
+    }
   } catch (error) {
     console.error('Analysis generation error:', error);
 
@@ -70,9 +164,6 @@ export const generateAnalysis = async (req, res) => {
     } else if (error.message.includes('AI service is not available')) {
       statusCode = 503;
       message = error.message;
-    } else if (error.message.includes('Invalid AI response')) {
-      statusCode = 500;
-      message = 'AI service returned invalid data. Please try again.';
     }
 
     res.status(statusCode).json({
@@ -91,22 +182,23 @@ export const generateAnalysis = async (req, res) => {
 export const getAnalysis = async (req, res) => {
   try {
     const { resumeId } = req.params;
-    const userId = req.user.id;
 
-    const analysis = await analysisService.getAnalysis(resumeId, userId);
+    const analysis = await Analysis.findByResumeId(resumeId);
 
     if (!analysis) {
       return res.status(404).json({
         success: false,
-        message: 'No analysis found for this resume. Generate one first.',
+        message: 'No analysis found for this resume',
       });
     }
 
     res.status(200).json({
       success: true,
+      status: analysis.analysisStatus,
       data: {
         analysisId: analysis._id,
         resumeId: analysis.resume,
+        analysisStatus: analysis.analysisStatus,
         atsScore: analysis.atsScore,
         summary: analysis.summary,
         strengths: analysis.strengths,
@@ -117,6 +209,7 @@ export const getAnalysis = async (req, res) => {
         suggestions: analysis.suggestions,
         generatedAt: analysis.generatedAt,
         aiModel: analysis.aiModel,
+        errorMessage: analysis.errorMessage,
         isStale: analysis.isStale(),
       },
     });
@@ -150,9 +243,17 @@ export const getAnalysis = async (req, res) => {
 export const deleteAnalysis = async (req, res) => {
   try {
     const { resumeId } = req.params;
-    const userId = req.user.id;
 
-    await analysisService.deleteAnalysis(resumeId, userId);
+    const analysis = await Analysis.findByResumeId(resumeId);
+    
+    if (!analysis) {
+      return res.status(404).json({
+        success: false,
+        message: 'Analysis not found',
+      });
+    }
+
+    await Analysis.deleteOne({ _id: analysis._id });
 
     res.status(200).json({
       success: true,
@@ -189,11 +290,12 @@ export const checkAnalysisExists = async (req, res) => {
   try {
     const { resumeId } = req.params;
 
-    const exists = await analysisService.analysisExists(resumeId);
+    const analysis = await Analysis.findByResumeId(resumeId);
 
     res.status(200).json({
       success: true,
-      exists,
+      exists: !!analysis,
+      status: analysis?.analysisStatus || null,
     });
   } catch (error) {
     console.error('Check analysis existence error:', error);
@@ -201,6 +303,65 @@ export const checkAnalysisExists = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to check analysis existence',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  }
+};
+
+/**
+ * @desc    Get analysis status
+ * @route   GET /api/analysis/:resumeId/status
+ * @access  Private
+ */
+export const getAnalysisStatus = async (req, res) => {
+  try {
+    const { resumeId } = req.params;
+
+    const status = await analysisPipeline.getAnalysisStatus(resumeId);
+
+    res.status(200).json({
+      success: true,
+      ...status,
+    });
+  } catch (error) {
+    console.error('Get analysis status error:', error);
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get analysis status',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  }
+};
+
+/**
+ * @desc    Retry failed analysis
+ * @route   POST /api/analysis/:resumeId/retry
+ * @access  Private
+ */
+export const retryAnalysis = async (req, res) => {
+  try {
+    const { resumeId } = req.params;
+    const userId = req.user.id;
+
+    const analysis = await analysisPipeline.retryFailedAnalysis(resumeId, userId);
+
+    res.status(202).json({
+      success: true,
+      status: 'processing',
+      message: 'Analysis retry started',
+      data: {
+        analysisId: analysis._id,
+        resumeId: analysis.resume,
+        analysisStatus: analysis.analysisStatus,
+      },
+    });
+  } catch (error) {
+    console.error('Retry analysis error:', error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to retry analysis',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined,
     });
   }

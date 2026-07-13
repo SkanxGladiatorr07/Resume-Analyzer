@@ -9,6 +9,8 @@ import {
   getAnalysis,
   deleteAnalysis,
   checkAnalysisExists,
+  getAnalysisStatus,
+  retryAnalysis,
 } from '../controllers/analysisController.js';
 import { authenticate } from '../middleware/auth.js';
 import { validateResumeId, checkResumeOwnership } from '../middleware/resumeAuth.js';
@@ -51,5 +53,21 @@ router.delete('/:resumeId', validateResumeId, checkResumeOwnership, deleteAnalys
  * @example GET /api/analysis/668f7a1b2c3d4e5f6a7b8c9d/exists
  */
 router.get('/:resumeId/exists', validateResumeId, checkResumeOwnership, checkAnalysisExists);
+
+/**
+ * @route   GET /api/analysis/:resumeId/status
+ * @desc    Get analysis status
+ * @access  Private
+ * @example GET /api/analysis/668f7a1b2c3d4e5f6a7b8c9d/status
+ */
+router.get('/:resumeId/status', validateResumeId, checkResumeOwnership, getAnalysisStatus);
+
+/**
+ * @route   POST /api/analysis/:resumeId/retry
+ * @desc    Retry failed analysis
+ * @access  Private
+ * @example POST /api/analysis/668f7a1b2c3d4e5f6a7b8c9d/retry
+ */
+router.post('/:resumeId/retry', validateResumeId, checkResumeOwnership, retryAnalysis);
 
 export default router;

@@ -8,6 +8,7 @@ import * as resumeParserService from './resumeParserService.js';
 import * as resumeStructuredParser from './resumeStructuredParser.js';
 import { validateStructuredData } from '../utils/dataValidator.js';
 import { calculateConfidence } from '../utils/parserUtils.js';
+import * as analysisPipeline from './analysisPipeline.js';
 
 /**
  * Start parsing process for a resume
@@ -97,6 +98,17 @@ export const startParsing = async (resumeId) => {
     console.log(`   • Words: ${wordCount}`);
     console.log(`   • Confidence: ${confidenceScore}%`);
     console.log(`   • Duration: ${duration}ms`);
+
+    // Step 9: Trigger AI analysis generation (async, non-blocking)
+    console.log(`🚀 Triggering AI analysis generation...`);
+    try {
+      await analysisPipeline.createPendingAnalysis(resume._id, resume.user);
+      analysisPipeline.triggerAnalysisGeneration(resume._id, resume.user);
+      console.log(`   ✓ Analysis generation triggered`);
+    } catch (analysisError) {
+      console.error(`   ⚠️  Failed to trigger analysis:`, analysisError.message);
+      // Don't fail the parsing if analysis triggering fails
+    }
 
     return {
       success: true,

@@ -23,10 +23,17 @@ const analysisSchema = new mongoose.Schema(
       index: true,
     },
 
+    // Analysis Status
+    analysisStatus: {
+      type: String,
+      enum: ['pending', 'processing', 'completed', 'failed'],
+      default: 'pending',
+      index: true,
+    },
+
     // ATS Score (0-100)
     atsScore: {
       type: Number,
-      required: true,
       min: 0,
       max: 100,
     },
@@ -34,7 +41,6 @@ const analysisSchema = new mongoose.Schema(
     // Overall summary
     summary: {
       type: String,
-      required: true,
       trim: true,
     },
 
@@ -74,6 +80,20 @@ const analysisSchema = new mongoose.Schema(
       default: [],
     },
 
+    // Error information (if failed)
+    errorMessage: {
+      type: String,
+    },
+
+    errorDetails: {
+      type: String,
+    },
+
+    retryCount: {
+      type: Number,
+      default: 0,
+    },
+
     // Metadata
     analysisVersion: {
       type: String,
@@ -89,7 +109,16 @@ const analysisSchema = new mongoose.Schema(
     // Generation timestamp
     generatedAt: {
       type: Date,
-      default: Date.now,
+    },
+
+    // Analysis started timestamp
+    analysisStartedAt: {
+      type: Date,
+    },
+
+    // Analysis completed timestamp
+    analysisCompletedAt: {
+      type: Date,
     },
 
     // Whether this was a forced regeneration
@@ -106,8 +135,12 @@ const analysisSchema = new mongoose.Schema(
 // Compound index for efficient queries
 analysisSchema.index({ resume: 1, user: 1 });
 
-// Ensure only one analysis per resume (unless regenerating)
-analysisSchema.index({ resume: 1 }, { unique: true });
+// Index on status for filtering
+analysisSchema.index({ analysisStatus: 1 });
+
+// Ensure only one analysis per resume
+// NOTE: We can't use unique index here because we need to create pending entries
+// Instead, we handle uniqueness in the application logic
 
 // Virtual for age of analysis
 analysisSchema.virtual('analysisAge').get(function () {
@@ -116,8 +149,19 @@ analysisSchema.virtual('analysisAge').get(function () {
 
 // Method to check if analysis is stale (older than 30 days)
 analysisSchema.methods.isStale = function () {
+  if (!this.generatedAt) return true;
   const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
   return this.analysisAge > thirtyDaysInMs;
+};
+
+// Method to check if analysis is in progress
+analysisSchema.methods.isInProgress = function () {
+  return this.analysisStatus === 'processing';
+};
+
+// Method to check if analysis can be regenerated
+analysisSchema.methods.canRegenerate = function () {
+  return ['completed', 'failed'].includes(this.analysisStatus);
 };
 
 // Static method to find analysis by resume ID
