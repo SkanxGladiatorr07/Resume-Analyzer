@@ -7,6 +7,7 @@ import resumeRoutes from './routes/resumeRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import analysisRoutes from './routes/analysisRoutes.js';
 import jobDescriptionRoutes from './routes/jobDescriptionRoutes.js';
+import jobMatchRoutes from './routes/jobMatchRoutes.js';
 
 const app = express();
 
@@ -48,6 +49,7 @@ app.use('/api/resumes', resumeRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/analysis', analysisRoutes);
 app.use('/api/job-descriptions', jobDescriptionRoutes);
+app.use('/api/job-match', jobMatchRoutes);
 
 // 404 Handler
 app.use((req, res) => {

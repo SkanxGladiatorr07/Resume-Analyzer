@@ -24,13 +24,11 @@
 
 // PRIMARY PROMPTS (Currently Active)
 export { generateStructuredAnalysisPrompt } from './structuredAnalysis.js';
+export { generateJobMatchPrompt } from './jobDescriptionMatch.js'; // NEW: Job matching active
 
 // FUTURE FEATURE PROMPTS (Prepared but Not Yet Used)
 export { generateATSOptimizationPrompt } from './atsOptimization.js';
-export { 
-  generateJobMatchPrompt,
-  generateKeywordExtractionPrompt 
-} from './jobDescriptionMatch.js';
+export { generateKeywordExtractionPrompt } from './jobDescriptionMatch.js';
 export { generateSkillGapPrompt } from './skillGapAnalysis.js';
 export { generateImprovementPrompt } from './improvementSuggestions.js';
 

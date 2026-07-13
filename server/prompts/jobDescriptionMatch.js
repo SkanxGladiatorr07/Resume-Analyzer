@@ -8,114 +8,127 @@
  * 
  * DESIGN DECISIONS:
  * 1. Match score calculation (0-100) based on skills, experience, and keywords
- * 2. Side-by-side comparison of requirements vs. qualifications
- * 3. Gap analysis - what's missing from the resume
- * 4. Tailoring suggestions - specific changes to improve match
- * 5. Keyword mapping - which job keywords are present/missing
+ * 2. Skill categorization - matching vs. missing (technical and soft)
+ * 3. Keyword analysis - present and missing keywords
+ * 4. Strengths identification - what makes the candidate stand out
+ * 5. Actionable recommendations - specific improvements
+ * 6. ATS optimization tips - how to pass ATS for this specific job
  * 
  * USAGE:
- * NOT YET IMPLEMENTED - prepared for future feature.
- * Will be used when user provides a job description along with their resume.
- * This is the next major feature after basic analysis.
- * 
- * IMPLEMENTATION NOTES:
- * - Job description will be stored in Resume model (new field: jobDescription)
- * - New endpoint: POST /api/analysis/:resumeId/job-match
- * - Frontend will have "Match with Job" button
- * - Results will show match percentage and tailoring suggestions
+ * ACTIVE - Used in job match endpoint
+ * Called when user compares resume with job description
+ * Endpoint: POST /api/job-match/:resumeId/:jobDescriptionId
  * 
  * OUTPUT STRUCTURE:
  * {
  *   "matchScore": number (0-100),
- *   "matchedRequirements": string[],
- *   "missingRequirements": string[],
- *   "matchedSkills": string[],
- *   "missingSkills": string[],
- *   "keywordMapping": { jobKeyword: resumeKeyword },
- *   "experienceMatch": { score, analysis },
- *   "tailoringSuggestions": string[],
- *   "priorityChanges": Array<{ change, impact, priority }>
+ *   "summary": string (2-3 sentences),
+ *   "matchingSkills": string[],
+ *   "missingTechnicalSkills": string[],
+ *   "missingSoftSkills": string[],
+ *   "missingKeywords": string[],
+ *   "strengths": string[],
+ *   "recommendations": string[],
+ *   "atsOptimizationTips": string[]
  * }
  */
 
 /**
  * Generate prompt for job description matching
- * @param {Object} resumeData - Parsed resume data
+ * @param {Object} resumeData - Parsed resume data (structuredData)
  * @param {string} jobDescription - Job description text
+ * @param {string} jobTitle - Job title
  * @returns {string} Formatted prompt for job matching analysis
  */
-export const generateJobMatchPrompt = (resumeData, jobDescription) => {
-  return `You are a resume-to-job matching expert. Compare this resume against the provided job description.
+export const generateJobMatchPrompt = (resumeData, jobDescription, jobTitle = '') => {
+  return `You are a resume-to-job matching expert and ATS specialist. Compare this resume against the provided job description and provide a comprehensive match analysis.
 
 RESUME DATA:
 ${JSON.stringify(resumeData, null, 2)}
 
 JOB DESCRIPTION:
-${jobDescription}
+Title: ${jobTitle || 'Not specified'}
+Description: ${jobDescription}
 
 ANALYSIS REQUIREMENTS:
-1. Calculate match score (0-100) based on:
-   - Skills alignment
+
+1. Calculate a match score (0-100) based on:
+   - Technical skills alignment
+   - Soft skills presence
    - Experience relevance
-   - Keyword presence
+   - Keyword matching
    - Qualification match
-   - Domain expertise
+   - Overall fit for the role
 
-2. Identify matched requirements (what the resume already covers).
+2. Provide a concise summary (2-3 sentences) of the overall match quality and candidate fit.
 
-3. Identify missing requirements (what the job needs but resume lacks).
+3. Identify matching skills - skills from the resume that align with job requirements.
 
-4. Compare skills - which are present, which are missing.
+4. Identify missing technical skills - technical skills required by the job but not present in the resume.
 
-5. Map keywords - show which job keywords are in the resume.
+5. Identify missing soft skills - soft skills mentioned in the job description but not evident in the resume.
 
-6. Evaluate experience match - does background fit the role level and type.
+6. Identify missing keywords - important keywords from the job description that should be added to the resume.
 
-7. Provide tailoring suggestions - specific changes to improve match.
+7. Highlight strengths - specific aspects where the candidate excels or stands out for this role.
 
-8. Prioritize changes by impact - which edits will improve score most.
+8. Provide actionable recommendations - specific changes to improve the match score.
 
-RESPONSE FORMAT:
-Return VALID JSON ONLY:
+9. Give ATS optimization tips - how to tailor the resume to pass ATS for this specific job.
+
+CRITICAL: You MUST respond with ONLY valid JSON in this EXACT structure:
 
 {
-  "matchScore": <number 0-100>,
-  "matchedRequirements": [
-    "<requirement from job that resume satisfies>"
+  "matchScore": <number between 0-100>,
+  "summary": "<2-3 sentence summary of match quality>",
+  "matchingSkills": [
+    "<skill that matches job requirement 1>",
+    "<skill that matches job requirement 2>",
+    "<skill that matches job requirement 3>"
   ],
-  "missingRequirements": [
-    "<requirement from job that resume lacks>"
+  "missingTechnicalSkills": [
+    "<missing technical skill 1>",
+    "<missing technical skill 2>"
   ],
-  "matchedSkills": [
-    "<skill present in both job and resume>"
+  "missingSoftSkills": [
+    "<missing soft skill 1>",
+    "<missing soft skill 2>"
   ],
-  "missingSkills": [
-    "<skill in job description but not in resume>"
+  "missingKeywords": [
+    "<missing keyword 1>",
+    "<missing keyword 2>"
   ],
-  "keywordMapping": {
-    "<job keyword>": "<corresponding resume keyword or null>"
-  },
-  "experienceMatch": {
-    "score": <number 0-100>,
-    "jobLevel": "<entry|mid|senior>",
-    "resumeLevel": "<entry|mid|senior>",
-    "analysis": "<brief explanation of experience match>"
-  },
-  "tailoringSuggestions": [
-    "<specific suggestion to improve match>"
+  "strengths": [
+    "<strength 1>",
+    "<strength 2>",
+    "<strength 3>"
   ],
-  "priorityChanges": [
-    {
-      "change": "<what to change>",
-      "impact": "<expected score improvement>",
-      "priority": "<high|medium|low>",
-      "section": "<which resume section to modify>"
-    }
+  "recommendations": [
+    "<actionable recommendation 1>",
+    "<actionable recommendation 2>",
+    "<actionable recommendation 3>"
   ],
-  "overallAssessment": "<2-3 sentence summary of match quality>"
+  "atsOptimizationTips": [
+    "<ATS tip 1>",
+    "<ATS tip 2>",
+    "<ATS tip 3>"
+  ]
 }
 
-IMPORTANT: Return ONLY the JSON object. No markdown, no explanations.`;
+IMPORTANT RULES:
+- Return ONLY the JSON object above
+- NO markdown formatting (no \`\`\`json or \`\`\`)
+- NO additional text or explanations
+- All arrays must contain strings
+- matchScore must be a number (0-100)
+- Each array should have at least 2-5 items
+- Be specific and actionable in all feedback
+- If no issues in a category, provide empty array []
+- Base match score on actual alignment, not potential
+- Be honest about gaps and mismatches
+- Recommendations should be concrete and implementable
+
+Return ONLY the JSON object now.`;
 };
 
 /**

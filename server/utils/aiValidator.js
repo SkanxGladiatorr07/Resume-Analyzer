@@ -322,6 +322,202 @@ export const checkContentSafety = (data) => {
  * @param {string} text - Text to estimate
  * @returns {number} Estimated token count
  */
+/**
+ * Validate job match response structure
+ * @param {Object} data - Job match data to validate
+ * @returns {Object} Validation result with detailed errors
+ */
+export const validateJobMatch = (data) => {
+  const errors = [];
+  const warnings = [];
+
+  // Validate matchScore
+  if (typeof data.matchScore !== 'number') {
+    errors.push('matchScore must be a number');
+  } else {
+    if (data.matchScore < 0 || data.matchScore > 100) {
+      errors.push('matchScore must be between 0 and 100');
+    }
+    if (!Number.isInteger(data.matchScore)) {
+      warnings.push('matchScore should be an integer (will be rounded)');
+    }
+  }
+
+  // Validate summary
+  if (typeof data.summary !== 'string') {
+    errors.push('summary must be a string');
+  } else {
+    const trimmedSummary = data.summary.trim();
+    if (trimmedSummary.length === 0) {
+      errors.push('summary cannot be empty');
+    } else if (trimmedSummary.length < 10) {
+      warnings.push('summary is very short (less than 10 characters)');
+    } else if (trimmedSummary.length > 1000) {
+      warnings.push('summary is very long (will be truncated to 1000 characters)');
+    }
+  }
+
+  // Validate array fields
+  const arrayFields = [
+    { name: 'matchingSkills', minItems: 0, maxItems: 20 },
+    { name: 'missingTechnicalSkills', minItems: 0, maxItems: 20 },
+    { name: 'missingSoftSkills', minItems: 0, maxItems: 20 },
+    { name: 'missingKeywords', minItems: 0, maxItems: 20 },
+    { name: 'strengths', minItems: 1, maxItems: 20 },
+    { name: 'recommendations', minItems: 1, maxItems: 20 },
+    { name: 'atsOptimizationTips', minItems: 0, maxItems: 20 },
+  ];
+
+  for (const field of arrayFields) {
+    if (!Array.isArray(data[field.name])) {
+      errors.push(`${field.name} must be an array`);
+      continue;
+    }
+
+    // Check array length
+    if (data[field.name].length < field.minItems) {
+      warnings.push(`${field.name} has fewer than ${field.minItems} items`);
+    }
+    if (data[field.name].length > field.maxItems) {
+      warnings.push(`${field.name} has more than ${field.maxItems} items (will be truncated)`);
+    }
+
+    // Check array items are strings
+    const nonStrings = data[field.name].filter(item => typeof item !== 'string');
+    if (nonStrings.length > 0) {
+      errors.push(`${field.name} must contain only strings`);
+      continue;
+    }
+
+    // Check for empty strings
+    const emptyItems = data[field.name].filter(item => !item.trim());
+    if (emptyItems.length > 0) {
+      warnings.push(`${field.name} contains empty strings (will be filtered)`);
+    }
+
+    // Check item length
+    const longItems = data[field.name].filter(item => item.length > 500);
+    if (longItems.length > 0) {
+      warnings.push(`${field.name} contains very long items (will be truncated to 500 chars)`);
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    warnings,
+  };
+};
+
+/**
+ * Sanitize job match data
+ * @param {Object} data - Raw job match response
+ * @returns {Object} Sanitized and normalized data
+ */
+export const sanitizeJobMatch = (data) => {
+  // Sanitize matchScore
+  let matchScore = Number(data.matchScore);
+  if (isNaN(matchScore)) matchScore = 0;
+  matchScore = Math.round(Math.max(0, Math.min(100, matchScore)));
+
+  // Sanitize summary
+  let summary = String(data.summary || '').trim();
+  if (summary.length > 1000) {
+    summary = summary.substring(0, 1000) + '...';
+  }
+
+  // Sanitize array fields
+  const sanitizeArray = (arr, maxLength = 20) => {
+    if (!Array.isArray(arr)) return [];
+    
+    return arr
+      .filter(item => typeof item === 'string' && item.trim().length > 0)
+      .map(item => {
+        let sanitized = item.trim();
+        // Remove excessive whitespace
+        sanitized = sanitized.replace(/\s+/g, ' ');
+        // Truncate if too long
+        if (sanitized.length > 500) {
+          sanitized = sanitized.substring(0, 500) + '...';
+        }
+        return sanitized;
+      })
+      .slice(0, maxLength); // Limit array size
+  };
+
+  return {
+    matchScore,
+    summary,
+    matchingSkills: sanitizeArray(data.matchingSkills),
+    missingTechnicalSkills: sanitizeArray(data.missingTechnicalSkills),
+    missingSoftSkills: sanitizeArray(data.missingSoftSkills),
+    missingKeywords: sanitizeArray(data.missingKeywords),
+    strengths: sanitizeArray(data.strengths),
+    recommendations: sanitizeArray(data.recommendations),
+    atsOptimizationTips: sanitizeArray(data.atsOptimizationTips),
+  };
+};
+
+/**
+ * Calculate confidence score for job match
+ * @param {Object} data - Sanitized job match data
+ * @returns {number} Confidence score (0-100)
+ */
+export const calculateJobMatchConfidence = (data) => {
+  let confidence = 100;
+
+  // Deduct for missing or poor quality data
+  if (!data.summary || data.summary.length < 20) {
+    confidence -= 15;
+  }
+
+  if (!data.strengths || data.strengths.length < 2) {
+    confidence -= 10;
+  }
+
+  if (!data.recommendations || data.recommendations.length < 2) {
+    confidence -= 10;
+  }
+
+  if (!data.matchingSkills || data.matchingSkills.length === 0) {
+    confidence -= 10;
+  }
+
+  // Check for generic/low-quality responses
+  const genericPhrases = [
+    'needs improvement',
+    'could be better',
+    'more details',
+    'not specified',
+    'n/a',
+    'none',
+  ];
+
+  const allText = [
+    data.summary,
+    ...data.strengths,
+    ...data.recommendations,
+    ...data.matchingSkills,
+  ].join(' ').toLowerCase();
+
+  const genericCount = genericPhrases.filter(phrase => 
+    allText.includes(phrase)
+  ).length;
+
+  if (genericCount > 3) {
+    confidence -= 15;
+  } else if (genericCount > 1) {
+    confidence -= 5;
+  }
+
+  // Check match score validity
+  if (data.matchScore === 0 || data.matchScore === 100) {
+    confidence -= 5; // Suspicious perfect or zero scores
+  }
+
+  return Math.max(0, Math.min(100, confidence));
+};
+
 export const estimateTokenCount = (text) => {
   if (!text || typeof text !== 'string') return 0;
   
