@@ -69,6 +69,16 @@ const Navbar = () => {
                   Dashboard
                 </NavLink>
                 <NavLink
+                  to="/analytics"
+                  className={({ isActive }) =>
+                    `text-lg font-medium ${
+                      isActive ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'
+                    }`
+                  }
+                >
+                  Analytics
+                </NavLink>
+                <NavLink
                   to="/upload"
                   className={({ isActive }) =>
                     `text-lg font-medium ${
@@ -183,6 +193,19 @@ const Navbar = () => {
                     }
                   >
                     Dashboard
+                  </NavLink>
+                  <NavLink
+                    to="/analytics"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={({ isActive }) =>
+                      `block px-3 py-2 rounded-md text-base font-medium ${
+                        isActive
+                          ? 'bg-blue-100 text-blue-600'
+                          : 'text-gray-700 hover:bg-gray-100'
+                      }`
+                    }
+                  >
+                    Analytics
                   </NavLink>
                   <NavLink
                     to="/upload"

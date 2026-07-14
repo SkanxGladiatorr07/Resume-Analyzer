@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import PublicRoute from './components/PublicRoute'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
+import AnalyticsDashboard from './pages/AnalyticsDashboard'
 import Upload from './pages/Upload'
 import { ResumeDetails } from './pages/ResumeDetails'
 import Analysis from './pages/Analysis'
@@ -34,6 +35,18 @@ function App() {
             }
           >
             <Route index element={<Dashboard />} />
+          </Route>
+
+          {/* Analytics Dashboard - protected route with main layout */}
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<AnalyticsDashboard />} />
           </Route>
 
           {/* Upload page - protected route with main layout */}

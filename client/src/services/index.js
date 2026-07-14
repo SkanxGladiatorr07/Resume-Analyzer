@@ -10,6 +10,7 @@ import * as resumeService from './resumeService';
 import analysisService from './analysisService';
 import * as jobDescriptionService from './jobDescriptionService';
 import * as jobMatchService from './jobMatchService';
+import * as dashboardService from './dashboardService';
 
 // Export individual services
 export { 
@@ -19,5 +20,6 @@ export {
   resumeService, 
   analysisService,
   jobDescriptionService,
-  jobMatchService
+  jobMatchService,
+  dashboardService
 };
