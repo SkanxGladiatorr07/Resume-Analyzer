@@ -9,6 +9,8 @@ import {
   getJobMatch,
   getJobMatchStatus,
   deleteJobMatch,
+  getUserJobMatches,
+  getJobMatchHistory,
 } from '../controllers/jobMatchController.js';
 import { authenticate } from '../middleware/auth.js';
 
@@ -16,6 +18,24 @@ const router = express.Router();
 
 // All routes require authentication
 router.use(authenticate);
+
+/**
+ * @route   GET /api/job-match/history
+ * @desc    Get all job match history for the authenticated user
+ * @access  Private
+ * @query   page, limit, status, sortBy, order
+ * @example GET /api/job-match/history
+ * @example GET /api/job-match/history?status=completed&page=1&limit=10
+ */
+router.get('/history', getUserJobMatches);
+
+/**
+ * @route   GET /api/job-match/history/:matchId
+ * @desc    Get specific job match from history by ID
+ * @access  Private
+ * @example GET /api/job-match/history/668f7a1b2c3d4e5f6a7b8c9d
+ */
+router.get('/history/:matchId', getJobMatchHistory);
 
 /**
  * @route   POST /api/job-match/:resumeId/:jobDescriptionId

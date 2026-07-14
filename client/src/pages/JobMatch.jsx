@@ -133,7 +133,7 @@ const JobMatch = () => {
     }
   };
 
-  const startJobMatch = async (resumeId, jobDescriptionId) => {
+  const startJobMatch = async (resumeId, jobDescriptionId, force = false) => {
     try {
       setGenerating(true);
       setCurrentStep(3);
@@ -141,34 +141,62 @@ const JobMatch = () => {
       setStatusMessage('Starting AI comparison...');
 
       // Generate match
-      const response = await generateJobMatch(resumeId, jobDescriptionId);
+      const response = await generateJobMatch(resumeId, jobDescriptionId, force);
 
       if (response.data.status === 'completed') {
         // Already completed (cached)
         setMatchResults(response.data.data);
         setStatusMessage('');
+        
+        // Show cached indicator
+        if (response.data.cached && !force) {
+          setError(null);
+          setStatusMessage('Using cached results. Click "Regenerate" for fresh analysis.');
+          setTimeout(() => setStatusMessage(''), 3000);
+        }
       } else if (response.data.status === 'processing') {
         // Poll for completion
         setStatusMessage('AI is analyzing the match... (this may take 10-20 seconds)');
 
-        await pollJobMatchStatus(
-          resumeId,
-          jobDescriptionId,
-          (statusData) => {
-            if (statusData.status === 'processing') {
-              setStatusMessage('AI is analyzing the match... please wait');
-            }
-          },
-          2000
-        );
+        try {
+          await pollJobMatchStatus(
+            resumeId,
+            jobDescriptionId,
+            (statusData, attempts) => {
+              if (statusData.status === 'processing') {
+                setStatusMessage(`AI is analyzing the match... (${attempts * 2}s elapsed)`);
+              }
+            },
+            2000,
+            60 // 2 minutes max
+          );
 
-        // Fetch final results
-        const resultsResponse = await getJobMatch(resumeId, jobDescriptionId);
-        setMatchResults(resultsResponse.data.data);
-        setStatusMessage('');
+          // Fetch final results
+          const resultsResponse = await getJobMatch(resumeId, jobDescriptionId);
+          setMatchResults(resultsResponse.data.data);
+          setStatusMessage('');
+        } catch (pollError) {
+          if (pollError.message.includes('timeout')) {
+            setError('The comparison is taking longer than expected. Please check History page later.');
+          } else {
+            throw pollError;
+          }
+        }
       }
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to generate job match');
+      let errorMessage = 'Failed to generate job match. Please try again.';
+      
+      if (err.response?.status === 409) {
+        errorMessage = 'A comparison is already in progress. Please wait for it to complete.';
+      } else if (err.response?.status === 503) {
+        errorMessage = 'AI service is temporarily unavailable. Please try again in a moment.';
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
       console.error('Error generating job match:', err);
       setStatusMessage('');
     } finally {
@@ -185,9 +213,10 @@ const JobMatch = () => {
     setStatusMessage('');
   };
 
-  const handleRegenerate = () => {
+  const handleRegenerate = async () => {
     if (selectedResume && selectedJobDescription) {
-      startJobMatch(selectedResume._id, selectedJobDescription._id);
+      // Force regeneration
+      await startJobMatch(selectedResume._id, selectedJobDescription._id, true);
     }
   };
 
@@ -385,20 +414,36 @@ const JobMatch = () => {
     return (
       <div>
         {/* Header with Back Button */}
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
           <button
             onClick={handleReset}
             className="text-blue-600 hover:text-blue-700 flex items-center gap-1"
           >
             ← Start New Match
           </button>
-          <button
-            onClick={handleRegenerate}
-            className="text-gray-600 hover:text-gray-700 flex items-center gap-1"
-          >
-            🔄 Regenerate Match
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate('/job-match-history')}
+              className="text-gray-600 hover:text-gray-700 flex items-center gap-1 px-4 py-2 border border-gray-300 rounded-lg"
+            >
+              📚 View History
+            </button>
+            <button
+              onClick={handleRegenerate}
+              disabled={generating}
+              className="text-gray-600 hover:text-gray-700 flex items-center gap-1 px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              🔄 Regenerate Match
+            </button>
+          </div>
         </div>
+
+        {/* Success Message (if shown) */}
+        {statusMessage && !error && (
+          <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg mb-6">
+            <p>{statusMessage}</p>
+          </div>
+        )}
 
         {/* Selected Items Summary */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
