@@ -1,0 +1,298 @@
+{
+  "description": "Example responses for chart endpoints - Frontend-ready JSON format",
+  
+  "atsScoreTrend": {
+    "endpoint": "GET /api/dashboard/charts/ats-trend?days=30",
+    "description": "ATS score trend over time (line chart)",
+    "response": {
+      "success": true,
+      "message": "ATS score trend retrieved successfully",
+      "data": {
+        "labels": ["2026-06-15", "2026-06-16", "2026-06-18", "2026-06-20"],
+        "datasets": [
+          {
+            "label": "Average ATS Score",
+            "data": [72, 78, 85, 82]
+          }
+        ],
+        "raw": [
+          { "date": "2026-06-15", "averageScore": 72, "count": 2 },
+          { "date": "2026-06-16", "averageScore": 78, "count": 1 },
+          { "date": "2026-06-18", "averageScore": 85, "count": 3 },
+          { "date": "2026-06-20", "averageScore": 82, "count": 1 }
+        ]
+      }
+    },
+    "chartType": "Line Chart",
+    "usage": "Shows progression of ATS scores over time to track improvement"
+  },
+
+  "resumeUploadTimeline": {
+    "endpoint": "GET /api/dashboard/charts/upload-timeline?days=30",
+    "description": "Resume upload activity over time (multi-line or stacked bar chart)",
+    "response": {
+      "success": true,
+      "message": "Resume upload timeline retrieved successfully",
+      "data": {
+        "labels": ["2026-06-15", "2026-06-17", "2026-06-20"],
+        "datasets": [
+          {
+            "label": "Total Uploads",
+            "data": [3, 2, 4]
+          },
+          {
+            "label": "Completed",
+            "data": [3, 1, 4]
+          },
+          {
+            "label": "Failed",
+            "data": [0, 1, 0]
+          }
+        ],
+        "raw": [
+          { "date": "2026-06-15", "total": 3, "completed": 3, "failed": 0 },
+          { "date": "2026-06-17", "total": 2, "completed": 1, "failed": 1 },
+          { "date": "2026-06-20", "total": 4, "completed": 4, "failed": 0 }
+        ]
+      }
+    },
+    "chartType": "Stacked Bar Chart or Multi-line Chart",
+    "usage": "Shows upload activity and success/failure rates over time"
+  },
+
+  "skillsDistribution": {
+    "endpoint": "GET /api/dashboard/charts/skills-distribution?limit=10",
+    "description": "Most common skills across resumes (bar chart)",
+    "response": {
+      "success": true,
+      "message": "Skills distribution retrieved successfully",
+      "data": {
+        "labels": ["JavaScript", "Python", "React", "Node.js", "SQL", "AWS", "Docker", "Git", "TypeScript", "MongoDB"],
+        "datasets": [
+          {
+            "label": "Skill Frequency",
+            "data": [8, 7, 6, 6, 5, 4, 4, 3, 3, 2]
+          }
+        ],
+        "raw": [
+          { "skill": "JavaScript", "count": 8 },
+          { "skill": "Python", "count": 7 },
+          { "skill": "React", "count": 6 },
+          { "skill": "Node.js", "count": 6 },
+          { "skill": "SQL", "count": 5 },
+          { "skill": "AWS", "count": 4 },
+          { "skill": "Docker", "count": 4 },
+          { "skill": "Git", "count": 3 },
+          { "skill": "TypeScript", "count": 3 },
+          { "skill": "MongoDB", "count": 2 }
+        ]
+      }
+    },
+    "chartType": "Horizontal Bar Chart",
+    "usage": "Shows most frequently used skills across all resumes"
+  },
+
+  "jobMatchScoreDistribution": {
+    "endpoint": "GET /api/dashboard/charts/match-distribution",
+    "description": "Job match score distribution by ranges (bar or pie chart)",
+    "response": {
+      "success": true,
+      "message": "Job match distribution retrieved successfully",
+      "data": {
+        "labels": ["0-20", "20-40", "40-60", "60-80", "80-100"],
+        "datasets": [
+          {
+            "label": "Number of Matches",
+            "data": [1, 2, 5, 8, 3]
+          }
+        ],
+        "raw": [
+          { "range": "0-20", "count": 1, "avgScore": 15 },
+          { "range": "20-40", "count": 2, "avgScore": 35 },
+          { "range": "40-60", "count": 5, "avgScore": 52 },
+          { "range": "60-80", "count": 8, "avgScore": 72 },
+          { "range": "80-100", "count": 3, "avgScore": 88 }
+        ]
+      }
+    },
+    "chartType": "Bar Chart or Pie Chart",
+    "usage": "Shows distribution of job match scores to identify typical ranges"
+  },
+
+  "resumeCompletenessScore": {
+    "endpoint": "GET /api/dashboard/charts/completeness",
+    "description": "Resume completeness percentage (horizontal bar chart)",
+    "response": {
+      "success": true,
+      "message": "Resume completeness scores retrieved successfully",
+      "data": {
+        "labels": ["John_Doe_Resume.pdf", "Jane_Smith_CV.pdf", "Updated_Resume.pdf"],
+        "datasets": [
+          {
+            "label": "Completeness (%)",
+            "data": [100, 83, 67]
+          }
+        ],
+        "raw": [
+          { "name": "John_Doe_Resume.pdf", "completeness": 100, "sections": 6, "maxSections": 6 },
+          { "name": "Jane_Smith_CV.pdf", "completeness": 83, "sections": 5, "maxSections": 6 },
+          { "name": "Updated_Resume.pdf", "completeness": 67, "sections": 4, "maxSections": 6 }
+        ]
+      }
+    },
+    "chartType": "Horizontal Bar Chart",
+    "usage": "Shows which resumes are most complete based on key sections"
+  },
+
+  "mostCommonMissingSkills": {
+    "endpoint": "GET /api/dashboard/charts/missing-skills?limit=10",
+    "description": "Most frequently missing skills from job matches (bar chart)",
+    "response": {
+      "success": true,
+      "message": "Missing skills data retrieved successfully",
+      "data": {
+        "labels": ["Kubernetes", "Machine Learning", "GraphQL", "CI/CD", "Agile Methodology", "Leadership", "Project Management", "Public Speaking", "Team Building", "Mentoring"],
+        "datasets": [
+          {
+            "label": "Frequency",
+            "data": [12, 10, 8, 7, 7, 6, 5, 4, 3, 3]
+          }
+        ],
+        "raw": [
+          { "skill": "Kubernetes", "count": 12, "type": "technical" },
+          { "skill": "Machine Learning", "count": 10, "type": "technical" },
+          { "skill": "GraphQL", "count": 8, "type": "technical" },
+          { "skill": "CI/CD", "count": 7, "type": "technical" },
+          { "skill": "Agile Methodology", "count": 7, "type": "technical" },
+          { "skill": "Leadership", "count": 6, "type": "soft" },
+          { "skill": "Project Management", "count": 5, "type": "soft" },
+          { "skill": "Public Speaking", "count": 4, "type": "soft" },
+          { "skill": "Team Building", "count": 3, "type": "soft" },
+          { "skill": "Mentoring", "count": 3, "type": "soft" }
+        ]
+      }
+    },
+    "chartType": "Horizontal Bar Chart with color coding by type",
+    "usage": "Identifies skills that need to be added based on job match analysis"
+  },
+
+  "atsScoreDistribution": {
+    "endpoint": "GET /api/dashboard/charts/ats-distribution",
+    "description": "ATS score distribution by quality ranges (bar or pie chart)",
+    "response": {
+      "success": true,
+      "message": "ATS score distribution retrieved successfully",
+      "data": {
+        "labels": ["0-20 (Poor)", "20-40 (Fair)", "40-60 (Good)", "60-80 (Very Good)", "80-100 (Excellent)"],
+        "datasets": [
+          {
+            "label": "Number of Resumes",
+            "data": [0, 2, 5, 8, 3]
+          }
+        ],
+        "raw": [
+          { "range": "0-20 (Poor)", "count": 0, "avgScore": null },
+          { "range": "20-40 (Fair)", "count": 2, "avgScore": 35 },
+          { "range": "40-60 (Good)", "count": 5, "avgScore": 54 },
+          { "range": "60-80 (Very Good)", "count": 8, "avgScore": 73 },
+          { "range": "80-100 (Excellent)", "count": 3, "avgScore": 87 }
+        ]
+      }
+    },
+    "chartType": "Bar Chart or Pie Chart",
+    "usage": "Shows overall quality distribution of analyzed resumes"
+  },
+
+  "analysisSuccessRate": {
+    "endpoint": "GET /api/dashboard/charts/success-rate?days=30",
+    "description": "Analysis success rate over time (line chart)",
+    "response": {
+      "success": true,
+      "message": "Analysis success rate retrieved successfully",
+      "data": {
+        "labels": ["2026-06-15", "2026-06-16", "2026-06-18", "2026-06-20"],
+        "datasets": [
+          {
+            "label": "Success Rate (%)",
+            "data": [100, 75, 100, 100]
+          }
+        ],
+        "raw": [
+          { "date": "2026-06-15", "total": 3, "completed": 3, "failed": 0, "successRate": 100 },
+          { "date": "2026-06-16", "total": 4, "completed": 3, "failed": 1, "successRate": 75 },
+          { "date": "2026-06-18", "total": 2, "completed": 2, "failed": 0, "successRate": 100 },
+          { "date": "2026-06-20", "total": 5, "completed": 5, "failed": 0, "successRate": 100 }
+        ]
+      }
+    },
+    "chartType": "Line Chart or Area Chart",
+    "usage": "Monitors reliability of AI analysis process over time"
+  },
+
+  "allCharts": {
+    "endpoint": "GET /api/dashboard/charts?days=30&topSkills=10&topMissingSkills=10",
+    "description": "All chart data in one request (for dashboard page load)",
+    "response": {
+      "success": true,
+      "message": "Chart data retrieved successfully",
+      "data": {
+        "atsScoreTrend": "{ ... see atsScoreTrend above ... }",
+        "resumeUploadTimeline": "{ ... see resumeUploadTimeline above ... }",
+        "skillsDistribution": "{ ... see skillsDistribution above ... }",
+        "jobMatchScoreDistribution": "{ ... see jobMatchScoreDistribution above ... }",
+        "resumeCompletenessScore": "{ ... see resumeCompletenessScore above ... }",
+        "mostCommonMissingSkills": "{ ... see mostCommonMissingSkills above ... }",
+        "atsScoreDistribution": "{ ... see atsScoreDistribution above ... }",
+        "analysisSuccessRate": "{ ... see analysisSuccessRate above ... }",
+        "metadata": {
+          "generatedAt": "2026-07-14T12:00:00.000Z",
+          "userId": "...",
+          "options": {
+            "days": 30,
+            "topSkills": 10,
+            "topMissingSkills": 10
+          }
+        }
+      }
+    },
+    "usage": "Load all charts at once for dashboard, then cache on frontend"
+  },
+
+  "frontendUsage": {
+    "description": "How to use this data in frontend charting libraries",
+    "examples": {
+      "ChartJS": {
+        "lineChart": {
+          "code": "new Chart(ctx, { type: 'line', data: response.data })"
+        },
+        "barChart": {
+          "code": "new Chart(ctx, { type: 'bar', data: response.data })"
+        },
+        "pieChart": {
+          "code": "new Chart(ctx, { type: 'pie', data: { labels: response.data.labels, datasets: [...] } })"
+        }
+      },
+      "Recharts": {
+        "lineChart": {
+          "code": "<LineChart data={response.data.raw}><Line dataKey='averageScore' /></LineChart>"
+        },
+        "barChart": {
+          "code": "<BarChart data={response.data.raw}><Bar dataKey='count' /></BarChart>"
+        }
+      },
+      "ApexCharts": {
+        "lineChart": {
+          "code": "{ series: response.data.datasets, xaxis: { categories: response.data.labels } }"
+        }
+      }
+    }
+  },
+
+  "notes": {
+    "dataFormat": "All endpoints return both 'labels/datasets' format (for Chart.js) and 'raw' format (for Recharts/custom charts)",
+    "authentication": "All endpoints require JWT token in Authorization header",
+    "caching": "Frontend should cache chart data for 30-60 seconds to reduce API calls",
+    "emptyData": "If no data exists, arrays will be empty []",
+    "nullValues": "Average scores return null if no completed items exist"
+  }
+}
