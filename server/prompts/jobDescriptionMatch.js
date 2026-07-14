@@ -41,94 +41,143 @@
  * @returns {string} Formatted prompt for job matching analysis
  */
 export const generateJobMatchPrompt = (resumeData, jobDescription, jobTitle = '') => {
-  return `You are a resume-to-job matching expert and ATS specialist. Compare this resume against the provided job description and provide a comprehensive match analysis.
+  return `You are an expert resume analyzer and ATS (Applicant Tracking System) specialist. Your task is to perform a detailed comparison between a candidate's resume and a job description, then provide structured analysis in JSON format.
 
-RESUME DATA:
+=== RESUME DATA ===
 ${JSON.stringify(resumeData, null, 2)}
 
-JOB DESCRIPTION:
+=== JOB DESCRIPTION ===
 Title: ${jobTitle || 'Not specified'}
 Description: ${jobDescription}
 
-ANALYSIS REQUIREMENTS:
+=== ANALYSIS INSTRUCTIONS ===
 
-1. Calculate a match score (0-100) based on:
-   - Technical skills alignment
-   - Soft skills presence
-   - Experience relevance
-   - Keyword matching
-   - Qualification match
-   - Overall fit for the role
+Perform a comprehensive evaluation following these exact steps:
 
-2. Provide a concise summary (2-3 sentences) of the overall match quality and candidate fit.
+**STEP 1: MATCH SCORE CALCULATION (0-100)**
+Calculate an overall match score considering:
+- Technical skills alignment (30% weight)
+- Relevant work experience (25% weight)
+- Education and qualifications (15% weight)
+- Soft skills and cultural fit (15% weight)
+- Keyword presence and density (15% weight)
 
-3. Identify matching skills - skills from the resume that align with job requirements.
+Be objective and realistic. Most candidates score between 40-80. Only exceptional perfect fits should score above 90.
 
-4. Identify missing technical skills - technical skills required by the job but not present in the resume.
+**STEP 2: SUMMARY (2-3 sentences)**
+Provide a clear, professional summary that:
+- States the overall match quality
+- Mentions key strengths
+- Notes any critical gaps
+- Gives hiring recommendation perspective
 
-5. Identify missing soft skills - soft skills mentioned in the job description but not evident in the resume.
+**STEP 3: MATCHING SKILLS**
+Identify 3-10 specific skills from the resume that directly match job requirements.
+- Include both technical and soft skills
+- Be specific (e.g., "Python 3.x" not just "Programming")
+- Only include genuinely matching skills
 
-6. Identify missing keywords - important keywords from the job description that should be added to the resume.
+**STEP 4: MISSING TECHNICAL SKILLS**
+Identify 2-8 technical skills required by the job but missing from the resume.
+- Focus on role-critical skills
+- Be specific and actionable
+- Prioritize high-impact skills
 
-7. Highlight strengths - specific aspects where the candidate excels or stands out for this role.
+**STEP 5: MISSING SOFT SKILLS**
+Identify 1-5 soft skills mentioned in job description but not evident in resume.
+- Leadership, communication, teamwork, etc.
+- Only include if explicitly mentioned or strongly implied in job description
 
-8. Provide actionable recommendations - specific changes to improve the match score.
+**STEP 6: MISSING KEYWORDS**
+Identify 3-10 important keywords from job description absent from resume.
+- Industry terms, tools, methodologies
+- Keywords that ATS systems will scan for
+- Exclude generic words
 
-9. Give ATS optimization tips - how to tailor the resume to pass ATS for this specific job.
+**STEP 7: STRENGTHS**
+Highlight 3-7 specific strengths where candidate excels for this role.
+- Relevant experience that stands out
+- Unique qualifications
+- Competitive advantages
 
-CRITICAL: You MUST respond with ONLY valid JSON in this EXACT structure:
+**STEP 8: RECOMMENDATIONS**
+Provide 4-8 specific, actionable recommendations to improve match.
+- Focus on highest-impact changes
+- Be concrete (what to add, modify, emphasize)
+- Prioritize quick wins
+
+**STEP 9: ATS OPTIMIZATION TIPS**
+Provide 3-6 specific tips to optimize resume for ATS systems.
+- Keyword placement strategies
+- Formatting recommendations
+- Section organization tips
+- Role-specific optimization
+
+=== OUTPUT FORMAT ===
+
+You MUST respond with ONLY valid JSON. No markdown, no explanations, JUST the JSON object:
 
 {
-  "matchScore": <number between 0-100>,
-  "summary": "<2-3 sentence summary of match quality>",
+  "matchScore": <integer 0-100>,
+  "summary": "<2-3 sentence professional summary>",
   "matchingSkills": [
-    "<skill that matches job requirement 1>",
-    "<skill that matches job requirement 2>",
-    "<skill that matches job requirement 3>"
+    "<specific matching skill 1>",
+    "<specific matching skill 2>",
+    "<specific matching skill 3>"
   ],
   "missingTechnicalSkills": [
-    "<missing technical skill 1>",
-    "<missing technical skill 2>"
+    "<specific missing technical skill 1>",
+    "<specific missing technical skill 2>"
   ],
   "missingSoftSkills": [
-    "<missing soft skill 1>",
-    "<missing soft skill 2>"
+    "<specific missing soft skill 1>",
+    "<specific missing soft skill 2>"
   ],
   "missingKeywords": [
-    "<missing keyword 1>",
-    "<missing keyword 2>"
+    "<important missing keyword 1>",
+    "<important missing keyword 2>",
+    "<important missing keyword 3>"
   ],
   "strengths": [
-    "<strength 1>",
-    "<strength 2>",
-    "<strength 3>"
+    "<specific strength 1>",
+    "<specific strength 2>",
+    "<specific strength 3>"
   ],
   "recommendations": [
     "<actionable recommendation 1>",
     "<actionable recommendation 2>",
-    "<actionable recommendation 3>"
+    "<actionable recommendation 3>",
+    "<actionable recommendation 4>"
   ],
   "atsOptimizationTips": [
-    "<ATS tip 1>",
-    "<ATS tip 2>",
-    "<ATS tip 3>"
+    "<specific ATS tip 1>",
+    "<specific ATS tip 2>",
+    "<specific ATS tip 3>"
   ]
 }
 
-IMPORTANT RULES:
-- Return ONLY the JSON object above
-- NO markdown formatting (no \`\`\`json or \`\`\`)
-- NO additional text or explanations
-- All arrays must contain strings
-- matchScore must be a number (0-100)
-- Each array should have at least 2-5 items
-- Be specific and actionable in all feedback
-- If no issues in a category, provide empty array []
-- Base match score on actual alignment, not potential
-- Be honest about gaps and mismatches
-- Recommendations should be concrete and implementable
+=== QUALITY GUIDELINES ===
 
-Return ONLY the JSON object now.`;
+1. **Be Specific**: Avoid generic phrases like "good fit" or "needs improvement"
+2. **Be Objective**: Base scores on actual evidence, not potential
+3. **Be Actionable**: Every recommendation should be implementable
+4. **Be Consistent**: Same quality resume + job = similar scores
+5. **Be Realistic**: Most matches score 40-80, perfect fits are rare
+6. **Be Thorough**: Include at least minimum items in each array
+7. **Be Relevant**: Only include information pertinent to THIS job
+
+=== CRITICAL RULES ===
+
+- Output ONLY the JSON object, nothing else
+- NO markdown code blocks (no \`\`\`json)
+- NO explanatory text before or after JSON
+- All string values must be clear and specific
+- All arrays must contain at least 2 items (except missingSoftSkills: min 1)
+- matchScore must be an integer between 0-100
+- Empty arrays [] are only acceptable if truly no items exist
+- Ensure JSON is valid and parseable
+
+Generate the analysis now.`;
 };
 
 /**

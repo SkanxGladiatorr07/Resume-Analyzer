@@ -324,16 +324,23 @@ export const checkContentSafety = (data) => {
  */
 /**
  * Validate job match response structure
+ * Enhanced validation with detailed checks
  * @param {Object} data - Job match data to validate
- * @returns {Object} Validation result with detailed errors
+ * @returns {Object} Validation result with detailed errors and quality metrics
  */
 export const validateJobMatch = (data) => {
   const errors = [];
   const warnings = [];
+  const qualityMetrics = {
+    completeness: 100,
+    specificity: 100,
+    consistency: 100,
+  };
 
   // Validate matchScore
   if (typeof data.matchScore !== 'number') {
     errors.push('matchScore must be a number');
+    qualityMetrics.completeness -= 20;
   } else {
     if (data.matchScore < 0 || data.matchScore > 100) {
       errors.push('matchScore must be between 0 and 100');
@@ -341,71 +348,140 @@ export const validateJobMatch = (data) => {
     if (!Number.isInteger(data.matchScore)) {
       warnings.push('matchScore should be an integer (will be rounded)');
     }
+    // Check for suspicious scores
+    if (data.matchScore === 0 || data.matchScore === 100) {
+      warnings.push('Extreme match score detected - verify accuracy');
+      qualityMetrics.consistency -= 10;
+    }
   }
 
   // Validate summary
   if (typeof data.summary !== 'string') {
     errors.push('summary must be a string');
+    qualityMetrics.completeness -= 15;
   } else {
     const trimmedSummary = data.summary.trim();
     if (trimmedSummary.length === 0) {
       errors.push('summary cannot be empty');
-    } else if (trimmedSummary.length < 10) {
-      warnings.push('summary is very short (less than 10 characters)');
+      qualityMetrics.completeness -= 15;
+    } else if (trimmedSummary.length < 20) {
+      warnings.push('summary is very short (less than 20 characters) - may lack detail');
+      qualityMetrics.specificity -= 15;
     } else if (trimmedSummary.length > 1000) {
       warnings.push('summary is very long (will be truncated to 1000 characters)');
     }
+    
+    // Check for generic summary
+    const genericPhrases = ['good fit', 'decent match', 'could work', 'okay match'];
+    if (genericPhrases.some(phrase => trimmedSummary.toLowerCase().includes(phrase))) {
+      warnings.push('summary contains generic phrases - may lack specificity');
+      qualityMetrics.specificity -= 10;
+    }
   }
 
-  // Validate array fields
+  // Validate array fields with enhanced checks
   const arrayFields = [
-    { name: 'matchingSkills', minItems: 0, maxItems: 20 },
-    { name: 'missingTechnicalSkills', minItems: 0, maxItems: 20 },
-    { name: 'missingSoftSkills', minItems: 0, maxItems: 20 },
-    { name: 'missingKeywords', minItems: 0, maxItems: 20 },
-    { name: 'strengths', minItems: 1, maxItems: 20 },
-    { name: 'recommendations', minItems: 1, maxItems: 20 },
-    { name: 'atsOptimizationTips', minItems: 0, maxItems: 20 },
+    { name: 'matchingSkills', minItems: 2, maxItems: 20, required: true },
+    { name: 'missingTechnicalSkills', minItems: 0, maxItems: 20, required: false },
+    { name: 'missingSoftSkills', minItems: 0, maxItems: 20, required: false },
+    { name: 'missingKeywords', minItems: 0, maxItems: 20, required: false },
+    { name: 'strengths', minItems: 2, maxItems: 20, required: true },
+    { name: 'recommendations', minItems: 3, maxItems: 20, required: true },
+    { name: 'atsOptimizationTips', minItems: 2, maxItems: 20, required: true },
   ];
 
   for (const field of arrayFields) {
     if (!Array.isArray(data[field.name])) {
       errors.push(`${field.name} must be an array`);
+      qualityMetrics.completeness -= 10;
       continue;
     }
 
+    const items = data[field.name];
+
     // Check array length
-    if (data[field.name].length < field.minItems) {
-      warnings.push(`${field.name} has fewer than ${field.minItems} items`);
+    if (field.required && items.length < field.minItems) {
+      errors.push(`${field.name} must have at least ${field.minItems} items`);
+      qualityMetrics.completeness -= 10;
+    } else if (items.length < field.minItems) {
+      warnings.push(`${field.name} has fewer than ${field.minItems} items (recommended minimum)`);
+      qualityMetrics.completeness -= 5;
     }
-    if (data[field.name].length > field.maxItems) {
+    
+    if (items.length > field.maxItems) {
       warnings.push(`${field.name} has more than ${field.maxItems} items (will be truncated)`);
     }
 
     // Check array items are strings
-    const nonStrings = data[field.name].filter(item => typeof item !== 'string');
+    const nonStrings = items.filter(item => typeof item !== 'string');
     if (nonStrings.length > 0) {
       errors.push(`${field.name} must contain only strings`);
       continue;
     }
 
     // Check for empty strings
-    const emptyItems = data[field.name].filter(item => !item.trim());
+    const emptyItems = items.filter(item => !item.trim());
     if (emptyItems.length > 0) {
-      warnings.push(`${field.name} contains empty strings (will be filtered)`);
+      warnings.push(`${field.name} contains ${emptyItems.length} empty strings (will be filtered)`);
+      qualityMetrics.completeness -= 5;
     }
 
-    // Check item length
-    const longItems = data[field.name].filter(item => item.length > 500);
+    // Check item length and specificity
+    const shortItems = items.filter(item => item.trim().length < 10);
+    if (shortItems.length > items.length / 2) {
+      warnings.push(`${field.name} has many very short items - may lack detail`);
+      qualityMetrics.specificity -= 10;
+    }
+
+    const longItems = items.filter(item => item.length > 500);
     if (longItems.length > 0) {
-      warnings.push(`${field.name} contains very long items (will be truncated to 500 chars)`);
+      warnings.push(`${field.name} contains ${longItems.length} very long items (will be truncated to 500 chars)`);
+    }
+
+    // Check for generic content
+    const genericTerms = ['etc', 'and more', 'various', 'multiple'];
+    const genericItems = items.filter(item => 
+      genericTerms.some(term => item.toLowerCase().includes(term))
+    );
+    if (genericItems.length > 0) {
+      warnings.push(`${field.name} contains generic items - may lack specificity`);
+      qualityMetrics.specificity -= 5;
+    }
+
+    // Check for duplicate items
+    const uniqueItems = new Set(items.map(item => item.toLowerCase().trim()));
+    if (uniqueItems.size < items.length) {
+      warnings.push(`${field.name} contains duplicate items`);
+      qualityMetrics.consistency -= 5;
     }
   }
+
+  // Cross-field validation
+  if (data.matchScore > 80 && Array.isArray(data.missingTechnicalSkills) && 
+      data.missingTechnicalSkills.length > 5) {
+    warnings.push('High match score but many missing technical skills - verify consistency');
+    qualityMetrics.consistency -= 10;
+  }
+
+  if (data.matchScore < 40 && Array.isArray(data.matchingSkills) && 
+      data.matchingSkills.length > 10) {
+    warnings.push('Low match score but many matching skills - verify consistency');
+    qualityMetrics.consistency -= 10;
+  }
+
+  // Calculate overall quality score
+  const overallQuality = Math.round(
+    (qualityMetrics.completeness + qualityMetrics.specificity + qualityMetrics.consistency) / 3
+  );
 
   return {
     valid: errors.length === 0,
     errors,
     warnings,
+    qualityMetrics: {
+      ...qualityMetrics,
+      overall: overallQuality,
+    },
   };
 };
 

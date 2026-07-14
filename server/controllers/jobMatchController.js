@@ -6,7 +6,8 @@
 import * as jobMatchPipeline from '../services/jobMatchPipeline.js';
 import JobMatch from '../models/JobMatch.js';
 import Resume from '../models/Resume.js';
-import JobDescription from '../models/JobDescription.js';
+import * as authUtils from '../utils/authUtils.js';
+import * as responseUtils from '../utils/responseUtils.js';
 
 // ============================================================================
 // COMPARISON HISTORY ENDPOINTS
@@ -15,8 +16,12 @@ import JobDescription from '../models/JobDescription.js';
 /**
  * @desc    Get all job match history for the authenticated user
  * @route   GET /api/job-match/history
- * @query   page, limit, status, sortBy, order
- * @access  Private
+ * @query   page - Page number (default: 1)
+ * @query   limit - Items per page (default: 20, max: 50)
+ * @query   status - Filter by status (pending, processing, completed, failed)
+ * @query   sortBy - Sort field (default: createdAt)
+ * @query   order - Sort order: asc, desc (default: desc)
+ * @access  Private - Requires authentication
  */
 export const getUserJobMatches = async (req, res) => {
   try {
@@ -31,14 +36,18 @@ export const getUserJobMatches = async (req, res) => {
 
     console.log(`📚 Fetching job match history - User: ${userId}, Page: ${page}, Status: ${status || 'all'}`);
 
+    // Validate and sanitize pagination params
+    const sanitizedLimit = Math.min(Math.max(1, parseInt(limit)), 50);
+    const sanitizedPage = Math.max(1, parseInt(page));
+
     // Build query
     const query = { user: userId };
-    if (status) {
+    if (status && ['pending', 'processing', 'completed', 'failed'].includes(status)) {
       query.matchStatus = status;
     }
 
     // Calculate pagination
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const skip = (sanitizedPage - 1) * sanitizedLimit;
     const sortOrder = order === 'asc' ? 1 : -1;
 
     // Fetch matches with population
@@ -47,38 +56,32 @@ export const getUserJobMatches = async (req, res) => {
       .populate('jobDescription', 'title company preview')
       .sort({ [sortBy]: sortOrder })
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(sanitizedLimit);
 
     // Get total count
     const total = await JobMatch.countDocuments(query);
 
     console.log(`✅ Retrieved ${matches.length} matches (total: ${total})`);
 
-    res.status(200).json({
-      success: true,
-      data: matches,
-      pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        total,
-        pages: Math.ceil(total / parseInt(limit)),
-      },
-    });
+    const pagination = responseUtils.createPagination(sanitizedPage, sanitizedLimit, total);
+
+    return responseUtils.sendSuccessWithPagination(
+      res,
+      matches,
+      pagination,
+      'Job match history retrieved successfully'
+    );
   } catch (error) {
     console.error('❌ Get user job matches error:', error);
-
-    res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve job match history',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
-    });
+    return responseUtils.handleError(res, error, 'Failed to retrieve job match history');
   }
 };
 
 /**
  * @desc    Get specific job match from history by ID
  * @route   GET /api/job-match/history/:matchId
- * @access  Private
+ * @param   matchId - Job match ID
+ * @access  Private - Requires authentication, ownership verification
  */
 export const getJobMatchHistory = async (req, res) => {
   try {
@@ -87,42 +90,23 @@ export const getJobMatchHistory = async (req, res) => {
 
     console.log(`📖 Fetching job match - ID: ${matchId}, User: ${userId}`);
 
-    // Find match by ID and verify ownership
-    const jobMatch = await JobMatch.findById(matchId)
-      .populate('resume', 'originalName fileSize createdAt')
-      .populate('jobDescription', 'title company description');
+    // Verify ownership and fetch match
+    const jobMatch = await authUtils.verifyJobMatchOwnership(matchId, userId);
 
-    if (!jobMatch) {
-      console.log(`❌ Job match not found - ID: ${matchId}`);
-      return res.status(404).json({
-        success: false,
-        message: 'Job match not found',
-      });
-    }
-
-    // Verify ownership
-    if (jobMatch.user.toString() !== userId.toString()) {
-      console.log(`❌ Unauthorized access attempt - Match: ${matchId}, User: ${userId}`);
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to access this job match',
-      });
-    }
+    // Populate related documents
+    await jobMatch.populate('resume', 'originalName fileSize createdAt');
+    await jobMatch.populate('jobDescription', 'title company description');
 
     console.log(`✅ Job match retrieved - Status: ${jobMatch.matchStatus}, Score: ${jobMatch.matchScore}%`);
 
-    res.status(200).json({
-      success: true,
-      data: jobMatch,
-    });
+    return responseUtils.sendSuccess(
+      res,
+      jobMatch,
+      'Job match retrieved successfully'
+    );
   } catch (error) {
     console.error('❌ Get job match history error:', error);
-
-    res.status(500).json({
-      success: false,
-      message: 'Failed to retrieve job match',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
-    });
+    return responseUtils.handleError(res, error, 'Failed to retrieve job match');
   }
 };
 
@@ -133,8 +117,10 @@ export const getJobMatchHistory = async (req, res) => {
 /**
  * @desc    Generate or retrieve job match for a resume and job description
  * @route   POST /api/job-match/:resumeId/:jobDescriptionId
- * @query   force=true to regenerate existing match
- * @access  Private
+ * @query   force - Set to 'true' to force regeneration of existing match
+ * @param   resumeId - Resume ID
+ * @param   jobDescriptionId - Job Description ID
+ * @access  Private - Requires authentication, triple ownership verification
  */
 export const generateJobMatch = async (req, res) => {
   const startTime = Date.now();
@@ -150,49 +136,12 @@ export const generateJobMatch = async (req, res) => {
     console.log(`   User ID: ${userId}`);
     console.log(`   Force Regenerate: ${forceRegenerate}`);
 
-    // Verify resume exists and belongs to user
-    const resume = await Resume.findById(resumeId);
-    if (!resume) {
-      console.log(`❌ Resume not found - ID: ${resumeId}`);
-      return res.status(404).json({
-        success: false,
-        message: 'Resume not found',
-      });
-    }
-
-    if (resume.user.toString() !== userId.toString()) {
-      console.log(`❌ Unauthorized resume access - Resume: ${resumeId}, User: ${userId}`);
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to access this resume',
-      });
-    }
-
-    if (resume.parsingStatus !== 'completed') {
-      console.log(`❌ Resume not parsed - Status: ${resume.parsingStatus}`);
-      return res.status(400).json({
-        success: false,
-        message: 'Resume must be successfully parsed before job matching',
-      });
-    }
-
-    // Verify job description exists and belongs to user
-    const jobDescription = await JobDescription.findById(jobDescriptionId);
-    if (!jobDescription) {
-      console.log(`❌ Job description not found - ID: ${jobDescriptionId}`);
-      return res.status(404).json({
-        success: false,
-        message: 'Job description not found',
-      });
-    }
-
-    if (jobDescription.user.toString() !== userId.toString()) {
-      console.log(`❌ Unauthorized job description access - Job: ${jobDescriptionId}, User: ${userId}`);
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to access this job description',
-      });
-    }
+    // Verify ownership of both resume and job description
+    const { resume, jobDescription } = await authUtils.verifyJobMatchResources(
+      resumeId,
+      jobDescriptionId,
+      userId
+    );
 
     console.log(`✅ Resources verified - Resume: "${resume.originalName}", Job: "${jobDescription.title}"`);
 
@@ -212,32 +161,25 @@ export const generateJobMatch = async (req, res) => {
         
         console.log(`✅ Job match generation started (new) - ID: ${jobMatch._id}`);
         
-        return res.status(202).json({
-          success: true,
-          status: 'processing',
-          message: 'Job match generation started',
-          data: {
+        return responseUtils.sendProcessing(
+          res,
+          {
             matchId: jobMatch._id,
             resumeId: jobMatch.resume,
             jobDescriptionId: jobMatch.jobDescription,
             matchStatus: jobMatch.matchStatus,
           },
-        });
+          'Job match generation started'
+        );
       }
 
       // Check if already processing
       if (existingMatch.matchStatus === 'processing') {
         console.log(`⏳ Match already processing - Cannot regenerate now`);
-        return res.status(409).json({
-          success: false,
-          status: 'processing',
-          message: 'Job match is currently being generated. Please wait for it to complete before regenerating.',
-          data: {
-            matchId: existingMatch._id,
-            matchStatus: existingMatch.matchStatus,
-            matchStartedAt: existingMatch.matchStartedAt,
-          },
-        });
+        return responseUtils.sendConflict(
+          res,
+          'Job match is currently being generated. Please wait for it to complete before regenerating.'
+        );
       }
 
       // Regenerate existing
@@ -246,17 +188,16 @@ export const generateJobMatch = async (req, res) => {
       
       console.log(`✅ Job match regeneration started - ID: ${jobMatch._id}`);
       
-      return res.status(202).json({
-        success: true,
-        status: 'processing',
-        message: 'Job match regeneration started',
-        data: {
+      return responseUtils.sendProcessing(
+        res,
+        {
           matchId: jobMatch._id,
           resumeId: jobMatch.resume,
           jobDescriptionId: jobMatch.jobDescription,
           matchStatus: jobMatch.matchStatus,
         },
-      });
+        'Job match regeneration started'
+      );
     }
 
     // Not forcing regeneration
@@ -270,17 +211,16 @@ export const generateJobMatch = async (req, res) => {
       
       console.log(`✅ Job match generation started - ID: ${jobMatch._id}`);
       
-      return res.status(202).json({
-        success: true,
-        status: 'processing',
-        message: 'Job match generation started',
-        data: {
+      return responseUtils.sendProcessing(
+        res,
+        {
           matchId: jobMatch._id,
           resumeId: jobMatch.resume,
           jobDescriptionId: jobMatch.jobDescription,
           matchStatus: jobMatch.matchStatus,
         },
-      });
+        'Job match generation started'
+      );
     }
 
     // Match exists, return based on status
@@ -319,87 +259,55 @@ export const generateJobMatch = async (req, res) => {
       // Still processing - prevent duplicate requests
       console.log(`⏳ Match still processing - ID: ${existingMatch._id}`);
       
-      return res.status(202).json({
-        success: true,
-        status: 'processing',
-        message: 'Job match is currently being generated',
-        data: {
+      return responseUtils.sendProcessing(
+        res,
+        {
           matchId: existingMatch._id,
           resumeId: existingMatch.resume,
           jobDescriptionId: existingMatch.jobDescription,
           matchStatus: existingMatch.matchStatus,
           matchStartedAt: existingMatch.matchStartedAt,
         },
-      });
+        'Job match is currently being generated'
+      );
     } else if (existingMatch.matchStatus === 'failed') {
       // Failed, offer retry
       console.log(`❌ Previous match failed - ID: ${existingMatch._id}, Error: ${existingMatch.errorMessage}`);
       
-      return res.status(500).json({
-        success: false,
-        status: 'failed',
-        message: 'Job match generation failed. Use force=true to retry.',
-        data: {
-          matchId: existingMatch._id,
-          resumeId: existingMatch.resume,
-          jobDescriptionId: existingMatch.jobDescription,
-          matchStatus: existingMatch.matchStatus,
-          errorMessage: existingMatch.errorMessage,
-        },
-      });
+      return responseUtils.sendError(
+        res,
+        'Job match generation failed. Use force=true to retry.',
+        500
+      );
     } else {
       // Pending
       console.log(`⏳ Match pending - ID: ${existingMatch._id}`);
       
-      return res.status(202).json({
-        success: true,
-        status: 'pending',
-        message: 'Job match is queued for generation',
-        data: {
+      return responseUtils.sendProcessing(
+        res,
+        {
           matchId: existingMatch._id,
           resumeId: existingMatch.resume,
           jobDescriptionId: existingMatch.jobDescription,
           matchStatus: existingMatch.matchStatus,
         },
-      });
+        'Job match is queued for generation'
+      );
     }
   } catch (error) {
     const elapsedTime = Date.now() - startTime;
     console.error(`❌ Job match generation error (${elapsedTime}ms):`, error);
 
-    // Determine appropriate status code
-    let statusCode = 500;
-    let message = 'Failed to generate job match';
-
-    if (error.message.includes('not found')) {
-      statusCode = 404;
-      message = error.message;
-    } else if (error.message.includes('not authorized')) {
-      statusCode = 403;
-      message = error.message;
-    } else if (error.message.includes('must be parsed')) {
-      statusCode = 400;
-      message = error.message;
-    } else if (error.message.includes('AI service is not available')) {
-      statusCode = 503;
-      message = error.message;
-    } else if (error.message.includes('currently being generated')) {
-      statusCode = 409;
-      message = error.message;
-    }
-
-    res.status(statusCode).json({
-      success: false,
-      message,
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
-    });
+    return responseUtils.handleError(res, error, 'Failed to generate job match');
   }
 };
 
 /**
  * @desc    Get existing job match
  * @route   GET /api/job-match/:resumeId/:jobDescriptionId
- * @access  Private
+ * @param   resumeId - Resume ID
+ * @param   jobDescriptionId - Job Description ID
+ * @access  Private - Requires authentication, ownership verification
  */
 export const getJobMatch = async (req, res) => {
   try {
@@ -411,59 +319,22 @@ export const getJobMatch = async (req, res) => {
     console.log(`   Job Description ID: ${jobDescriptionId}`);
     console.log(`   User ID: ${userId}`);
 
-    // Verify resume belongs to user
-    const resume = await Resume.findById(resumeId);
-    if (!resume) {
-      console.log(`❌ Resume not found - ID: ${resumeId}`);
-      return res.status(404).json({
-        success: false,
-        message: 'Resume not found',
-      });
-    }
-
-    if (resume.user.toString() !== userId.toString()) {
-      console.log(`❌ Unauthorized resume access`);
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to access this resume',
-      });
-    }
-
-    // Verify job description belongs to user
-    const jobDescription = await JobDescription.findById(jobDescriptionId);
-    if (!jobDescription) {
-      console.log(`❌ Job description not found - ID: ${jobDescriptionId}`);
-      return res.status(404).json({
-        success: false,
-        message: 'Job description not found',
-      });
-    }
-
-    if (jobDescription.user.toString() !== userId.toString()) {
-      console.log(`❌ Unauthorized job description access`);
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized to access this job description',
-      });
-    }
+    // Verify ownership of both resources
+    await authUtils.verifyJobMatchResources(resumeId, jobDescriptionId, userId);
 
     // Find match
     const jobMatch = await JobMatch.findByResumeAndJob(resumeId, jobDescriptionId);
 
     if (!jobMatch) {
       console.log(`❌ No job match found`);
-      return res.status(404).json({
-        success: false,
-        message: 'No job match found for this resume and job description',
-      });
+      return responseUtils.sendNotFound(res, 'Job match');
     }
 
     console.log(`✅ Job match found - Status: ${jobMatch.matchStatus}, Score: ${jobMatch.matchScore}%`);
 
-    res.status(200).json({
-      success: true,
-      status: jobMatch.matchStatus,
-      data: {
+    return responseUtils.sendSuccess(
+      res,
+      {
         matchId: jobMatch._id,
         resumeId: jobMatch.resume,
         jobDescriptionId: jobMatch.jobDescription,
@@ -483,33 +354,20 @@ export const getJobMatch = async (req, res) => {
         errorMessage: jobMatch.errorMessage,
         isStale: jobMatch.isStale(),
       },
-    });
+      'Job match retrieved successfully'
+    );
   } catch (error) {
     console.error('❌ Get job match error:', error);
-
-    let statusCode = 500;
-    let message = 'Failed to retrieve job match';
-
-    if (error.message.includes('not found')) {
-      statusCode = 404;
-      message = error.message;
-    } else if (error.message.includes('not authorized')) {
-      statusCode = 403;
-      message = error.message;
-    }
-
-    res.status(statusCode).json({
-      success: false,
-      message,
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
-    });
+    return responseUtils.handleError(res, error, 'Failed to retrieve job match');
   }
 };
 
 /**
  * @desc    Get job match status
  * @route   GET /api/job-match/:resumeId/:jobDescriptionId/status
- * @access  Private
+ * @param   resumeId - Resume ID
+ * @param   jobDescriptionId - Job Description ID
+ * @access  Private - Requires authentication, lightweight ownership check
  */
 export const getJobMatchStatus = async (req, res) => {
   try {
@@ -518,39 +376,30 @@ export const getJobMatchStatus = async (req, res) => {
 
     console.log(`📊 Get job match status - Resume: ${resumeId}, Job: ${jobDescriptionId}`);
 
-    // Verify ownership (lightweight check)
-    const resume = await Resume.findById(resumeId).select('user');
-    if (!resume || resume.user.toString() !== userId.toString()) {
+    // Lightweight ownership check
+    const isOwned = await authUtils.quickOwnershipCheck(Resume, resumeId, userId);
+    if (!isOwned) {
       console.log(`❌ Unauthorized access`);
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized',
-      });
+      return responseUtils.sendUnauthorized(res);
     }
 
     const status = await jobMatchPipeline.getJobMatchStatus(resumeId, jobDescriptionId);
 
     console.log(`✅ Status retrieved - Exists: ${status.exists}, Status: ${status.status}`);
 
-    res.status(200).json({
-      success: true,
-      ...status,
-    });
+    return responseUtils.sendSuccess(res, status, 'Status retrieved successfully');
   } catch (error) {
     console.error('❌ Get job match status error:', error);
-
-    res.status(500).json({
-      success: false,
-      message: 'Failed to get job match status',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
-    });
+    return responseUtils.handleError(res, error, 'Failed to get job match status');
   }
 };
 
 /**
  * @desc    Delete job match
  * @route   DELETE /api/job-match/:resumeId/:jobDescriptionId
- * @access  Private
+ * @param   resumeId - Resume ID
+ * @param   jobDescriptionId - Job Description ID
+ * @access  Private - Requires authentication, ownership verification
  */
 export const deleteJobMatch = async (req, res) => {
   try {
@@ -563,49 +412,35 @@ export const deleteJobMatch = async (req, res) => {
     console.log(`   User ID: ${userId}`);
 
     // Verify ownership
-    const resume = await Resume.findById(resumeId).select('user');
-    if (!resume || resume.user.toString() !== userId.toString()) {
+    const isOwned = await authUtils.quickOwnershipCheck(Resume, resumeId, userId);
+    if (!isOwned) {
       console.log(`❌ Unauthorized access`);
-      return res.status(403).json({
-        success: false,
-        message: 'Not authorized',
-      });
+      return responseUtils.sendUnauthorized(res);
     }
 
     const jobMatch = await JobMatch.findByResumeAndJob(resumeId, jobDescriptionId);
     
     if (!jobMatch) {
       console.log(`❌ Job match not found`);
-      return res.status(404).json({
-        success: false,
-        message: 'Job match not found',
-      });
+      return responseUtils.sendNotFound(res, 'Job match');
     }
 
     // Don't allow deleting while processing
     if (jobMatch.matchStatus === 'processing') {
       console.log(`❌ Cannot delete while processing`);
-      return res.status(409).json({
-        success: false,
-        message: 'Cannot delete job match while it is being generated',
-      });
+      return responseUtils.sendConflict(
+        res,
+        'Cannot delete job match while it is being generated'
+      );
     }
 
     await JobMatch.deleteOne({ _id: jobMatch._id });
 
     console.log(`✅ Job match deleted - ID: ${jobMatch._id}`);
 
-    res.status(200).json({
-      success: true,
-      message: 'Job match deleted successfully',
-    });
+    return responseUtils.sendSuccess(res, null, 'Job match deleted successfully');
   } catch (error) {
     console.error('❌ Delete job match error:', error);
-
-    res.status(500).json({
-      success: false,
-      message: 'Failed to delete job match',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
-    });
+    return responseUtils.handleError(res, error, 'Failed to delete job match');
   }
 };
