@@ -4,13 +4,19 @@
  */
 
 import api from './api';
+import { handleApiError, retryRequest } from '../utils/errorHandler';
 
 /**
  * Get complete dashboard data
  * @returns {Promise} API response
  */
 export const getDashboard = async () => {
-  return api.get('/dashboard');
+  try {
+    return await retryRequest(() => api.get('/dashboard'));
+  } catch (error) {
+    const message = handleApiError(error, 'getDashboard');
+    throw new Error(message);
+  }
 };
 
 /**
@@ -18,7 +24,12 @@ export const getDashboard = async () => {
  * @returns {Promise} API response
  */
 export const getDashboardOverview = async () => {
-  return api.get('/dashboard/overview');
+  try {
+    return await retryRequest(() => api.get('/dashboard/overview'));
+  } catch (error) {
+    const message = handleApiError(error, 'getDashboardOverview');
+    throw new Error(message);
+  }
 };
 
 /**
@@ -30,8 +41,15 @@ export const getDashboardOverview = async () => {
  * @returns {Promise} API response
  */
 export const getChartData = async (params = {}) => {
-  const queryString = new URLSearchParams(params).toString();
-  return api.get(`/dashboard/charts${queryString ? `?${queryString}` : ''}`);
+  try {
+    const queryString = new URLSearchParams(params).toString();
+    return await retryRequest(() =>
+      api.get(`/dashboard/charts${queryString ? `?${queryString}` : ''}`)
+    );
+  } catch (error) {
+    const message = handleApiError(error, 'getChartData');
+    throw new Error(message);
+  }
 };
 
 /**
@@ -40,7 +58,12 @@ export const getChartData = async (params = {}) => {
  * @returns {Promise} API response
  */
 export const getRecentActivity = async (limit = 10) => {
-  return api.get(`/dashboard/activity?limit=${limit}`);
+  try {
+    return await retryRequest(() => api.get(`/dashboard/activity?limit=${limit}`));
+  } catch (error) {
+    const message = handleApiError(error, 'getRecentActivity');
+    throw new Error(message);
+  }
 };
 
 /**
@@ -48,5 +71,10 @@ export const getRecentActivity = async (limit = 10) => {
  * @returns {Promise} API response
  */
 export const getStatusBreakdown = async () => {
-  return api.get('/dashboard/status');
+  try {
+    return await retryRequest(() => api.get('/dashboard/status'));
+  } catch (error) {
+    const message = handleApiError(error, 'getStatusBreakdown');
+    throw new Error(message);
+  }
 };

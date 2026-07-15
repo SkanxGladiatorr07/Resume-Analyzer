@@ -20,11 +20,20 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import { dashboardService } from '../services';
-import { LoadingSpinner, NotificationBanner } from '../components';
-import StatCard from '../components/dashboard/StatCard';
-import ChartCard from '../components/dashboard/ChartCard';
-import RecentItem from '../components/dashboard/RecentItem';
+import { dashboardService, resumeService } from '../services';
+import { NotificationBanner } from '../components';
+import {
+  StatCard,
+  ChartCard,
+  RecentItem,
+  QuickActions,
+  ActivityTimeline,
+  EmptyStateCard,
+  DashboardSkeleton,
+  StatsGridSkeleton,
+  ChartCardSkeleton,
+} from '../components/dashboard';
+import { handleApiError } from '../utils/errorHandler';
 
 const AnalyticsDashboard = () => {
   const navigate = useNavigate();
@@ -32,8 +41,11 @@ const AnalyticsDashboard = () => {
   // State management
   const [overview, setOverview] = useState(null);
   const [chartData, setChartData] = useState(null);
+  const [recentActivity, setRecentActivity] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isChartsLoading, setIsChartsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   /**
    * Fetch dashboard data on mount
@@ -43,32 +55,141 @@ const AnalyticsDashboard = () => {
   }, []);
 
   /**
+   * Auto-dismiss success messages
+   */
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
+  /**
+   * Auto-dismiss error messages
+   */
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
+  /**
    * Fetch all dashboard data
    */
   const fetchDashboardData = async () => {
     try {
       setIsLoading(true);
+      setIsChartsLoading(true);
       setError(null);
 
-      // Fetch overview and chart data in parallel
-      const [overviewRes, chartsRes] = await Promise.all([
-        dashboardService.getDashboardOverview(),
-        dashboardService.getChartData({ days: 30, topSkills: 10, topMissingSkills: 5 }),
-      ]);
-
+      // Fetch overview first (faster response)
+      const overviewRes = await dashboardService.getDashboardOverview();
       setOverview(overviewRes.data);
+      setIsLoading(false);
+
+      // Transform overview data to activity timeline
+      const activities = transformToActivities(overviewRes.data);
+      setRecentActivity(activities);
+
+      // Fetch chart data (can be slower)
+      const chartsRes = await dashboardService.getChartData({
+        days: 30,
+        topSkills: 10,
+        topMissingSkills: 5,
+      });
       setChartData(chartsRes.data);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      setError('Failed to load analytics. Please try again.');
-    } finally {
+      const errorMsg = handleApiError(err, 'Analytics Dashboard');
+      setError(errorMsg);
       setIsLoading(false);
+    } finally {
+      setIsChartsLoading(false);
     }
+  };
+
+  /**
+   * Transform overview data to activity timeline format
+   */
+  const transformToActivities = (data) => {
+    const activities = [];
+
+    if (data.latestResume) {
+      activities.push({
+        id: `resume-${data.latestResume._id}`,
+        type: 'upload',
+        title: 'Resume uploaded',
+        description: data.latestResume.fileName || 'Untitled Resume',
+        timestamp: data.latestResume.uploadedAt || data.latestResume.createdAt,
+      });
+    }
+
+    if (data.latestAnalysis) {
+      activities.push({
+        id: `analysis-${data.latestAnalysis._id}`,
+        type: 'analysis',
+        title: 'AI analysis completed',
+        description: `ATS Score: ${data.latestAnalysis.atsScore || 'N/A'}%`,
+        timestamp: data.latestAnalysis.analyzedAt || data.latestAnalysis.createdAt,
+      });
+    }
+
+    if (data.latestJobMatch) {
+      activities.push({
+        id: `jobmatch-${data.latestJobMatch._id}`,
+        type: 'jobMatch',
+        title: 'Job comparison completed',
+        description: data.latestJobMatch.jobTitle || 'Job Match',
+        timestamp: data.latestJobMatch.comparedAt || data.latestJobMatch.createdAt,
+      });
+    }
+
+    // Sort by timestamp (newest first)
+    return activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  };
+
+  /**
+   * Quick Actions Handlers
+   */
+  const handleUploadResume = () => {
+    navigate('/upload');
+  };
+
+  const handleAnalyzeResume = async () => {
+    try {
+      // Fetch user's resumes
+      const response = await resumeService.getResumes();
+      const resumes = response.data || [];
+
+      if (resumes.length === 0) {
+        setError('No resumes found. Please upload a resume first.');
+        return;
+      }
+
+      // Navigate to the most recent resume details
+      navigate(`/resume/${resumes[0]._id}`);
+    } catch (err) {
+      const errorMsg = handleApiError(err, 'Analyze Resume');
+      setError(errorMsg);
+    }
+  };
+
+  const handleCompareJob = () => {
+    navigate('/job-match');
+  };
+
+  const handleViewHistory = () => {
+    navigate('/dashboard');
   };
 
   // Loading state
   if (isLoading) {
-    return <LoadingSpinner text="Loading analytics..." />;
+    return <DashboardSkeleton />;
   }
 
   // Chart colors
@@ -86,11 +207,18 @@ const AnalyticsDashboard = () => {
         </p>
       </div>
 
+      {/* Success Notification */}
+      <NotificationBanner
+        type="success"
+        message={successMessage}
+        onDismiss={() => setSuccessMessage(null)}
+      />
+
       {/* Error Notification */}
       <NotificationBanner type="error" message={error} onDismiss={() => setError(null)} />
 
       {/* Top Stat Cards */}
-      {overview && (
+      {overview ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Total Resumes"
@@ -121,10 +249,29 @@ const AnalyticsDashboard = () => {
             subtitle="Average completeness"
           />
         </div>
+      ) : (
+        <StatsGridSkeleton />
+      )}
+
+      {/* Quick Actions Section */}
+      <div className="mb-8">
+        <QuickActions
+          onUpload={handleUploadResume}
+          onAnalyze={handleAnalyzeResume}
+          onCompare={handleCompareJob}
+          onHistory={handleViewHistory}
+        />
+      </div>
+
+      {/* Recent Activity Timeline */}
+      {overview && overview.totalResumes > 0 && (
+        <div className="mb-8">
+          <ActivityTimeline activities={recentActivity} isLoading={false} />
+        </div>
       )}
 
       {/* Charts Section */}
-      {chartData && (
+      {chartData ? (
         <div className="space-y-8 mb-8">
           {/* ATS Score Trend */}
           {chartData.atsScoreTrend && chartData.atsScoreTrend.data.length > 0 && (
@@ -268,7 +415,15 @@ const AnalyticsDashboard = () => {
             </ChartCard>
           )}
         </div>
-      )}
+      ) : isChartsLoading ? (
+        <div className="space-y-8 mb-8">
+          <ChartCardSkeleton />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <ChartCardSkeleton />
+            <ChartCardSkeleton />
+          </div>
+        </div>
+      ) : null}
 
       {/* Recent Items Section */}
       {overview && (overview.latestResume || overview.latestAnalysis || overview.latestJobMatch) && (
@@ -313,19 +468,19 @@ const AnalyticsDashboard = () => {
 
       {/* Empty State */}
       {overview && overview.totalResumes === 0 && (
-        <div className="bg-white rounded-lg shadow-md p-12 text-center">
-          <div className="text-6xl mb-4">📊</div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No Analytics Yet</h3>
-          <p className="text-gray-600 mb-6">
-            Upload your first resume to start tracking your analytics and insights.
-          </p>
-          <button
-            onClick={() => navigate('/upload')}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-          >
-            Upload Resume
-          </button>
-        </div>
+        <EmptyStateCard
+          icon="📊"
+          title="No Analytics Yet"
+          description="Upload your first resume to start tracking your analytics and insights."
+          action={
+            <button
+              onClick={() => navigate('/upload')}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+            >
+              Upload Resume
+            </button>
+          }
+        />
       )}
     </div>
   );

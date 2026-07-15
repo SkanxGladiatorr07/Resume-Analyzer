@@ -22,6 +22,7 @@ export { ConfirmDialog } from './ConfirmDialog';
 export { EmptyState } from './EmptyState';
 export { LoadingSpinner } from './LoadingSpinner';
 export { NotificationBanner } from './NotificationBanner';
+export { default as ErrorBoundary } from './ErrorBoundary';
 
 // Route Components
 export { default as ProtectedRoute } from './ProtectedRoute';
