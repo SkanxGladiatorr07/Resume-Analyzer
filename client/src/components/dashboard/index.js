@@ -9,4 +9,5 @@ export { default as RecentItem } from './RecentItem';
 export { default as QuickActions } from './QuickActions';
 export { default as ActivityTimeline } from './ActivityTimeline';
 export { default as EmptyStateCard } from './EmptyStateCard';
+export { default as OptimizedChart } from './OptimizedChart';
 export * from './LoadingSkeleton';

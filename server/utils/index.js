@@ -7,3 +7,4 @@ export * as authUtils from './authUtils.js';
 export * as responseUtils from './responseUtils.js';
 export * as aiValidator from './aiValidator.js';
 export * as embeddingUtils from './embeddingUtils.js';
+export * as ragPreparation from './ragPreparation.js';

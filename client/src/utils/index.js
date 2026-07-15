@@ -4,3 +4,4 @@
  */
 
 export * from './errorHandler';
+export * from './cacheManager';
