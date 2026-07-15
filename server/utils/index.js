@@ -8,3 +8,4 @@ export * as responseUtils from './responseUtils.js';
 export * as aiValidator from './aiValidator.js';
 export * as embeddingUtils from './embeddingUtils.js';
 export * as ragPreparation from './ragPreparation.js';
+export * as ragSetup from './ragSetup.js';
