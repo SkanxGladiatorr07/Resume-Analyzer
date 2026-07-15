@@ -13,3 +13,5 @@ export * as analyticsService from './analyticsService.js';
 export * as embeddingService from './embeddingService.js';
 export * as vectorService from './vectorService.js';
 export * as chunkingService from './chunkingService.js';
+export * as embeddingPipeline from './embeddingPipeline.js';
+

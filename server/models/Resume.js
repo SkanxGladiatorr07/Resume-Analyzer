@@ -60,6 +60,28 @@ const resumeSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    // Embedding status
+    embeddingStatus: {
+      type: String,
+      enum: ['pending', 'processing', 'completed', 'failed'],
+      default: 'pending',
+    },
+    embeddingError: {
+      type: String,
+      default: null,
+    },
+    embeddingStartedAt: {
+      type: Date,
+      default: null,
+    },
+    embeddingCompletedAt: {
+      type: Date,
+      default: null,
+    },
+    embeddingRetryCount: {
+      type: Number,
+      default: 0,
+    },
     // Structured parsed data
     structuredData: {
       contactInfo: {
