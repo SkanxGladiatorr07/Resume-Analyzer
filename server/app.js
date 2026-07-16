@@ -10,6 +10,7 @@ import jobDescriptionRoutes from './routes/jobDescriptionRoutes.js';
 import jobMatchRoutes from './routes/jobMatchRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import searchRoutes from './routes/searchRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use('/api/job-descriptions', jobDescriptionRoutes);
 app.use('/api/job-match', jobMatchRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/chat', chatRoutes);
 
 // 404 Handler
 app.use((req, res) => {

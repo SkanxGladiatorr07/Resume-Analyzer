@@ -18,5 +18,6 @@ export * as searchService from './searchService.js';
 export * as chunkService from './chunkService.js';
 export * as retrievalService from './retrievalService.js';
 export * as ragPipeline from './ragPipeline.js';
+export * as chatService from './chatService.js';
 
 
