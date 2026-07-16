@@ -286,7 +286,7 @@ const processChunk = async (chunk) => {
 
 /**
  * Generate embeddings for all chunks of a resume
- * Main pipeline function
+ * Main pipeline function with improved duplicate prevention
  * 
  * @param {string} resumeId - Resume identifier
  * @returns {Promise<Object>} Pipeline execution result
@@ -301,10 +301,46 @@ export const generateEmbeddingsForResume = async (resumeId) => {
   console.log(`\n[EmbeddingPipeline] Starting pipeline for resume: ${resumeId}`);
 
   try {
-    // Step 1: Update resume status to processing
+    // Step 1: Get resume
+    const resume = await Resume.findById(resumeId);
+    if (!resume) {
+      throw new Error('Resume not found');
+    }
+
+    // Step 2: Prevent duplicate processing
+    if (resume.embeddingStatus === 'processing') {
+      console.log('[EmbeddingPipeline] Resume is already being processed, skipping');
+      return {
+        resumeId,
+        skipped: true,
+        reason: 'Already processing',
+        embeddingStatus: 'processing',
+      };
+    }
+
+    if (resume.embeddingStatus === 'completed') {
+      // Check if all chunks are actually indexed
+      const chunks = await ResumeChunk.findByResumeId(resumeId);
+      const indexedCount = chunks.filter((c) => c.status === 'indexed').length;
+      
+      if (indexedCount === chunks.length && chunks.length > 0) {
+        console.log('[EmbeddingPipeline] All chunks already indexed, skipping');
+        return {
+          resumeId,
+          skipped: true,
+          reason: 'All chunks indexed',
+          totalChunks: chunks.length,
+          successful: indexedCount,
+        };
+      }
+      
+      console.log('[EmbeddingPipeline] Resume marked complete but has unindexed chunks, continuing');
+    }
+
+    // Step 3: Update resume status to processing
     await updateResumeStatus(resumeId, 'processing');
 
-    // Step 2: Fetch all chunks for this resume
+    // Step 4: Fetch all chunks for this resume
     const chunks = await ResumeChunk.findByResumeId(resumeId);
 
     if (chunks.length === 0) {

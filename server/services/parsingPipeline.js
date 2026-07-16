@@ -110,6 +110,17 @@ export const startParsing = async (resumeId) => {
       // Don't fail the parsing if analysis triggering fails
     }
 
+    // Step 10: Trigger RAG pipeline (chunking + embedding) - async, non-blocking
+    console.log(`🚀 Triggering RAG pipeline (chunking + embedding)...`);
+    try {
+      const { triggerRAGPipelineAfterParsing } = await import('./ragPipeline.js');
+      triggerRAGPipelineAfterParsing(resume._id.toString());
+      console.log(`   ✓ RAG pipeline triggered`);
+    } catch (ragError) {
+      console.error(`   ⚠️  Failed to trigger RAG pipeline:`, ragError.message);
+      // Don't fail the parsing if RAG triggering fails
+    }
+
     return {
       success: true,
       resumeId: resume._id,

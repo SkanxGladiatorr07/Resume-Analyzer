@@ -10,3 +10,5 @@ export * as embeddingUtils from './embeddingUtils.js';
 export * as ragPreparation from './ragPreparation.js';
 export * as ragSetup from './ragSetup.js';
 export * as chunkUtils from './chunkUtils.js';
+export * as ragLogger from './ragLogger.js';
+export * as vectorOptimizer from './vectorOptimizer.js';
