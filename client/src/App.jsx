@@ -11,6 +11,7 @@ import { ResumeDetails } from './pages/ResumeDetails'
 import Analysis from './pages/Analysis'
 import JobMatch from './pages/JobMatch'
 import JobMatchHistory from './pages/JobMatchHistory'
+import ResumeChat from './pages/ResumeChat'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import NotFound from './pages/NotFound'
@@ -108,6 +109,16 @@ function App() {
           >
             <Route index element={<JobMatchHistory />} />
           </Route>
+
+          {/* Resume Chat page - protected route without main layout (full screen) */}
+          <Route
+            path="/chat"
+            element={
+              <ProtectedRoute>
+                <ResumeChat />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Auth routes (redirect if already logged in) */}
           <Route

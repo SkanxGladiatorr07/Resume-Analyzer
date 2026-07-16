@@ -388,9 +388,15 @@ const Dashboard = () => {
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="text-2xl mb-2">💬</div>
               <h3 className="font-semibold text-gray-900 mb-2">Resume Chat</h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 mb-3">
                 Ask questions about your resume and get instant answers
               </p>
+              <button
+                onClick={() => navigate('/chat')}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors text-sm"
+              >
+                Start Chat
+              </button>
             </div>
 
             <div className="bg-gray-50 p-4 rounded-lg">

@@ -11,6 +11,7 @@ import analysisService from './analysisService';
 import * as jobDescriptionService from './jobDescriptionService';
 import * as jobMatchService from './jobMatchService';
 import * as dashboardService from './dashboardService';
+import chatService from './chatService';
 
 // Export individual services
 export { 
@@ -21,5 +22,6 @@ export {
   analysisService,
   jobDescriptionService,
   jobMatchService,
-  dashboardService
+  dashboardService,
+  chatService
 };
