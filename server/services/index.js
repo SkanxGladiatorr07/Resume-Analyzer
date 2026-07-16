@@ -14,4 +14,5 @@ export * as embeddingService from './embeddingService.js';
 export * as vectorService from './vectorService.js';
 export * as chunkingService from './chunkingService.js';
 export * as embeddingPipeline from './embeddingPipeline.js';
+export * as searchService from './searchService.js';
 
