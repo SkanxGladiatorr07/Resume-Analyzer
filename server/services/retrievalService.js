@@ -8,6 +8,8 @@
 
 import { searchResume, searchMultipleResumes } from './searchService.js';
 import { logSearch, logStructuredError } from '../utils/ragLogger.js';
+import { optimizeChunks } from '../utils/chatHelpers.js';
+import chatConfig from '../config/chat.js';
 
 /**
  * Retrieve relevant chunks for a query
@@ -125,6 +127,7 @@ export const formatChunksForContext = (chunks, options = {}) => {
 /**
  * Get context for RAG chat
  * Retrieves and formats chunks for use in chat
+ * Enhanced with chunk optimization and minimum similarity filtering
  * 
  * @param {Object} params - Context parameters
  * @param {string} params.resumeId - Resume identifier
@@ -135,17 +138,35 @@ export const formatChunksForContext = (chunks, options = {}) => {
  */
 export const getContextForChat = async ({ resumeId, query, userId, options = {} }) => {
   try {
-    // Retrieve relevant chunks
-    const topK = options.topK || 5;
+    // Retrieve relevant chunks with increased topK to allow for filtering
+    const topK = options.topK || chatConfig.retrieval.topK;
+    const minSimilarityScore = options.minSimilarityScore || chatConfig.retrieval.minSimilarityScore;
+    
+    // Request more chunks than needed to allow for filtering
+    const retrieveTopK = Math.min(topK * 2, 20);
+    
     const results = await retrieveRelevantChunks({
       resumeId,
       query,
       userId,
-      options: { topK },
+      options: { topK: retrieveTopK },
     });
 
+    // Optimize chunks: filter by score, remove duplicates, limit size
+    const optimizedChunks = optimizeChunks(results.results, {
+      minScore: minSimilarityScore,
+      maxChunks: topK,
+      maxLength: options.maxContextLength || chatConfig.retrieval.maxContextLength,
+    });
+
+    // Log optimization results
+    console.log(`[RetrievalService] Retrieved ${results.totalResults} chunks, optimized to ${optimizedChunks.length}`);
+    if (optimizedChunks.length > 0) {
+      console.log(`[RetrievalService] Score range: ${(optimizedChunks[0].score * 100).toFixed(1)}% - ${(optimizedChunks[optimizedChunks.length - 1].score * 100).toFixed(1)}%`);
+    }
+
     // Format for context
-    const context = formatChunksForContext(results.results, {
+    const context = formatChunksForContext(optimizedChunks, {
       maxLength: options.maxContextLength,
       includeScores: options.includeScores,
       includeSections: options.includeSections,
@@ -153,8 +174,9 @@ export const getContextForChat = async ({ resumeId, query, userId, options = {} 
 
     return {
       context,
-      chunks: results.results,
-      totalResults: results.totalResults,
+      chunks: optimizedChunks,
+      totalResults: optimizedChunks.length,
+      originalResults: results.totalResults,
       resumeId,
       query,
     };

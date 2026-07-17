@@ -13,61 +13,56 @@ import ChatSession from '../models/ChatSession.js';
 import ChatMessage from '../models/ChatMessage.js';
 import Resume from '../models/Resume.js';
 
+// Import new modules
+import chatConfig from '../config/chat.js';
+import {
+  isDuplicateRequest,
+  markRequestInProgress,
+  clearRequest,
+  validateMessage,
+  sleep,
+  calculateBackoff,
+  sanitizeForLog,
+  getShortId,
+} from '../utils/chatHelpers.js';
+import { buildChatPrompt, buildNoContextPrompt, validatePrompt } from './promptBuilder.js';
+
 /**
- * Build structured prompt for AI chat
- * Creates a prompt with retrieved context and user question
+ * Call Gemini with retry mechanism
+ * Implements exponential backoff for transient failures
  * 
- * @param {string} question - User's question
- * @param {Array} chunks - Retrieved resume chunks
- * @param {string} resumeFileName - Resume file name for context
- * @returns {string} Structured prompt
+ * @param {string} prompt - Prompt to send
+ * @param {number} attempt - Current attempt number
+ * @returns {Promise<Object>} AI response
  */
-const buildChatPrompt = (question, chunks, resumeFileName) => {
-  // Build context from chunks
-  let context = '';
-  chunks.forEach((chunk, index) => {
-    context += `\n--- Chunk ${index + 1} [${chunk.sectionName}] (Relevance: ${(chunk.score * 100).toFixed(1)}%) ---\n`;
-    context += chunk.text;
-    context += '\n';
-  });
+const callGeminiWithRetry = async (prompt, attempt = 0) => {
+  const maxRetries = chatConfig.gemini.maxRetries;
+  const logPrefix = '[AI Chat]';
 
-  // Build the structured prompt
-  const prompt = `You are an AI assistant helping users understand their resume. You have been given relevant sections from the resume "${resumeFileName}".
+  try {
+    const response = await generateContent(prompt, true);
+    return response;
+  } catch (error) {
+    // Check if we should retry
+    const isRetryable = 
+      error.message.includes('timeout') ||
+      error.message.includes('429') ||
+      error.message.includes('503') ||
+      error.message.includes('UNAVAILABLE');
 
-RESUME CONTEXT:
-${context}
-
-USER QUESTION:
-${question}
-
-IMPORTANT INSTRUCTIONS:
-1. Answer ONLY based on the provided resume context above
-2. If the answer is not in the provided context, respond with: "I don't have enough information in your resume to answer this question."
-3. Be specific and reference the exact sections when answering
-4. Keep answers concise and professional
-5. If you mention any information, it MUST come from the resume context provided
-
-Your response MUST be in this EXACT JSON format (no markdown, no code blocks, no extra text):
-{
-  "answer": "Your detailed answer here, based ONLY on the resume context",
-  "sources": [
-    {
-      "section": "Section name from resume",
-      "similarity": 0.92
+    if (isRetryable && attempt < maxRetries) {
+      const delay = calculateBackoff(attempt);
+      console.log(`${logPrefix} Gemini call failed (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${delay}ms...`);
+      console.log(`${logPrefix} Error: ${error.message}`);
+      
+      await sleep(delay);
+      return callGeminiWithRetry(prompt, attempt + 1);
     }
-  ]
-}
 
-The "sources" array should list which resume sections you used to answer, with their relevance scores.
-If you cannot answer from the provided context, return:
-{
-  "answer": "I don't have enough information in your resume to answer this question.",
-  "sources": []
-}
-
-Remember: Your response must be ONLY the JSON object. No additional text, explanations, or markdown formatting.`;
-
-  return prompt;
+    // Max retries reached or non-retryable error
+    console.error(`${logPrefix} Gemini call failed after ${attempt + 1} attempts`);
+    throw error;
+  }
 };
 
 /**
@@ -127,14 +122,33 @@ const validateAIResponse = (response, retrievedChunks) => {
  */
 export const processChatMessage = async (sessionId, userId, question) => {
   const startTime = Date.now();
-  const logPrefix = `[AI Chat ${sessionId.slice(-6)}]`;
+  const shortId = getShortId(sessionId);
+  const logPrefix = `[AI Chat ${shortId}]`;
 
   try {
     console.log(`\n${'='.repeat(70)}`);
     console.log(`${logPrefix} 🚀 Starting Chat Pipeline`);
-    console.log(`${logPrefix} Question: "${question.substring(0, 100)}${question.length > 100 ? '...' : ''}"`);
+    console.log(`${logPrefix} Question: "${sanitizeForLog(question, 100)}"`);
     console.log(`${logPrefix} User ID: ${userId}`);
     console.log(`${'='.repeat(70)}\n`);
+
+    // Step 0: Validate message
+    console.log(`${logPrefix} 📝 Step 0/9: Validating message...`);
+    const validation = validateMessage(question);
+    
+    if (!validation.isValid) {
+      throw new Error(`Invalid message: ${validation.errors.join(', ')}`);
+    }
+
+    // Step 0.5: Check for duplicate requests
+    console.log(`${logPrefix} 🔍 Step 0.5/9: Checking for duplicates...`);
+    if (isDuplicateRequest(sessionId, question)) {
+      console.log(`${logPrefix} ⚠️  Duplicate request detected - rejecting\n`);
+      throw new Error('Duplicate request. Please wait for the previous request to complete.');
+    }
+
+    // Mark request as in-progress
+    markRequestInProgress(sessionId, question);
 
     // Step 1: Validate session and get resume
     console.log(`${logPrefix} 📋 Step 1/9: Validating session...`);
@@ -187,7 +201,7 @@ export const processChatMessage = async (sessionId, userId, question) => {
     console.log(`${logPrefix}    • Dimensions: ${questionEmbedding.length}`);
     console.log(`${logPrefix}    • Model: text-embedding-004\n`);
 
-    // Step 4: Retrieve relevant chunks (Top 5)
+    // Step 4: Retrieve relevant chunks (Top K from config)
     console.log(`${logPrefix} 🔍 Step 4/9: Retrieving relevant resume chunks...`);
     const step4StartTime = Date.now();
     const retrievalResult = await getContextForChat({
@@ -195,8 +209,9 @@ export const processChatMessage = async (sessionId, userId, question) => {
       query: question,
       userId,
       options: {
-        topK: 5,
-        maxContextLength: 4000,
+        topK: chatConfig.retrieval.topK,
+        maxContextLength: chatConfig.retrieval.maxContextLength,
+        minSimilarityScore: chatConfig.retrieval.minSimilarityScore,
         includeScores: true,
         includeSections: true,
       },
@@ -214,13 +229,16 @@ export const processChatMessage = async (sessionId, userId, question) => {
     if (retrievalResult.chunks.length === 0) {
       console.log(`${logPrefix} ⚠️  No relevant chunks found - returning generic response\n`);
       
+      // Clear request from cache
+      clearRequest(sessionId, question);
+      
       // Create AI message with no context response
       const aiMessage = await ChatMessage.createAIMessage(
         sessionId,
         "I don't have enough information in your resume to answer this question.",
         [],
         {
-          model: 'gemini-1.5-flash',
+          model: chatConfig.gemini.model,
           tokensUsed: 0,
           responseTime: Date.now() - startTime,
         }
@@ -252,35 +270,51 @@ export const processChatMessage = async (sessionId, userId, question) => {
       };
     }
 
-    // Step 5: Build structured prompt
+    // Step 5: Build structured prompt with new prompt builder
     console.log(`${logPrefix} 📝 Step 5/9: Building structured prompt...`);
     const step5StartTime = Date.now();
-    const prompt = buildChatPrompt(
+    const promptObject = buildChatPrompt(
       question,
       retrievalResult.chunks,
       resume.fileName || resume.originalName
     );
+
+    // Validate prompt
+    const promptValidation = validatePrompt(promptObject);
+    if (!promptValidation.isValid) {
+      throw new Error(`Invalid prompt: ${promptValidation.errors.join(', ')}`);
+    }
+
     const step5Time = Date.now() - step5StartTime;
     console.log(`${logPrefix} ✅ Step 5 Complete (${step5Time}ms)`);
-    console.log(`${logPrefix}    • Prompt Length: ${prompt.length} characters`);
-    console.log(`${logPrefix}    • Context Chunks: ${retrievalResult.chunks.length}\n`);
+    console.log(`${logPrefix}    • Prompt Length: ${promptObject.text.length} characters`);
+    console.log(`${logPrefix}    • Estimated Tokens: ${promptObject.metadata.estimatedTokens}`);
+    console.log(`${logPrefix}    • Truncated: ${promptObject.metadata.truncated ? 'Yes' : 'No'}`);
+    console.log(`${logPrefix}    • Context Chunks: ${promptObject.metadata.chunksUsed}\n`);
 
-    // Step 6: Send to Gemini and get response
-    console.log(`${logPrefix} 🤖 Step 6/9: Sending to Gemini AI...`);
+    // Step 6: Send to Gemini with retry mechanism
+    console.log(`${logPrefix} 🤖 Step 6/9: Sending to Gemini AI (with retry)...`);
     let aiResponse;
     let responseTime = 0;
 
     try {
       const geminiStartTime = Date.now();
-      aiResponse = await generateContent(prompt, true);
+      aiResponse = await callGeminiWithRetry(promptObject.text);
       responseTime = Date.now() - geminiStartTime;
+      
+      // Clear request from cache after successful response
+      clearRequest(sessionId, question);
+      
       console.log(`${logPrefix} ✅ Step 6 Complete (${responseTime}ms)`);
-      console.log(`${logPrefix}    • Model: gemini-1.5-flash`);
+      console.log(`${logPrefix}    • Model: ${chatConfig.gemini.model}`);
       console.log(`${logPrefix}    • Answer Length: ${aiResponse.answer?.length || 0} characters`);
       console.log(`${logPrefix}    • Sources Cited: ${aiResponse.sources?.length || 0}\n`);
     } catch (geminiError) {
       console.error(`${logPrefix} ❌ Step 6 Failed: Gemini error`);
       console.error(`${logPrefix}    • Error: ${geminiError.message}\n`);
+      
+      // Clear request from cache
+      clearRequest(sessionId, question);
       
       // Create error AI message
       const errorMessage = await ChatMessage.createAIMessage(
@@ -288,7 +322,7 @@ export const processChatMessage = async (sessionId, userId, question) => {
         "I'm sorry, I'm having trouble processing your question right now. Please try again in a moment.",
         [],
         {
-          model: 'gemini-1.5-flash',
+          model: chatConfig.gemini.model,
           tokensUsed: 0,
           responseTime: Date.now() - startTime,
         }
@@ -373,8 +407,8 @@ export const processChatMessage = async (sessionId, userId, question) => {
       aiResponse.answer,
       sourcesUsed,
       {
-        model: 'gemini-1.5-flash',
-        tokensUsed: Math.ceil(prompt.length / 4), // Rough estimate
+        model: chatConfig.gemini.model,
+        tokensUsed: promptObject.metadata.estimatedTokens,
         responseTime,
       }
     );
@@ -425,7 +459,12 @@ export const processChatMessage = async (sessionId, userId, question) => {
     };
   } catch (error) {
     const totalTime = Date.now() - startTime;
-    const logPrefix = `[AI Chat ${sessionId.slice(-6)}]`;
+    const shortId = getShortId(sessionId);
+    const logPrefix = `[AI Chat ${shortId}]`;
+    
+    // Clear request from cache on error
+    clearRequest(sessionId, question);
+    
     console.error(`\n${'='.repeat(70)}`);
     console.error(`${logPrefix} ❌ PIPELINE ERROR`);
     console.error(`${logPrefix} Error: ${error.message}`);

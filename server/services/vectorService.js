@@ -166,6 +166,7 @@ export const upsertVectorsBatch = async (vectors, namespace, batchSize = 100) =>
 /**
  * Query similar vectors
  * Finds vectors most similar to the query embedding
+ * Enhanced with better error handling and query optimization
  * 
  * @param {number[]} queryEmbedding - Query vector embedding
  * @param {Object} [options={}] - Query options
@@ -174,6 +175,7 @@ export const upsertVectorsBatch = async (vectors, namespace, batchSize = 100) =>
  * @param {string} [options.namespace] - Namespace to query
  * @param {boolean} [options.includeMetadata=true] - Include metadata in results
  * @param {boolean} [options.includeValues=false] - Include vector values in results
+ * @param {number} [options.minScore] - Minimum similarity score (0-1)
  * @returns {Promise<QueryResult[]>} Array of similar vectors with scores
  * @throws {Error} If query operation fails
  * 
@@ -182,12 +184,20 @@ export const upsertVectorsBatch = async (vectors, namespace, batchSize = 100) =>
  *   queryEmbedding,
  *   {
  *     topK: 5,
- *     filter: { documentType: 'resume', userId: 'user-123' }
+ *     filter: { documentType: 'resume', userId: 'user-123' },
+ *     minScore: 0.7
  *   }
  * );
  */
 export const querySimilarVectors = async (queryEmbedding, options = {}) => {
+  const startTime = Date.now();
+
   try {
+    // Validate query embedding
+    if (!Array.isArray(queryEmbedding) || queryEmbedding.length === 0) {
+      throw new Error('Query embedding must be a non-empty array');
+    }
+
     await ensureIndexExists();
 
     const index = await getPineconeIndex();
@@ -199,25 +209,66 @@ export const querySimilarVectors = async (queryEmbedding, options = {}) => {
       namespace,
       includeMetadata = true,
       includeValues = false,
+      minScore,
     } = options;
 
     const ns = namespace || config.namespace;
 
-    // Query Pinecone
+    // Optimize query parameters
+    // Request more results if we're filtering by score
+    const queryTopK = minScore ? Math.min(topK * 2, 100) : topK;
+
+    // Query Pinecone with optimized parameters
     const queryResponse = await index.namespace(ns).query({
       vector: queryEmbedding,
-      topK,
+      topK: queryTopK,
       filter,
       includeMetadata,
       includeValues,
     });
 
-    const matches = queryResponse.matches || [];
-    console.log(`[VectorService] Found ${matches.length} similar vectors in namespace: ${ns}`);
+    let matches = queryResponse.matches || [];
+
+    // Filter by minimum score if specified
+    if (minScore && minScore > 0) {
+      const originalCount = matches.length;
+      matches = matches.filter((match) => match.score >= minScore);
+      
+      if (matches.length < originalCount) {
+        console.log(
+          `[VectorService] Filtered ${originalCount - matches.length} results below min score ${minScore}`
+        );
+      }
+    }
+
+    // Limit to requested topK after filtering
+    matches = matches.slice(0, topK);
+
+    const duration = Date.now() - startTime;
+    console.log(
+      `[VectorService] Found ${matches.length} similar vectors in namespace: ${ns} (${duration}ms)`
+    );
+
+    if (matches.length > 0) {
+      console.log(
+        `[VectorService] Score range: ${matches[0].score.toFixed(3)} - ${matches[matches.length - 1].score.toFixed(3)}`
+      );
+    }
 
     return matches;
   } catch (error) {
-    console.error('[VectorService] Error querying vectors:', error.message);
+    const duration = Date.now() - startTime;
+    console.error(`[VectorService] Error querying vectors (${duration}ms):`, error.message);
+    
+    // Provide more specific error messages
+    if (error.message.includes('dimension')) {
+      throw new Error('Query embedding dimension mismatch. Check your embedding model configuration.');
+    }
+    
+    if (error.message.includes('namespace')) {
+      throw new Error(`Namespace not found or inaccessible: ${options.namespace || 'default'}`);
+    }
+
     throw new Error(`Failed to query similar vectors: ${error.message}`);
   }
 };
