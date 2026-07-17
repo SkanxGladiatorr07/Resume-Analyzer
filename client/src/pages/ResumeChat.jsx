@@ -28,6 +28,9 @@ const ResumeChat = () => {
   const [error, setError] = useState(null);
   const [showSidebar, setShowSidebar] = useState(true);
   const [showNewChatModal, setShowNewChatModal] = useState(false);
+  const [editingSessionId, setEditingSessionId] = useState(null);
+  const [editingTitle, setEditingTitle] = useState('');
+  const [copiedMessageId, setCopiedMessageId] = useState(null);
 
   // Refs
   const messagesEndRef = useRef(null);
@@ -229,6 +232,60 @@ const ResumeChat = () => {
   };
 
   /**
+   * Rename session
+   */
+  const handleRenameSession = async (sessionId) => {
+    if (!editingTitle.trim() || editingTitle === sessions.find(s => s.id === sessionId)?.title) {
+      setEditingSessionId(null);
+      setEditingTitle('');
+      return;
+    }
+
+    try {
+      await chatService.updateSessionTitle(sessionId, editingTitle.trim());
+      
+      // Update in sessions list
+      setSessions((prev) =>
+        prev.map((s) => (s.id === sessionId ? { ...s, title: editingTitle.trim() } : s))
+      );
+      
+      // Update current session if it's the one being renamed
+      if (currentSession?.id === sessionId) {
+        setCurrentSession((prev) => ({ ...prev, title: editingTitle.trim() }));
+      }
+      
+      setEditingSessionId(null);
+      setEditingTitle('');
+    } catch (err) {
+      console.error('Error renaming session:', err);
+      setError('Failed to rename session');
+    }
+  };
+
+  /**
+   * Start editing session title
+   */
+  const startEditing = (session, e) => {
+    e.stopPropagation();
+    setEditingSessionId(session.id);
+    setEditingTitle(session.title);
+  };
+
+  /**
+   * Copy message to clipboard
+   */
+  const handleCopyMessage = async (messageId, text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedMessageId(messageId);
+      setTimeout(() => setCopiedMessageId(null), 2000);
+    } catch (err) {
+      console.error('Error copying message:', err);
+      setError('Failed to copy message');
+    }
+  };
+
+  /**
    * Format timestamp
    */
   const formatTime = (timestamp) => {
@@ -303,21 +360,55 @@ const ResumeChat = () => {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 truncate text-sm">
-                        {session.title}
-                      </p>
+                      {editingSessionId === session.id ? (
+                        <input
+                          type="text"
+                          value={editingTitle}
+                          onChange={(e) => setEditingTitle(e.target.value)}
+                          onBlur={() => handleRenameSession(session.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') handleRenameSession(session.id);
+                            if (e.key === 'Escape') {
+                              setEditingSessionId(null);
+                              setEditingTitle('');
+                            }
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          autoFocus
+                          className="w-full px-2 py-1 text-sm font-medium text-gray-900 border border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      ) : (
+                        <p 
+                          className="font-medium text-gray-900 truncate text-sm"
+                          onDoubleClick={(e) => startEditing(session, e)}
+                        >
+                          {session.title}
+                        </p>
+                      )}
                       <p className="text-xs text-gray-500 mt-1">
                         {session.messageCount} messages
                       </p>
                     </div>
-                    <button
-                      onClick={(e) => handleDeleteSession(session.id, e)}
-                      className="ml-2 text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                    <div className="flex items-center ml-2 space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={(e) => startEditing(session, e)}
+                        className="text-gray-400 hover:text-blue-600"
+                        title="Rename"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={(e) => handleDeleteSession(session.id, e)}
+                        className="text-gray-400 hover:text-red-600"
+                        title="Delete"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                   {session.lastMessageAt && (
                     <p className="text-xs text-gray-400 mt-1">
@@ -395,33 +486,43 @@ const ResumeChat = () => {
             </div>
           ) : messages.length === 0 && !isLoading ? (
             <div className="h-full flex items-center justify-center">
-              <div className="text-center max-w-md">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Start the conversation
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  Ask me anything about your resume!
-                </p>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setInputMessage('What programming languages do I know?')}
-                    className="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-sm"
-                  >
-                    💻 What programming languages do I know?
-                  </button>
-                  <button
-                    onClick={() => setInputMessage('Summarize my work experience')}
-                    className="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-sm"
-                  >
-                    📋 Summarize my work experience
-                  </button>
-                  <button
-                    onClick={() => setInputMessage('What are my key skills?')}
-                    className="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-sm"
-                  >
-                    ⭐ What are my key skills?
-                  </button>
+              <div className="text-center max-w-2xl px-4">
+                <div className="mb-8">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    What would you like to know?
+                  </h3>
+                  <p className="text-gray-600">
+                    Ask me anything about your resume. Here are some suggestions to get started:
+                  </p>
                 </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                  {[
+                    { icon: '📝', text: 'Review my resume', emoji: true },
+                    { icon: '🔄', text: 'Rewrite my project section', emoji: true },
+                    { icon: '🎯', text: 'What skills am I missing?', emoji: true },
+                    { icon: '💡', text: 'Generate interview questions', emoji: true },
+                    { icon: '📊', text: 'Summarize my experience', emoji: true },
+                    { icon: '💻', text: 'What programming languages do I know?', emoji: true },
+                    { icon: '🏆', text: 'What are my key achievements?', emoji: true },
+                    { icon: '🎓', text: 'Tell me about my education', emoji: true },
+                  ].map((suggestion, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setInputMessage(suggestion.text)}
+                      className="flex items-center p-4 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all text-left group"
+                    >
+                      <span className="text-2xl mr-3">{suggestion.icon}</span>
+                      <span className="text-sm font-medium text-gray-700 group-hover:text-blue-700">
+                        {suggestion.text}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                
+                <p className="text-xs text-gray-500">
+                  💡 Tip: Double-click a session title in the sidebar to rename it
+                </p>
               </div>
             </div>
           ) : (
@@ -436,27 +537,72 @@ const ResumeChat = () => {
                       message.sender === 'user'
                         ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm'
                         : 'bg-white border border-gray-200 rounded-2xl rounded-tl-sm'
-                    } px-4 py-3 shadow-sm`}
+                    } px-4 py-3 shadow-sm relative group`}
                   >
                     {message.sender === 'user' ? (
                       <p className="text-sm whitespace-pre-wrap">{message.message}</p>
                     ) : (
-                      <div className="prose prose-sm max-w-none">
-                        <ReactMarkdown>{message.message}</ReactMarkdown>
-                      </div>
+                      <>
+                        <div className="prose prose-sm max-w-none">
+                          <ReactMarkdown>{message.message}</ReactMarkdown>
+                        </div>
+                        
+                        {/* Copy button for AI messages */}
+                        <button
+                          onClick={() => handleCopyMessage(message.id, message.message)}
+                          className="absolute top-2 right-2 p-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                          title="Copy response"
+                        >
+                          {copiedMessageId === message.id ? (
+                            <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                          )}
+                        </button>
+                      </>
                     )}
                     
-                    {/* Sources for AI messages */}
+                    {/* Sources for AI messages - Enhanced Display */}
                     {message.sender === 'ai' && message.sourcesUsed && message.sourcesUsed.length > 0 && (
-                      <div className="mt-3 pt-3 border-t border-gray-200">
-                        <p className="text-xs text-gray-500 font-medium mb-2">Sources:</p>
-                        <div className="space-y-1">
+                      <div className="mt-4 pt-3 border-t border-gray-200">
+                        <p className="text-xs text-gray-500 font-semibold mb-2 flex items-center">
+                          <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          Resume Sections Used:
+                        </p>
+                        <div className="space-y-2">
                           {message.sourcesUsed.map((source, idx) => (
-                            <div key={idx} className="text-xs text-gray-600 flex items-center">
-                              <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
-                              <span className="font-medium">{source.sectionName}</span>
-                              <span className="mx-1">•</span>
-                              <span>{(source.score * 100).toFixed(0)}% relevant</span>
+                            <div key={idx} className="bg-blue-50 rounded-lg p-2 border border-blue-100">
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center">
+                                  <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                                  <span className="text-xs font-bold text-blue-900">{source.sectionName}</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <div className="flex items-center">
+                                    <span className="text-xs font-medium text-blue-700">
+                                      {(source.score * 100).toFixed(0)}%
+                                    </span>
+                                  </div>
+                                  {/* Similarity bar */}
+                                  <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                    <div 
+                                      className="h-full bg-blue-500 rounded-full transition-all"
+                                      style={{ width: `${source.score * 100}%` }}
+                                    ></div>
+                                  </div>
+                                </div>
+                              </div>
+                              {source.text && (
+                                <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                                  {source.text}
+                                </p>
+                              )}
                             </div>
                           ))}
                         </div>
@@ -472,12 +618,18 @@ const ResumeChat = () => {
               
               {isSending && (
                 <div className="flex justify-start">
-                  <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
-                    <div className="flex space-x-2">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                  <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-sm px-6 py-4 shadow-sm">
+                    <div className="flex items-center space-x-3">
+                      <div className="flex space-x-1.5">
+                        <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce"></div>
+                        <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                      </div>
+                      <span className="text-sm text-gray-500 font-medium">AI is thinking...</span>
                     </div>
+                    <p className="text-xs text-gray-400 mt-2">
+                      Analyzing your resume and generating response
+                    </p>
                   </div>
                 </div>
               )}

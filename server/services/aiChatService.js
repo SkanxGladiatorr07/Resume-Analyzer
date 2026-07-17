@@ -127,13 +127,18 @@ const validateAIResponse = (response, retrievedChunks) => {
  */
 export const processChatMessage = async (sessionId, userId, question) => {
   const startTime = Date.now();
+  const logPrefix = `[AI Chat ${sessionId.slice(-6)}]`;
 
   try {
-    console.log(`\n[AI Chat] Processing message for session ${sessionId}`);
-    console.log(`[AI Chat] Question: "${question}"`);
+    console.log(`\n${'='.repeat(70)}`);
+    console.log(`${logPrefix} 🚀 Starting Chat Pipeline`);
+    console.log(`${logPrefix} Question: "${question.substring(0, 100)}${question.length > 100 ? '...' : ''}"`);
+    console.log(`${logPrefix} User ID: ${userId}`);
+    console.log(`${'='.repeat(70)}\n`);
 
     // Step 1: Validate session and get resume
-    console.log('[AI Chat] Step 1: Validating session...');
+    console.log(`${logPrefix} 📋 Step 1/9: Validating session...`);
+    const stepStartTime = Date.now();
     const session = await ChatSession.findById(sessionId).populate('resume');
 
     if (!session) {
@@ -158,20 +163,33 @@ export const processChatMessage = async (sessionId, userId, question) => {
       throw new Error('Resume embeddings are not ready. Please wait for processing to complete.');
     }
 
-    console.log(`[AI Chat] ✅ Session valid, resume: ${resume.fileName || resume.originalName}`);
+    const step1Time = Date.now() - stepStartTime;
+    console.log(`${logPrefix} ✅ Step 1 Complete (${step1Time}ms)`);
+    console.log(`${logPrefix}    • Resume: ${resume.fileName || resume.originalName}`);
+    console.log(`${logPrefix}    • Status: ${session.status}`);
+    console.log(`${logPrefix}    • Embedding Status: ${resume.embeddingStatus}\n`);
 
     // Step 2: Create user message
-    console.log('[AI Chat] Step 2: Creating user message...');
+    console.log(`${logPrefix} 💬 Step 2/9: Creating user message...`);
+    const step2StartTime = Date.now();
     const userMessage = await ChatMessage.createUserMessage(sessionId, question);
-    console.log(`[AI Chat] ✅ User message created: ${userMessage._id}`);
+    const step2Time = Date.now() - step2StartTime;
+    console.log(`${logPrefix} ✅ Step 2 Complete (${step2Time}ms)`);
+    console.log(`${logPrefix}    • Message ID: ${userMessage._id}`);
+    console.log(`${logPrefix}    • Length: ${question.length} characters\n`);
 
     // Step 3: Generate embedding for question
-    console.log('[AI Chat] Step 3: Generating question embedding...');
+    console.log(`${logPrefix} 🔢 Step 3/9: Generating question embedding...`);
+    const step3StartTime = Date.now();
     const questionEmbedding = await generateQueryEmbedding(question);
-    console.log(`[AI Chat] ✅ Question embedding generated (${questionEmbedding.length} dimensions)`);
+    const step3Time = Date.now() - step3StartTime;
+    console.log(`${logPrefix} ✅ Step 3 Complete (${step3Time}ms)`);
+    console.log(`${logPrefix}    • Dimensions: ${questionEmbedding.length}`);
+    console.log(`${logPrefix}    • Model: text-embedding-004\n`);
 
     // Step 4: Retrieve relevant chunks (Top 5)
-    console.log('[AI Chat] Step 4: Retrieving relevant resume chunks...');
+    console.log(`${logPrefix} 🔍 Step 4/9: Retrieving relevant resume chunks...`);
+    const step4StartTime = Date.now();
     const retrievalResult = await getContextForChat({
       resumeId: resume._id.toString(),
       query: question,
@@ -184,14 +202,17 @@ export const processChatMessage = async (sessionId, userId, question) => {
       },
     });
 
-    console.log(`[AI Chat] ✅ Retrieved ${retrievalResult.chunks.length} chunks`);
+    const step4Time = Date.now() - step4StartTime;
+    console.log(`${logPrefix} ✅ Step 4 Complete (${step4Time}ms)`);
+    console.log(`${logPrefix}    • Chunks Retrieved: ${retrievalResult.chunks.length}`);
     retrievalResult.chunks.forEach((chunk, idx) => {
-      console.log(`   - Chunk ${idx + 1}: ${chunk.sectionName} (score: ${(chunk.score * 100).toFixed(1)}%)`);
+      console.log(`${logPrefix}    • Chunk ${idx + 1}: ${chunk.sectionName} (${(chunk.score * 100).toFixed(1)}% match)`);
     });
+    console.log();
 
     // Check if we have relevant context
     if (retrievalResult.chunks.length === 0) {
-      console.log('[AI Chat] ⚠️  No relevant chunks found');
+      console.log(`${logPrefix} ⚠️  No relevant chunks found - returning generic response\n`);
       
       // Create AI message with no context response
       const aiMessage = await ChatMessage.createAIMessage(
@@ -204,6 +225,10 @@ export const processChatMessage = async (sessionId, userId, question) => {
           responseTime: Date.now() - startTime,
         }
       );
+
+      const totalTime = Date.now() - startTime;
+      console.log(`${logPrefix} ✅ Pipeline Complete (${totalTime}ms) - No context response\n`);
+      console.log(`${'='.repeat(70)}\n`);
 
       return {
         success: true,
@@ -222,22 +247,26 @@ export const processChatMessage = async (sessionId, userId, question) => {
         },
         retrievalStats: {
           chunksRetrieved: 0,
-          processingTime: Date.now() - startTime,
+          processingTime: totalTime,
         },
       };
     }
 
     // Step 5: Build structured prompt
-    console.log('[AI Chat] Step 5: Building structured prompt...');
+    console.log(`${logPrefix} 📝 Step 5/9: Building structured prompt...`);
+    const step5StartTime = Date.now();
     const prompt = buildChatPrompt(
       question,
       retrievalResult.chunks,
       resume.fileName || resume.originalName
     );
-    console.log(`[AI Chat] ✅ Prompt built (${prompt.length} chars)`);
+    const step5Time = Date.now() - step5StartTime;
+    console.log(`${logPrefix} ✅ Step 5 Complete (${step5Time}ms)`);
+    console.log(`${logPrefix}    • Prompt Length: ${prompt.length} characters`);
+    console.log(`${logPrefix}    • Context Chunks: ${retrievalResult.chunks.length}\n`);
 
     // Step 6: Send to Gemini and get response
-    console.log('[AI Chat] Step 6: Sending to Gemini AI...');
+    console.log(`${logPrefix} 🤖 Step 6/9: Sending to Gemini AI...`);
     let aiResponse;
     let responseTime = 0;
 
@@ -245,9 +274,13 @@ export const processChatMessage = async (sessionId, userId, question) => {
       const geminiStartTime = Date.now();
       aiResponse = await generateContent(prompt, true);
       responseTime = Date.now() - geminiStartTime;
-      console.log(`[AI Chat] ✅ Gemini responded in ${responseTime}ms`);
+      console.log(`${logPrefix} ✅ Step 6 Complete (${responseTime}ms)`);
+      console.log(`${logPrefix}    • Model: gemini-1.5-flash`);
+      console.log(`${logPrefix}    • Answer Length: ${aiResponse.answer?.length || 0} characters`);
+      console.log(`${logPrefix}    • Sources Cited: ${aiResponse.sources?.length || 0}\n`);
     } catch (geminiError) {
-      console.error('[AI Chat] ❌ Gemini error:', geminiError.message);
+      console.error(`${logPrefix} ❌ Step 6 Failed: Gemini error`);
+      console.error(`${logPrefix}    • Error: ${geminiError.message}\n`);
       
       // Create error AI message
       const errorMessage = await ChatMessage.createAIMessage(
@@ -262,6 +295,10 @@ export const processChatMessage = async (sessionId, userId, question) => {
       );
 
       await errorMessage.markAsError(geminiError.message);
+
+      const totalTime = Date.now() - startTime;
+      console.log(`${logPrefix} ❌ Pipeline Failed (${totalTime}ms) - Gemini error\n`);
+      console.log(`${'='.repeat(70)}\n`);
 
       return {
         success: false,
@@ -284,18 +321,28 @@ export const processChatMessage = async (sessionId, userId, question) => {
     }
 
     // Step 7: Validate response
-    console.log('[AI Chat] Step 7: Validating AI response...');
+    console.log(`${logPrefix} ✔️  Step 7/9: Validating AI response...`);
+    const step7StartTime = Date.now();
     const validation = validateAIResponse(aiResponse, retrievalResult.chunks);
 
     if (!validation.isValid) {
-      console.error('[AI Chat] ❌ Invalid response format:', validation.errors);
+      console.error(`${logPrefix} ❌ Step 7 Failed: Invalid response format`);
+      validation.errors.forEach(err => {
+        console.error(`${logPrefix}    • ${err}`);
+      });
+      console.log();
       throw new Error(`Invalid AI response: ${validation.errors.join(', ')}`);
     }
 
-    console.log(`[AI Chat] ✅ Response validated (grounded: ${validation.isGrounded})`);
+    const step7Time = Date.now() - step7StartTime;
+    console.log(`${logPrefix} ✅ Step 7 Complete (${step7Time}ms)`);
+    console.log(`${logPrefix}    • Valid Format: Yes`);
+    console.log(`${logPrefix}    • Grounded: ${validation.isGrounded ? 'Yes' : 'No'}`);
+    console.log(`${logPrefix}    • Has Context: ${validation.hasContext ? 'Yes' : 'No'}\n`);
 
     // Step 8: Prepare sources with actual data from retrieved chunks
-    console.log('[AI Chat] Step 8: Preparing sources...');
+    console.log(`${logPrefix} 🔗 Step 8/9: Preparing sources...`);
+    const step8StartTime = Date.now();
     const sourcesUsed = aiResponse.sources.map((source) => {
       // Find the matching chunk
       const matchingChunk = retrievalResult.chunks.find(
@@ -310,10 +357,17 @@ export const processChatMessage = async (sessionId, userId, question) => {
       };
     });
 
-    console.log(`[AI Chat] ✅ Prepared ${sourcesUsed.length} sources`);
+    const step8Time = Date.now() - step8StartTime;
+    console.log(`${logPrefix} ✅ Step 8 Complete (${step8Time}ms)`);
+    console.log(`${logPrefix}    • Sources Matched: ${sourcesUsed.length}`);
+    sourcesUsed.forEach((source, idx) => {
+      console.log(`${logPrefix}    • Source ${idx + 1}: ${source.sectionName} (${(source.score * 100).toFixed(1)}%)`);
+    });
+    console.log();
 
     // Step 9: Save AI response
-    console.log('[AI Chat] Step 9: Saving AI response...');
+    console.log(`${logPrefix} 💾 Step 9/9: Saving AI response...`);
+    const step9StartTime = Date.now();
     const aiMessage = await ChatMessage.createAIMessage(
       sessionId,
       aiResponse.answer,
@@ -325,8 +379,26 @@ export const processChatMessage = async (sessionId, userId, question) => {
       }
     );
 
-    console.log(`[AI Chat] ✅ AI message created: ${aiMessage._id}`);
-    console.log(`[AI Chat] ✅ Pipeline completed in ${Date.now() - startTime}ms\n`);
+    const step9Time = Date.now() - step9StartTime;
+    console.log(`${logPrefix} ✅ Step 9 Complete (${step9Time}ms)`);
+    console.log(`${logPrefix}    • AI Message ID: ${aiMessage._id}`);
+    console.log(`${logPrefix}    • Session Updated: Yes\n`);
+
+    const totalTime = Date.now() - startTime;
+    console.log(`${'='.repeat(70)}`);
+    console.log(`${logPrefix} 🎉 Pipeline Complete Successfully!`);
+    console.log(`${logPrefix} Total Time: ${totalTime}ms`);
+    console.log(`${logPrefix} Breakdown:`);
+    console.log(`${logPrefix}    • Validation: ${step1Time}ms (${((step1Time/totalTime)*100).toFixed(1)}%)`);
+    console.log(`${logPrefix}    • User Message: ${step2Time}ms (${((step2Time/totalTime)*100).toFixed(1)}%)`);
+    console.log(`${logPrefix}    • Embedding: ${step3Time}ms (${((step3Time/totalTime)*100).toFixed(1)}%)`);
+    console.log(`${logPrefix}    • Retrieval: ${step4Time}ms (${((step4Time/totalTime)*100).toFixed(1)}%)`);
+    console.log(`${logPrefix}    • Prompt Build: ${step5Time}ms (${((step5Time/totalTime)*100).toFixed(1)}%)`);
+    console.log(`${logPrefix}    • AI Generation: ${responseTime}ms (${((responseTime/totalTime)*100).toFixed(1)}%)`);
+    console.log(`${logPrefix}    • Validation: ${step7Time}ms (${((step7Time/totalTime)*100).toFixed(1)}%)`);
+    console.log(`${logPrefix}    • Source Match: ${step8Time}ms (${((step8Time/totalTime)*100).toFixed(1)}%)`);
+    console.log(`${logPrefix}    • Save Response: ${step9Time}ms (${((step9Time/totalTime)*100).toFixed(1)}%)`);
+    console.log(`${'='.repeat(70)}\n`);
 
     // Return complete result
     return {
@@ -348,11 +420,17 @@ export const processChatMessage = async (sessionId, userId, question) => {
       retrievalStats: {
         chunksRetrieved: retrievalResult.chunks.length,
         topScore: retrievalResult.chunks[0]?.score || 0,
-        processingTime: Date.now() - startTime,
+        processingTime: totalTime,
       },
     };
   } catch (error) {
-    console.error('[AI Chat] ❌ Pipeline error:', error.message);
+    const totalTime = Date.now() - startTime;
+    const logPrefix = `[AI Chat ${sessionId.slice(-6)}]`;
+    console.error(`\n${'='.repeat(70)}`);
+    console.error(`${logPrefix} ❌ PIPELINE ERROR`);
+    console.error(`${logPrefix} Error: ${error.message}`);
+    console.error(`${logPrefix} Time: ${totalTime}ms`);
+    console.error(`${'='.repeat(70)}\n`);
     throw error;
   }
 };
