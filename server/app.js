@@ -12,6 +12,7 @@ import dashboardRoutes from './routes/dashboardRoutes.js';
 import searchRoutes from './routes/searchRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import aiRewriteRoutes from './routes/aiRewriteRoutes.js';
+import aiStarRoutes from './routes/aiStarRoutes.js';
 
 const app = express();
 
@@ -58,6 +59,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/ai', aiRewriteRoutes);
+app.use('/api/ai', aiStarRoutes);
 
 // 404 Handler
 app.use((req, res) => {
