@@ -13,6 +13,9 @@ import searchRoutes from './routes/searchRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import aiRewriteRoutes from './routes/aiRewriteRoutes.js';
 import aiStarRoutes from './routes/aiStarRoutes.js';
+import aiInterviewRoutes from './routes/aiInterviewRoutes.js';
+import aiProjectsRoutes from './routes/aiProjectsRoutes.js';
+import aiRoadmapRoutes from './routes/aiRoadmapRoutes.js';
 
 const app = express();
 
@@ -60,6 +63,9 @@ app.use('/api/search', searchRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/ai', aiRewriteRoutes);
 app.use('/api/ai', aiStarRoutes);
+app.use('/api/ai', aiInterviewRoutes);
+app.use('/api/ai', aiProjectsRoutes);
+app.use('/api/ai', aiRoadmapRoutes);
 
 // 404 Handler
 app.use((req, res) => {

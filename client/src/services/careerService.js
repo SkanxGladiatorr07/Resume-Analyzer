@@ -36,12 +36,12 @@ const careerService = {
 
   /**
    * Generate interview questions
-   * @param {Object} data - { resumeId, jobTitle, experienceLevel }
+   * @param {Object} data - { resumeId, jobDescription }
    * @returns {Promise}
    */
   generateInterviewQuestions: async (data) => {
     try {
-      const response = await apiClient.post('/api/ai/interview-questions', data);
+      const response = await apiClient.post('/api/ai/interview', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -50,12 +50,12 @@ const careerService = {
 
   /**
    * Get project suggestions
-   * @param {Object} data - { skills, experience, careerGoal }
+   * @param {Object} data - { existingSkills, missingSkills, careerGoal }
    * @returns {Promise}
    */
   getProjectSuggestions: async (data) => {
     try {
-      const response = await apiClient.post('/api/ai/project-suggestions', data);
+      const response = await apiClient.post('/api/ai/projects', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -69,7 +69,7 @@ const careerService = {
    */
   generateLearningRoadmap: async (data) => {
     try {
-      const response = await apiClient.post('/api/ai/learning-roadmap', data);
+      const response = await apiClient.post('/api/ai/roadmap/learning', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -78,12 +78,12 @@ const careerService = {
 
   /**
    * Generate career roadmap
-   * @param {Object} data - { currentRole, targetRole, yearsOfExperience }
+   * @param {Object} data - { currentRole, targetCareerRole, yearsOfExperience }
    * @returns {Promise}
    */
   generateCareerRoadmap: async (data) => {
     try {
-      const response = await apiClient.post('/api/ai/career-roadmap', data);
+      const response = await apiClient.post('/api/ai/roadmap/career', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
