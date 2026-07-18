@@ -12,6 +12,7 @@ import Analysis from './pages/Analysis'
 import JobMatch from './pages/JobMatch'
 import JobMatchHistory from './pages/JobMatchHistory'
 import ResumeChat from './pages/ResumeChat'
+import CareerAssistant from './pages/CareerAssistant'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import NotFound from './pages/NotFound'
@@ -119,6 +120,18 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          {/* Career Assistant page - protected route with main layout */}
+          <Route
+            path="/career-assistant"
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<CareerAssistant />} />
+          </Route>
 
           {/* Auth routes (redirect if already logged in) */}
           <Route
