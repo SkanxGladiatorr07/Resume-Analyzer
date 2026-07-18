@@ -99,7 +99,26 @@ export const startParsing = async (resumeId) => {
     console.log(`   • Confidence: ${confidenceScore}%`);
     console.log(`   • Duration: ${duration}ms`);
 
-    // Step 9: Trigger AI analysis generation (async, non-blocking)
+    // Step 9: Create version snapshot after successful parsing
+    console.log(`📸 Creating version snapshot...`);
+    try {
+      const { createVersionAfterUpdate } = await import('../middleware/versionMiddleware.js');
+      await createVersionAfterUpdate(resume._id, resume.user, {
+        parsedData: {
+          text: extractedText,
+          structuredData: structuredData,
+        },
+        aiAnalysis: null, // Will be updated later when AI analysis completes
+        changeDescription: 'Initial parsing completed',
+        isAutoSave: true,
+      });
+      console.log(`   ✓ Version snapshot created`);
+    } catch (versionError) {
+      console.error(`   ⚠️  Failed to create version:`, versionError.message);
+      // Don't fail parsing if version creation fails
+    }
+
+    // Step 10: Trigger AI analysis generation (async, non-blocking)
     console.log(`🚀 Triggering AI analysis generation...`);
     try {
       await analysisPipeline.createPendingAnalysis(resume._id, resume.user);
@@ -110,7 +129,7 @@ export const startParsing = async (resumeId) => {
       // Don't fail the parsing if analysis triggering fails
     }
 
-    // Step 10: Trigger RAG pipeline (chunking + embedding) - async, non-blocking
+    // Step 11: Trigger RAG pipeline (chunking + embedding) - async, non-blocking
     console.log(`🚀 Triggering RAG pipeline (chunking + embedding)...`);
     try {
       const { triggerRAGPipelineAfterParsing } = await import('./ragPipeline.js');

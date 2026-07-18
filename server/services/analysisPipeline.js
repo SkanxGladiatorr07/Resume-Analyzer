@@ -8,6 +8,32 @@
 import Analysis from '../models/Analysis.js';
 import Resume from '../models/Resume.js';
 import * as geminiService from './geminiService.js';
+
+/**
+ * Helper: Determine experience level from experience array
+ */
+const determineExperienceLevel = (experience) => {
+  if (!experience || experience.length === 0) return 'Entry Level';
+  
+  let totalYears = 0;
+  experience.forEach(exp => {
+    // Simple estimation: count positions
+    totalYears += 2; // Assume average 2 years per position
+  });
+  
+  if (totalYears < 2) return 'Entry Level';
+  if (totalYears < 5) return 'Mid Level';
+  if (totalYears < 10) return 'Senior Level';
+  return 'Expert Level';
+};
+
+/**
+ * Helper: Extract key achievements from strengths
+ */
+const extractKeyAchievements = (strengths = []) => {
+  return strengths.slice(0, 3); // Return top 3 strengths as achievements
+};
+
 import { generateStructuredAnalysisPrompt } from '../prompts/index.js';
 import * as aiValidator from '../utils/aiValidator.js';
 
@@ -174,6 +200,39 @@ const generateAnalysisAsync = async (resumeId, userId) => {
     console.log(`   ATS Score: ${analysis.atsScore}`);
     console.log(`   Confidence: ${confidenceScore}%`);
     console.log(`   Duration: ${duration}ms\n`);
+
+    // Create/update version with AI analysis
+    console.log(`📸 Updating version with AI analysis...`);
+    try {
+      const { createVersionAfterUpdate } = await import('../middleware/versionMiddleware.js');
+      const Resume = (await import('../models/Resume.js')).default;
+      
+      const resume = await Resume.findById(resumeId);
+      if (resume) {
+        await createVersionAfterUpdate(resume._id, resume.user, {
+          parsedData: {
+            text: resume.extractedText,
+            structuredData: resume.structuredData,
+          },
+          aiAnalysis: {
+            score: analysis.atsScore,
+            strengths: analysis.strengths,
+            weaknesses: analysis.weaknesses,
+            suggestions: analysis.suggestions,
+            skills: resume.structuredData?.skills || [],
+            experienceLevel: determineExperienceLevel(resume.structuredData?.experience || []),
+            keyAchievements: extractKeyAchievements(analysis.strengths),
+            industryFit: analysis.summary || '',
+          },
+          changeDescription: 'AI analysis completed',
+          isAutoSave: true,
+        });
+        console.log(`   ✓ Version updated with AI analysis`);
+      }
+    } catch (versionError) {
+      console.error(`   ⚠️  Failed to update version:`, versionError.message);
+      // Don't fail analysis if version update fails
+    }
 
   } catch (error) {
     console.error(`❌ Analysis generation failed for resume ${resumeId}:`, error);
