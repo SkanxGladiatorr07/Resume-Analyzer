@@ -102,3 +102,76 @@ export const formatDate = (dateString) => {
     minute: '2-digit',
   });
 };
+
+/**
+ * Toggle resume pin status
+ * @param {string} resumeId - The ID of the resume
+ * @returns {Promise} API response
+ */
+export const togglePin = async (resumeId) => {
+  const response = await apiClient.patch(`/resumes/${resumeId}/pin`);
+  return response.data;
+};
+
+/**
+ * Set resume as default
+ * @param {string} resumeId - The ID of the resume
+ * @returns {Promise} API response
+ */
+export const setDefault = async (resumeId) => {
+  const response = await apiClient.patch(`/resumes/${resumeId}/default`);
+  return response.data;
+};
+
+/**
+ * Remove default status from resume
+ * @param {string} resumeId - The ID of the resume
+ * @returns {Promise} API response
+ */
+export const removeDefault = async (resumeId) => {
+  const response = await apiClient.delete(`/resumes/${resumeId}/default`);
+  return response.data;
+};
+
+/**
+ * Get resume versions
+ * @param {string} resumeId - The ID of the resume
+ * @param {Object} params - Query parameters (limit, skip, includeData)
+ * @returns {Promise} API response with versions array
+ */
+export const getResumeVersions = async (resumeId, params = {}) => {
+  const queryString = new URLSearchParams(params).toString();
+  const response = await apiClient.get(`/resumes/${resumeId}/versions${queryString ? `?${queryString}` : ''}`);
+  return response.data;
+};
+
+/**
+ * Compare two resume versions
+ * @param {string} resumeId - The ID of the resume
+ * @param {number} version1 - First version number
+ * @param {number} version2 - Second version number
+ * @returns {Promise} API response with comparison data
+ */
+export const compareVersions = async (resumeId, version1, version2) => {
+  const response = await apiClient.get(`/resumes/${resumeId}/compare/${version1}/${version2}`);
+  return response.data;
+};
+
+/**
+ * Get recent exports
+ * @param {number} limit - Number of exports to retrieve
+ * @returns {Promise} API response with exports array
+ */
+export const getRecentExports = async (limit = 5) => {
+  const response = await apiClient.get(`/report/export/history?limit=${limit}`);
+  return response.data;
+};
+
+/**
+ * Get export statistics
+ * @returns {Promise} API response with export stats
+ */
+export const getExportStats = async () => {
+  const response = await apiClient.get('/report/export/stats');
+  return response.data;
+};

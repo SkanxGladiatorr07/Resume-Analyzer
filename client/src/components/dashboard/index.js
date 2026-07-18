@@ -11,3 +11,6 @@ export { default as ActivityTimeline } from './ActivityTimeline';
 export { default as EmptyStateCard } from './EmptyStateCard';
 export { default as OptimizedChart } from './OptimizedChart';
 export * from './LoadingSkeleton';
+export { default as DashboardSkeleton } from './DashboardSkeleton';
+export { default as DefaultResumeCard } from './DefaultResumeCard';
+export { default as RecentExports } from './RecentExports';

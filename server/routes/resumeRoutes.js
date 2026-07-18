@@ -6,6 +6,9 @@ import {
   getResumeRawText,
   getResumeParsedData,
   getParsingStatus,
+  togglePin,
+  setDefault,
+  removeDefault,
 } from '../controllers/resumeController.js';
 import {
   getVersions,
@@ -64,6 +67,27 @@ router.get('/:id/parsed', validateResumeId, checkResumeOwnership, getResumeParse
  * @access  Private
  */
 router.get('/:id/status', validateResumeId, checkResumeOwnership, getParsingStatus);
+
+/**
+ * @route   PATCH /api/resumes/:id/pin
+ * @desc    Toggle resume pin status
+ * @access  Private
+ */
+router.patch('/:id/pin', validateResumeId, togglePin);
+
+/**
+ * @route   PATCH /api/resumes/:id/default
+ * @desc    Set resume as default
+ * @access  Private
+ */
+router.patch('/:id/default', validateResumeId, setDefault);
+
+/**
+ * @route   DELETE /api/resumes/:id/default
+ * @desc    Remove default resume status
+ * @access  Private
+ */
+router.delete('/:id/default', validateResumeId, removeDefault);
 
 /**
  * VERSION MANAGEMENT ROUTES

@@ -134,11 +134,28 @@ const resumeSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    // Dashboard features
+    isPinned: {
+      type: Boolean,
+      default: false,
+    },
+    isDefault: {
+      type: Boolean,
+      default: false,
+    },
+    pinnedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt
   }
 );
+
+// Index for efficient queries
+resumeSchema.index({ user: 1, isPinned: -1, createdAt: -1 });
+resumeSchema.index({ user: 1, isDefault: 1 });
 
 const Resume = mongoose.model('Resume', resumeSchema);
 

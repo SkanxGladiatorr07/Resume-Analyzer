@@ -264,3 +264,147 @@ export const getParsingStatus = async (req, res) => {
     });
   }
 };
+
+
+/**
+ * @desc    Toggle resume pin status
+ * @route   PATCH /api/resumes/:id/pin
+ * @access  Private
+ */
+export const togglePin = async (req, res) => {
+  try {
+    const resume = await Resume.findById(req.params.id);
+
+    if (!resume) {
+      return res.status(404).json({
+        success: false,
+        message: 'Resume not found',
+      });
+    }
+
+    // Verify ownership
+    if (resume.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied',
+      });
+    }
+
+    // Toggle pin status
+    resume.isPinned = !resume.isPinned;
+    resume.pinnedAt = resume.isPinned ? new Date() : null;
+    await resume.save();
+
+    res.status(200).json({
+      success: true,
+      message: resume.isPinned ? 'Resume pinned successfully' : 'Resume unpinned successfully',
+      data: {
+        resumeId: resume._id,
+        isPinned: resume.isPinned,
+        pinnedAt: resume.pinnedAt,
+      },
+    });
+  } catch (error) {
+    console.error('Toggle pin error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error toggling pin status',
+    });
+  }
+};
+
+/**
+ * @desc    Set resume as default
+ * @route   PATCH /api/resumes/:id/default
+ * @access  Private
+ */
+export const setDefault = async (req, res) => {
+  try {
+    const resume = await Resume.findById(req.params.id);
+
+    if (!resume) {
+      return res.status(404).json({
+        success: false,
+        message: 'Resume not found',
+      });
+    }
+
+    // Verify ownership
+    if (resume.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied',
+      });
+    }
+
+    // Remove default from all other resumes for this user
+    await Resume.updateMany(
+      { user: req.user._id, _id: { $ne: req.params.id } },
+      { isDefault: false }
+    );
+
+    // Set this resume as default
+    resume.isDefault = true;
+    await resume.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Default resume set successfully',
+      data: {
+        resumeId: resume._id,
+        isDefault: resume.isDefault,
+      },
+    });
+  } catch (error) {
+    console.error('Set default error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error setting default resume',
+    });
+  }
+};
+
+/**
+ * @desc    Remove default resume
+ * @route   DELETE /api/resumes/:id/default
+ * @access  Private
+ */
+export const removeDefault = async (req, res) => {
+  try {
+    const resume = await Resume.findById(req.params.id);
+
+    if (!resume) {
+      return res.status(404).json({
+        success: false,
+        message: 'Resume not found',
+      });
+    }
+
+    // Verify ownership
+    if (resume.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied',
+      });
+    }
+
+    // Remove default status
+    resume.isDefault = false;
+    await resume.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Default resume removed successfully',
+      data: {
+        resumeId: resume._id,
+        isDefault: resume.isDefault,
+      },
+    });
+  } catch (error) {
+    console.error('Remove default error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error removing default resume',
+    });
+  }
+};
