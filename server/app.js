@@ -16,6 +16,7 @@ import aiStarRoutes from './routes/aiStarRoutes.js';
 import aiInterviewRoutes from './routes/aiInterviewRoutes.js';
 import aiProjectsRoutes from './routes/aiProjectsRoutes.js';
 import aiRoadmapRoutes from './routes/aiRoadmapRoutes.js';
+import aiHistoryRoutes from './routes/aiHistoryRoutes.js';
 
 const app = express();
 
@@ -66,6 +67,7 @@ app.use('/api/ai', aiStarRoutes);
 app.use('/api/ai', aiInterviewRoutes);
 app.use('/api/ai', aiProjectsRoutes);
 app.use('/api/ai', aiRoadmapRoutes);
+app.use('/api/ai', aiHistoryRoutes);
 
 // 404 Handler
 app.use((req, res) => {
