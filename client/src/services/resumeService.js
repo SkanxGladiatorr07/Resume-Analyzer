@@ -33,6 +33,16 @@ export const getResumes = async () => {
 };
 
 /**
+ * Get resume by ID
+ * @param {string} resumeId - Resume ID
+ * @returns {Promise} API response with resume data
+ */
+export const getResumeById = async (resumeId) => {
+  const response = await apiClient.get(`/resumes/${resumeId}`);
+  return response.data;
+};
+
+/**
  * Delete a resume by ID
  * @param {string} resumeId - The ID of the resume to delete
  * @returns {Promise} API response
@@ -174,4 +184,24 @@ export const getRecentExports = async (limit = 5) => {
 export const getExportStats = async () => {
   const response = await apiClient.get('/report/export/stats');
   return response.data;
+};
+
+// Default export for convenience
+export default {
+  uploadResume,
+  getResumes,
+  getResumeById,
+  deleteResume,
+  getResumeRawText,
+  getResumeParsedData,
+  getParsingStatus,
+  formatFileSize,
+  formatDate,
+  togglePin,
+  setDefault,
+  removeDefault,
+  getResumeVersions,
+  compareVersions,
+  getRecentExports,
+  getExportStats,
 };

@@ -8,9 +8,10 @@
  * @param {ReactNode} action - Optional action button/element
  */
 
+import React from 'react';
 import { Card } from './ui';
 
-export const EmptyState = ({
+const EmptyState = ({
   icon = 'document',
   title = 'No items found',
   description = 'Get started by creating your first item.',
@@ -90,3 +91,5 @@ export const EmptyState = ({
     </Card>
   );
 };
+
+export default EmptyState;

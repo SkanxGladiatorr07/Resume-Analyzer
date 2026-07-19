@@ -7,9 +7,10 @@
  * @param {boolean} fullScreen - Whether to show as fullscreen overlay
  */
 
+import React from 'react';
 import { Card } from './ui';
 
-export const LoadingSpinner = ({
+const LoadingSpinner = ({
   size = 'medium',
   text = 'Loading...',
   fullScreen = false,
@@ -49,3 +50,5 @@ export const LoadingSpinner = ({
     </Card>
   );
 };
+
+export default LoadingSpinner;

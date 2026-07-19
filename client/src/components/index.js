@@ -18,9 +18,9 @@ export { ResumeList } from './ResumeList';
 export { ResumeCard } from './ResumeCard';
 
 // Utility Components
-export { ConfirmDialog } from './ConfirmDialog';
-export { EmptyState } from './EmptyState';
-export { LoadingSpinner } from './LoadingSpinner';
+export { default as ConfirmDialog } from './ConfirmDialog';
+export { default as EmptyState } from './EmptyState';
+export { default as LoadingSpinner } from './LoadingSpinner';
 export { NotificationBanner } from './NotificationBanner';
 export { default as ErrorBoundary } from './ErrorBoundary';
 

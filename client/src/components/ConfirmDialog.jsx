@@ -12,9 +12,10 @@
  * @param {boolean} isLoading - Whether action is in progress
  */
 
+import React from 'react';
 import { Button } from './ui';
 
-export const ConfirmDialog = ({
+const ConfirmDialog = ({
   isOpen,
   title = 'Confirm Action',
   message,
@@ -95,3 +96,5 @@ export const ConfirmDialog = ({
     </div>
   );
 };
+
+export default ConfirmDialog;
