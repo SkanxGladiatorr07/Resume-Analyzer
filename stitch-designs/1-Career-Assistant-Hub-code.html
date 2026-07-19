@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Career Assistant Hub | ResumeAI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tool-card-active {
+            border-color: #004ac6 !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#faf8ff",
+                        "on-surface": "#191b23",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-container": "#ffede7",
+                        "inverse-surface": "#2e3039",
+                        "tertiary-fixed-dim": "#ffb599",
+                        "on-surface-variant": "#434655",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "tertiary-container": "#c04400",
+                        "outline-variant": "#c3c6d7",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e1e2ed",
+                        "secondary-fixed": "#7ffc97",
+                        "inverse-on-surface": "#f0f0fb",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#0053db",
+                        "inverse-primary": "#b4c5ff",
+                        "primary-container": "#2563eb",
+                        "on-secondary-fixed": "#002109",
+                        "on-secondary-fixed-variant": "#005320",
+                        "on-secondary-container": "#007230",
+                        "tertiary": "#973400",
+                        "on-background": "#191b23",
+                        "secondary-container": "#7cf994",
+                        "secondary": "#006e2d",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#ededf9",
+                        "on-primary-fixed": "#00174b",
+                        "primary": "#004ac6",
+                        "tertiary-fixed": "#ffdbce",
+                        "surface-container-low": "#f3f3fe",
+                        "surface-dim": "#d9d9e5",
+                        "background": "#faf8ff",
+                        "surface-bright": "#faf8ff",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "outline": "#737686",
+                        "secondary-fixed-dim": "#62df7d",
+                        "on-tertiary-fixed-variant": "#7f2b00",
+                        "on-primary-container": "#eeefff",
+                        "on-tertiary-fixed": "#370e00",
+                        "surface-container-highest": "#e1e2ed",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-container-high": "#e7e7f3"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "xl": "32px",
+                        "gutter": "20px",
+                        "base": "4px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "container-max": "1200px",
+                        "xxl": "48px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Inter"],
+                        "body-base": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "display-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-base": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface font-body-base">
+<!-- Top Navigation Bar -->
+<header class="bg-surface border-b border-outline-variant w-full h-16 sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-lg md:px-xxl max-w-container-max mx-auto h-full">
+<div class="text-headline-md font-headline-md font-bold text-primary">ResumeAI</div>
+<nav class="hidden md:flex items-center gap-xl">
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 text-label-caps" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 text-label-caps" href="#">Upload</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-bold text-label-caps" href="#">Analysis</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 text-label-caps" href="#">Job Match</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 text-label-caps" href="#">Chat</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="p-sm text-on-surface-variant hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a diverse young professional, minimalist corporate style, soft daylight illumination, clean white background, sharp focus, professional attire." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJugQNLItHIIvuBNe1BpH9PJoLuAB035XxEPXHhCmAmrVugR8CswOCnhAKERiDGvZmpSpDPbn2evcxKHHLQ30GoAYq4Abk8TEidOZKpiETkdBmuhMxr9iQ_CKheF9n_S48vLJDBEM2XFtHPz03JTSfU97eu2vORKchDpLIIK8r1X00yeQVsT-9y7I6gxDs_j5EzrfOPm9qosb7OQNq4_1Tsq5SlNkAI7pi8q_1T1zCUdBn14BpE6ne"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-lg md:px-xxl py-xl">
+<!-- Header Section with Resume Selector -->
+<section class="mb-xxl flex flex-col md:flex-row md:items-end justify-between gap-lg">
+<div class="space-y-sm">
+<h1 class="text-display-lg font-display-lg text-on-surface">Career Assistant Hub</h1>
+<p class="text-on-surface-variant max-w-2xl">Leverage AI-driven tools to refine your professional narrative, prepare for interviews, and map out your next career milestone.</p>
+</div>
+<div class="w-full md:w-72">
+<label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Active Resume</label>
+<div class="relative">
+<select class="w-full appearance-none bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm pr-xl focus:outline-none focus:border-primary text-body-base">
+<option>Senior_Product_Designer_2024.pdf</option>
+<option>UX_Researcher_v2.pdf</option>
+<option>Creative_Director_Master.pdf</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
+</div>
+</div>
+</section>
+<!-- Bento Grid Tools -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg mb-xxl">
+<!-- Tool 1: Resume Rewriter -->
+<div class="tool-card group bg-surface-container-lowest border border-outline-variant p-lg rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg hover:border-primary/50 relative overflow-hidden" id="tool-rewriter" onclick="switchTool('rewriter')">
+<div class="text-4xl mb-md">✍️</div>
+<h3 class="text-headline-md font-headline-md text-on-surface group-hover:text-primary transition-colors">Resume Rewriter</h3>
+<p class="text-body-sm text-on-surface-variant mt-sm">Optimize your bullet points for high-impact keywords and professional tone.</p>
+<div class="absolute top-0 right-0 p-md opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-primary">arrow_forward</span>
+</div>
+</div>
+<!-- Tool 2: STAR Generator -->
+<div class="tool-card group bg-surface-container-lowest border border-outline-variant p-lg rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg hover:border-primary/50 relative overflow-hidden" id="tool-star" onclick="switchTool('star')">
+<div class="text-4xl mb-md">⭐</div>
+<h3 class="text-headline-md font-headline-md text-on-surface group-hover:text-primary transition-colors">STAR Generator</h3>
+<p class="text-body-sm text-on-surface-variant mt-sm">Transform vague experiences into compelling Situation, Task, Action, Result stories.</p>
+<div class="absolute top-0 right-0 p-md opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-primary">arrow_forward</span>
+</div>
+</div>
+<!-- Tool 3: Interview Questions -->
+<div class="tool-card group bg-surface-container-lowest border border-outline-variant p-lg rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg hover:border-primary/50 relative overflow-hidden" id="tool-interview" onclick="switchTool('interview')">
+<div class="text-4xl mb-md">💼</div>
+<h3 class="text-headline-md font-headline-md text-on-surface group-hover:text-primary transition-colors">Interview Questions</h3>
+<p class="text-body-sm text-on-surface-variant mt-sm">Get personalized practice questions based on your specific experience levels.</p>
+<div class="absolute top-0 right-0 p-md opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-primary">arrow_forward</span>
+</div>
+</div>
+<!-- Tool 4: Project Suggestions -->
+<div class="tool-card group bg-surface-container-lowest border border-outline-variant p-lg rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg hover:border-primary/50 relative overflow-hidden" id="tool-projects" onclick="switchTool('projects')">
+<div class="text-4xl mb-md">🚀</div>
+<h3 class="text-headline-md font-headline-md text-on-surface group-hover:text-primary transition-colors">Project Suggestions</h3>
+<p class="text-body-sm text-on-surface-variant mt-sm">Identify skill gaps and get tailored project ideas to bolster your portfolio.</p>
+<div class="absolute top-0 right-0 p-md opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-primary">arrow_forward</span>
+</div>
+</div>
+<!-- Tool 5: Learning Roadmap -->
+<div class="tool-card group bg-surface-container-lowest border border-outline-variant p-lg rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg hover:border-primary/50 relative overflow-hidden" id="tool-learning" onclick="switchTool('learning')">
+<div class="text-4xl mb-md">📚</div>
+<h3 class="text-headline-md font-headline-md text-on-surface group-hover:text-primary transition-colors">Learning Roadmap</h3>
+<p class="text-body-sm text-on-surface-variant mt-sm">A curated curriculum to master the technologies mentioned in target job posts.</p>
+<div class="absolute top-0 right-0 p-md opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-primary">arrow_forward</span>
+</div>
+</div>
+<!-- Tool 6: Career Roadmap -->
+<div class="tool-card group bg-surface-container-lowest border border-outline-variant p-lg rounded-xl cursor-pointer transition-all duration-300 hover:shadow-lg hover:border-primary/50 relative overflow-hidden" id="tool-career" onclick="switchTool('career')">
+<div class="text-4xl mb-md">🎯</div>
+<h3 class="text-headline-md font-headline-md text-on-surface group-hover:text-primary transition-colors">Career Roadmap</h3>
+<p class="text-body-sm text-on-surface-variant mt-sm">Visualize your 5-year trajectory from Junior to Executive leadership roles.</p>
+<div class="absolute top-0 right-0 p-md opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-primary">arrow_forward</span>
+</div>
+</div>
+</section>
+<!-- Dynamic Tool Content Area -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm">
+<div class="p-lg md:p-xl border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
+<div class="flex items-center gap-md">
+<span class="text-2xl" id="active-tool-icon">✍️</span>
+<h2 class="text-headline-md font-headline-md text-on-surface" id="active-tool-title">Resume Rewriter</h2>
+</div>
+<button class="flex items-center gap-sm px-md py-sm bg-primary text-on-primary rounded-lg font-bold text-label-caps hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-sm">bolt</span>
+                    Generate AI Insight
+                </button>
+</div>
+<div class="p-lg md:p-xl min-h-[400px]">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-xl h-full" id="tool-content-placeholder">
+<!-- Input Side -->
+<div class="space-y-lg">
+<div>
+<label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Select Experience Block</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-body-base">
+<option>Product Designer at TechFlow (2021-Present)</option>
+<option>Junior Designer at Pixel Perfect (2019-2021)</option>
+<option>Freelance Creative (2018-2019)</option>
+</select>
+</div>
+<div>
+<label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Original Text</label>
+<textarea class="w-full h-48 bg-surface-container-lowest border border-outline-variant rounded-lg p-md text-body-base focus:ring-1 focus:ring-primary focus:border-primary" placeholder="Paste the bullet point you want to improve...">Led the design of a new dashboard which improved user engagement by a significant amount over several months.</textarea>
+</div>
+</div>
+<!-- Output Side -->
+<div class="bg-surface-container-low rounded-xl p-lg border border-dashed border-outline flex flex-col justify-center items-center text-center">
+<div class="w-16 h-16 bg-surface-container-highest rounded-full flex items-center justify-center mb-md">
+<span class="material-symbols-outlined text-primary text-3xl">auto_awesome</span>
+</div>
+<h4 class="text-headline-md font-headline-md text-on-surface">AI Suggestions will appear here</h4>
+<p class="text-body-sm text-on-surface-variant mt-sm max-w-sm">Select an experience block or paste text on the left to start optimizing your resume content with industry-standard keywords.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low border-t border-outline-variant w-full py-xl px-lg md:px-xxl flex flex-col md:flex-row justify-between items-center gap-md mt-xxl">
+<div class="text-body-base font-headline-md font-bold text-on-surface">ResumeAI</div>
+<div class="flex gap-lg flex-wrap justify-center">
+<a class="text-body-sm font-body-sm text-on-surface-variant hover:underline decoration-primary transition-all" href="#">Privacy Policy</a>
+<a class="text-body-sm font-body-sm text-on-surface-variant hover:underline decoration-primary transition-all" href="#">Terms of Service</a>
+<a class="text-body-sm font-body-sm text-on-surface-variant hover:underline decoration-primary transition-all" href="#">Career Resources</a>
+<a class="text-body-sm font-body-sm text-on-surface-variant hover:underline decoration-primary transition-all" href="#">Contact Support</a>
+</div>
+<div class="text-body-sm font-body-sm text-on-surface-variant">
+            © 2024 ResumeAI. Empowering professional advancement through AI.
+        </div>
+</footer>
+<script>
+        const tools = {
+            rewriter: {
+                title: "Resume Rewriter",
+                icon: "✍️",
+                description: "Select an experience block or paste text on the left to start optimizing your resume content with industry-standard keywords.",
+                label: "Original Text",
+                placeholder: "Paste the bullet point you want to improve..."
+            },
+            star: {
+                title: "STAR Generator",
+                icon: "⭐",
+                description: "Input a specific accomplishment, and our AI will structure it into a perfect Situation-Task-Action-Result format.",
+                label: "The Achievement",
+                placeholder: "I successfully launched a mobile app in 3 months..."
+            },
+            interview: {
+                title: "Interview Questions",
+                icon: "💼",
+                description: "Get predictive questions tailored to your resume's skill set and the seniority of the roles you're applying for.",
+                label: "Target Role",
+                placeholder: "e.g. Senior Product Designer at Stripe"
+            },
+            projects: {
+                title: "Project Suggestions",
+                icon: "🚀",
+                description: "Describe a skill you want to learn, and we'll suggest 3 high-impact portfolio projects to prove your mastery.",
+                label: "Skill to Master",
+                placeholder: "e.g. React.js, Strategic User Research, A/B Testing"
+            },
+            learning: {
+                title: "Learning Roadmap",
+                icon: "📚",
+                description: "Provide a job description link, and we'll build a custom learning path to bridge your current qualifications.",
+                label: "Job Description",
+                placeholder: "Paste the URL or text of the job you want..."
+            },
+            career: {
+                title: "Career Roadmap",
+                icon: "🎯",
+                description: "Tell us your ultimate career goal, and we'll map the necessary intermediate roles and skills to get there.",
+                label: "Your Dream Title",
+                placeholder: "e.g. Chief Product Officer"
+            }
+        };
+
+        function switchTool(toolId) {
+            const tool = tools[toolId];
+            
+            // Update Active Card Styling
+            document.querySelectorAll('.tool-card').forEach(card => {
+                card.classList.remove('tool-card-active');
+            });
+            document.getElementById(`tool-${toolId}`).classList.add('tool-card-active');
+
+            // Update Content Area
+            document.getElementById('active-tool-title').innerText = tool.title;
+            document.getElementById('active-tool-icon').innerText = tool.icon;
+            
+            const contentArea = document.getElementById('tool-content-placeholder');
+            contentArea.innerHTML = `
+                <div class="space-y-lg animate-in fade-in duration-500">
+                    <div>
+                        <label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Target Context</label>
+                        <select class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-body-base">
+                            <option>Standard Professional (Default)</option>
+                            <option>Aggressive Growth/Startup</option>
+                            <option>Conservative Corporate</option>
+                            <option>Academic/Creative</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-body-sm font-body-sm text-on-surface-variant mb-xs">${tool.label}</label>
+                        <textarea class="w-full h-48 bg-surface-container-lowest border border-outline-variant rounded-lg p-md text-body-base focus:ring-1 focus:ring-primary focus:border-primary" placeholder="${tool.placeholder}"></textarea>
+                    </div>
+                </div>
+                <div class="bg-surface-container-low rounded-xl p-lg border border-dashed border-outline flex flex-col justify-center items-center text-center animate-in zoom-in duration-500">
+                    <div class="w-16 h-16 bg-surface-container-highest rounded-full flex items-center justify-center mb-md">
+                        <span class="material-symbols-outlined text-primary text-3xl">auto_awesome</span>
+                    </div>
+                    <h4 class="text-headline-md font-headline-md text-on-surface">AI Suggestions will appear here</h4>
+                    <p class="text-body-sm text-on-surface-variant mt-sm max-w-sm">${tool.description}</p>
+                </div>
+            `;
+        }
+
+        // Initialize first tool as active
+        window.onload = () => switchTool('rewriter');
+    </script>
+</body></html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Job Match History | ResumeAI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .score-gauge {
+            transition: stroke-dashoffset 0.6s ease-in-out;
+        }
+        .hover-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .hover-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#faf8ff",
+                        "on-surface": "#191b23",
+                        "on-primary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-container": "#ffede7",
+                        "inverse-surface": "#2e3039",
+                        "tertiary-fixed-dim": "#ffb599",
+                        "on-surface-variant": "#434655",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "tertiary-container": "#c04400",
+                        "outline-variant": "#c3c6d7",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e1e2ed",
+                        "secondary-fixed": "#7ffc97",
+                        "inverse-on-surface": "#f0f0fb",
+                        "on-error": "#ffffff",
+                        "surface-tint": "#0053db",
+                        "inverse-primary": "#b4c5ff",
+                        "primary-container": "#2563eb",
+                        "on-secondary-fixed": "#002109",
+                        "on-secondary-fixed-variant": "#005320",
+                        "on-secondary-container": "#007230",
+                        "tertiary": "#973400",
+                        "on-background": "#191b23",
+                        "secondary-container": "#7cf994",
+                        "secondary": "#006e2d",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#ededf9",
+                        "on-primary-fixed": "#00174b",
+                        "primary": "#004ac6",
+                        "tertiary-fixed": "#ffdbce",
+                        "surface-container-low": "#f3f3fe",
+                        "surface-dim": "#d9d9e5",
+                        "background": "#faf8ff",
+                        "surface-bright": "#faf8ff",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "outline": "#737686",
+                        "secondary-fixed-dim": "#62df7d",
+                        "on-tertiary-fixed-variant": "#7f2b00",
+                        "on-primary-container": "#eeefff",
+                        "on-tertiary-fixed": "#370e00",
+                        "surface-container-highest": "#e1e2ed",
+                        "primary-fixed": "#dbe1ff",
+                        "surface-container-high": "#e7e7f3"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "xl": "32px",
+                        "gutter": "20px",
+                        "base": "4px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "container-max": "1200px",
+                        "xxl": "48px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Inter"],
+                        "body-base": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "display-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-base": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "display-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-base min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="bg-surface border-b border-outline-variant flex justify-between items-center w-full px-lg md:px-xxl max-w-container-max mx-auto h-16 sticky top-0 z-50">
+<div class="text-headline-md font-headline-md font-bold text-primary">ResumeAI</div>
+<nav class="hidden md:flex gap-lg items-center">
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 text-label-caps font-label-caps" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 text-label-caps font-label-caps" href="#">Upload</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 text-label-caps font-label-caps" href="#">Analysis</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-bold text-label-caps font-label-caps" href="#">Job Match</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors duration-200 text-label-caps font-label-caps" href="#">Chat</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">settings</button>
+<div class="w-8 h-8 rounded-full bg-primary-fixed overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a corporate user in a modern office setting, bright natural lighting, soft focus background, high-end commercial photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyEb6wKGYkhSJoy9T2Yw3r-IFbU_WM04L-cDcP2ldPfKpKMLLYM0P2Xr_W1QtPnpYayZxWAeU0Kni8FONk9irE3411Ih7q-uK2ht0PlAXKKFq22JJNMRZ0J6HJBjm63jH_3E3B7Bkn3-ZIePfAEw8bfd3inJwncsFzWKqN6SyEz-rOMTz5Q37M8ROlshvZW323w3pXUI29e5D5Lo71r_eltISqTwLJUVcoSiTX5iZYiZf6I3-qaP0L"/>
+</div>
+</div>
+</header>
+<main class="flex-grow w-full max-w-container-max mx-auto px-lg md:px-xxl py-xl">
+<!-- Header & Filters -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-lg mb-xl">
+<div>
+<h1 class="text-display-lg font-display-lg text-on-surface mb-xs">Job Match History</h1>
+<p class="text-on-surface-variant text-body-base">Review and manage your resume's compatibility with previous job applications.</p>
+</div>
+<div class="flex flex-wrap items-center gap-md">
+<div class="flex flex-col gap-xs">
+<span class="text-label-caps font-label-caps text-on-surface-variant px-1">Status</span>
+<select class="bg-surface border border-outline rounded-lg px-md py-sm text-body-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+<option>All Statuses</option>
+<option>Completed</option>
+<option>Pending</option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<span class="text-label-caps font-label-caps text-on-surface-variant px-1">Sort By</span>
+<select class="bg-surface border border-outline rounded-lg px-md py-sm text-body-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+<option>Newest First</option>
+<option>Oldest First</option>
+<option>Score: High to Low</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Content Area -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+<!-- Table View -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant">
+<th class="px-lg py-md text-label-caps font-label-caps text-on-surface-variant">Resume Name</th>
+<th class="px-lg py-md text-label-caps font-label-caps text-on-surface-variant">Job Title</th>
+<th class="px-lg py-md text-label-caps font-label-caps text-on-surface-variant">Company</th>
+<th class="px-lg py-md text-label-caps font-label-caps text-on-surface-variant">Match Score</th>
+<th class="px-lg py-md text-label-caps font-label-caps text-on-surface-variant">Status</th>
+<th class="px-lg py-md text-label-caps font-label-caps text-on-surface-variant">Date</th>
+<th class="px-lg py-md text-label-caps font-label-caps text-on-surface-variant text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="px-lg py-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">description</span>
+<span class="text-body-sm font-semibold">Software_Eng_v2.pdf</span>
+</div>
+</td>
+<td class="px-lg py-md text-body-sm">Senior Full Stack Developer</td>
+<td class="px-lg py-md text-body-sm">TechCorp Systems</td>
+<td class="px-lg py-md">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 relative">
+<svg class="w-full h-full -rotate-90" viewbox="0 0 36 36">
+<path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" stroke-width="3"></path>
+<path class="score-gauge" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#006e2d" stroke-dasharray="88, 100" stroke-width="3"></path>
+</svg>
+<span class="absolute inset-0 flex items-center justify-center text-[10px] font-bold">88%</span>
+</div>
+<span class="text-secondary font-bold text-body-sm">Excellent</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="bg-[#e7f6ed] text-[#006e2d] px-sm py-xs rounded-full text-[10px] font-bold uppercase tracking-wider">Completed</span>
+</td>
+<td class="px-lg py-md text-body-sm text-on-surface-variant">Oct 24, 2024</td>
+<td class="px-lg py-md text-right">
+<div class="flex justify-end gap-sm">
+<button class="p-2 hover:bg-surface-variant rounded-lg transition-colors text-primary" title="View Report">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+<button class="p-2 hover:bg-error-container hover:text-on-error-container rounded-lg transition-colors text-on-surface-variant" title="Delete">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="px-lg py-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">description</span>
+<span class="text-body-sm font-semibold">Product_Manager_Final.pdf</span>
+</div>
+</td>
+<td class="px-lg py-md text-body-sm">Technical Product Manager</td>
+<td class="px-lg py-md text-body-sm">InnovaSoft Solutions</td>
+<td class="px-lg py-md">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 relative">
+<svg class="w-full h-full -rotate-90" viewbox="0 0 36 36">
+<path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" stroke-width="3"></path>
+<path class="score-gauge" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#973400" stroke-dasharray="62, 100" stroke-width="3"></path>
+</svg>
+<span class="absolute inset-0 flex items-center justify-center text-[10px] font-bold">62%</span>
+</div>
+<span class="text-tertiary font-bold text-body-sm">Good</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="bg-[#e7f6ed] text-[#006e2d] px-sm py-xs rounded-full text-[10px] font-bold uppercase tracking-wider">Completed</span>
+</td>
+<td class="px-lg py-md text-body-sm text-on-surface-variant">Oct 22, 2024</td>
+<td class="px-lg py-md text-right">
+<div class="flex justify-end gap-sm">
+<button class="p-2 hover:bg-surface-variant rounded-lg transition-colors text-primary" title="View Report">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+<button class="p-2 hover:bg-error-container hover:text-on-error-container rounded-lg transition-colors text-on-surface-variant" title="Delete">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="px-lg py-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">description</span>
+<span class="text-body-sm font-semibold">Software_Eng_v2.pdf</span>
+</div>
+</td>
+<td class="px-lg py-md text-body-sm">Staff DevOps Engineer</td>
+<td class="px-lg py-md text-body-sm">CloudScale Inc.</td>
+<td class="px-lg py-md">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 relative">
+<svg class="w-full h-full -rotate-90" viewbox="0 0 36 36">
+<path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" stroke-width="3"></path>
+<path class="score-gauge" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ba1a1a" stroke-dasharray="34, 100" stroke-width="3"></path>
+</svg>
+<span class="absolute inset-0 flex items-center justify-center text-[10px] font-bold">34%</span>
+</div>
+<span class="text-error font-bold text-body-sm">Low</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="bg-[#fff0f0] text-[#ba1a1a] px-sm py-xs rounded-full text-[10px] font-bold uppercase tracking-wider">Completed</span>
+</td>
+<td class="px-lg py-md text-body-sm text-on-surface-variant">Oct 20, 2024</td>
+<td class="px-lg py-md text-right">
+<div class="flex justify-end gap-sm">
+<button class="p-2 hover:bg-surface-variant rounded-lg transition-colors text-primary" title="View Report">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+<button class="p-2 hover:bg-error-container hover:text-on-error-container rounded-lg transition-colors text-on-surface-variant" title="Delete">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 (Pending) -->
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="px-lg py-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">description</span>
+<span class="text-body-sm font-semibold">UX_Designer_Portfolio.pdf</span>
+</div>
+</td>
+<td class="px-lg py-md text-body-sm">Lead UI/UX Designer</td>
+<td class="px-lg py-md text-body-sm">CreativeFlow Agency</td>
+<td class="px-lg py-md">
+<div class="flex items-center gap-sm">
+<div class="animate-pulse w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">sync</span>
+</div>
+<span class="text-on-surface-variant italic text-body-sm">Calculating...</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="bg-[#f0f0fb] text-primary px-sm py-xs rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 w-fit">
+<span class="w-1.5 h-1.5 bg-primary rounded-full animate-ping"></span>
+                                    Pending
+                                </span>
+</td>
+<td class="px-lg py-md text-body-sm text-on-surface-variant">Oct 25, 2024</td>
+<td class="px-lg py-md text-right">
+<div class="flex justify-end gap-sm">
+<button class="p-2 cursor-not-allowed text-outline" disabled="">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+<button class="p-2 hover:bg-error-container hover:text-on-error-container rounded-lg transition-colors text-on-surface-variant" title="Delete">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Empty State (Hidden by default, shown when no data) -->
+<div class="hidden flex flex-col items-center justify-center py-xxl px-lg text-center" id="empty-state">
+<div class="w-24 h-24 bg-surface-container-high rounded-full flex items-center justify-center mb-lg">
+<span class="material-symbols-outlined text-[48px] text-outline">search_off</span>
+</div>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-xs">No Match History Found</h3>
+<p class="text-on-surface-variant text-body-base max-w-md mx-auto mb-xl">You haven't run any job matches yet. Upload your resume and paste a job description to see how you stack up.</p>
+<button class="bg-primary text-on-primary px-lg py-md rounded-lg font-bold hover:bg-opacity-90 transition-all flex items-center gap-sm">
+<span class="material-symbols-outlined">add_circle</span>
+                    Start New Match
+                </button>
+</div>
+<!-- Pagination -->
+<div class="px-lg py-md bg-surface-container-low border-t border-outline-variant flex items-center justify-between">
+<span class="text-body-sm text-on-surface-variant">Showing <span class="font-bold">1-4</span> of <span class="font-bold">24</span> results</span>
+<div class="flex items-center gap-sm">
+<button class="p-2 border border-outline rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors disabled:opacity-30 disabled:cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="flex items-center">
+<button class="w-10 h-10 rounded-lg bg-primary text-on-primary font-bold">1</button>
+<button class="w-10 h-10 rounded-lg hover:bg-surface-variant text-on-surface-variant">2</button>
+<button class="w-10 h-10 rounded-lg hover:bg-surface-variant text-on-surface-variant">3</button>
+<span class="px-2 text-outline">...</span>
+<button class="w-10 h-10 rounded-lg hover:bg-surface-variant text-on-surface-variant">6</button>
+</div>
+<button class="p-2 border border-outline rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Pro Tip Section -->
+<div class="mt-xxl bg-primary-fixed bg-opacity-10 border border-primary-fixed-dim rounded-xl p-lg flex flex-col md:flex-row gap-lg items-center">
+<div class="w-16 h-16 bg-primary-container rounded-xl flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary-container text-display-lg">auto_awesome</span>
+</div>
+<div>
+<h4 class="text-headline-md font-bold text-primary mb-xs">Improve Your Match Rate</h4>
+<p class="text-body-sm text-on-surface-variant">Users with a match score above 85% are 3x more likely to secure an interview. Use our AI Resume Editor to tailor your skills to the job description automatically.</p>
+</div>
+<button class="bg-primary text-on-primary px-lg py-sm rounded-lg text-label-caps font-bold hover:shadow-lg transition-all whitespace-nowrap">Try AI Editor</button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-xl px-lg md:px-xxl flex flex-col md:flex-row justify-between items-center gap-md bg-surface-container-low border-t border-outline-variant">
+<div class="text-on-surface font-headline-md font-bold">ResumeAI</div>
+<p class="text-body-sm text-on-surface-variant">© 2024 ResumeAI. Empowering professional advancement through AI.</p>
+<div class="flex gap-lg">
+<a class="text-on-surface-variant hover:underline decoration-primary transition-all text-label-caps font-label-caps" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:underline decoration-primary transition-all text-label-caps font-label-caps" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:underline decoration-primary transition-all text-label-caps font-label-caps" href="#">Career Resources</a>
+<a class="text-on-surface-variant hover:underline decoration-primary transition-all text-label-caps font-label-caps" href="#">Contact Support</a>
+</div>
+</footer>
+<script>
+        // Micro-interactions and simulation logic
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('click', (e) => {
+                // Prevent trigger on action button clicks
+                if (e.target.closest('button')) return;
+                
+                // Highlight row effect
+                row.classList.add('bg-primary-fixed', 'bg-opacity-10');
+                setTimeout(() => {
+                    row.classList.remove('bg-primary-fixed', 'bg-opacity-10');
+                }, 300);
+            });
+        });
+
+        // Simulating a dynamic update for the pending row
+        setTimeout(() => {
+            const pendingRow = document.querySelector('tr:nth-child(4)');
+            if (pendingRow) {
+                const scoreCell = pendingRow.querySelector('td:nth-child(4)');
+                const statusCell = pendingRow.querySelector('td:nth-child(5)');
+                
+                // This is just a visual mock for the demo
+                // statusCell.innerHTML = '<span class="bg-[#e7f6ed] text-[#006e2d] px-sm py-xs rounded-full text-[10px] font-bold uppercase tracking-wider">Completed</span>';
+            }
+        }, 5000);
+    </script>
+</body></html>

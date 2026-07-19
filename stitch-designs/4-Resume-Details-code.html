@@ -1,0 +1,344 @@
+<!DOCTYPE html><html lang="en" class="light"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-container": "#c04400",
+                      "surface-dim": "#d9d9e5",
+                      "inverse-primary": "#b4c5ff",
+                      "surface-tint": "#0053db",
+                      "secondary-container": "#7cf994",
+                      "inverse-on-surface": "#f0f0fb",
+                      "tertiary-fixed": "#ffdbce",
+                      "outline": "#737686",
+                      "surface-variant": "#e1e2ed",
+                      "on-tertiary-container": "#ffede7",
+                      "on-secondary-fixed": "#002109",
+                      "on-tertiary-fixed-variant": "#7f2b00",
+                      "on-primary-fixed-variant": "#003ea8",
+                      "background": "#faf8ff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed": "#00174b",
+                      "inverse-surface": "#2e3039",
+                      "on-primary": "#ffffff",
+                      "error": "#ba1a1a",
+                      "surface-container": "#ededf9",
+                      "on-background": "#191b23",
+                      "surface-container-high": "#e7e7f3",
+                      "outline-variant": "#c3c6d7",
+                      "surface-bright": "#faf8ff",
+                      "primary-container": "#2563eb",
+                      "error-container": "#ffdad6",
+                      "on-tertiary-fixed": "#370e00",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-low": "#f3f3fe",
+                      "on-surface-variant": "#434655",
+                      "on-error": "#ffffff",
+                      "secondary-fixed": "#7ffc97",
+                      "surface": "#faf8ff",
+                      "primary-fixed": "#dbe1ff",
+                      "on-primary-container": "#eeefff",
+                      "secondary-fixed-dim": "#62df7d",
+                      "surface-container-highest": "#e1e2ed",
+                      "tertiary": "#973400",
+                      "on-error-container": "#93000a",
+                      "primary-fixed-dim": "#b4c5ff",
+                      "on-surface": "#191b23",
+                      "on-secondary-container": "#007230",
+                      "on-secondary": "#ffffff",
+                      "primary": "#004ac6",
+                      "on-secondary-fixed-variant": "#005320",
+                      "secondary": "#006e2d",
+                      "tertiary-fixed-dim": "#ffb599"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "lg": "24px",
+                      "xs": "4px",
+                      "md": "16px",
+                      "xxl": "48px",
+                      "gutter": "20px",
+                      "base": "4px",
+                      "xl": "32px",
+                      "container-max": "1200px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Inter"],
+                      "display-lg-mobile": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "label-caps": ["Inter"],
+                      "body-base": ["Inter"],
+                      "display-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "display-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "body-base": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    }catch(_e){}</script><meta charset="utf-8"></head><body class="bg-surface text-on-surface font-body-base">
+<!-- TopNavBar -->
+<header class="bg-surface shadow-sm flex justify-between items-center w-full px-lg h-16 sticky top-0 z-50">
+<div class="flex items-center gap-md">
+<span class="text-headline-md font-headline-md font-extrabold text-primary">ResumeAI</span>
+<nav class="hidden md:flex gap-lg ml-xl">
+<a href="#" class="text-on-surface-variant font-body-base text-body-base hover:text-primary transition-colors duration-200">Dashboard</a>
+<a href="#" class="text-on-surface-variant font-body-base text-body-base hover:text-primary transition-colors duration-200">Upload</a>
+<a href="#" class="text-primary font-bold border-b-2 border-primary pb-1">Analysis</a>
+<a href="#" class="text-on-surface-variant font-body-base text-body-base hover:text-primary transition-colors duration-200">Job Match</a>
+<a href="#" class="text-on-surface-variant font-body-base text-body-base hover:text-primary transition-colors duration-200">Chat</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">settings</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">account_circle</button>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-lg py-xl">
+<!-- Header Actions & Meta -->
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-xl gap-md">
+<div class="flex items-center gap-md">
+<button onclick="window.history.back()" class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-variant transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div>
+<h1 class="font-display-lg text-display-lg">Resume Details</h1>
+<div class="flex items-center gap-sm mt-xs">
+<span class="font-body-sm text-body-sm text-on-surface-variant">alex_chen_senior_dev.pdf</span>
+<span class="px-sm py-xs bg-secondary-container bg-opacity-10 text-on-secondary-container text-label-caps font-label-caps rounded-lg">Ready</span>
+</div>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="px-lg py-sm border border-outline text-primary font-label-caps rounded-lg hover:bg-surface-container-low transition-colors">Edit Content</button>
+<button class="px-lg py-sm bg-primary-container text-on-primary font-label-caps rounded-lg hover:opacity-90 transition-opacity">Export PDF</button>
+</div>
+</div>
+<!-- Bento Grid Content -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Left Column: Personal & Skills -->
+<div class="md:col-span-4 flex flex-col gap-lg">
+<!-- Profile Section -->
+<section class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
+<div class="flex items-center gap-md mb-md">
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-primary-fixed">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a person with a friendly expression, soft studio lighting, high resolution photography, clean white background, corporate professional style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYNRR3QqR8R25b0HZD2olmCc-4V20Th08lrap_4v2gz2EXzpfzEj003Ri26EBYCmN-JWQk2hyFBaVUD_7Nh2rUg_PNwpgUSuCcS4H6LfYkR3DzFZy81S9jyR6ngLLPHZL6Stzc252ygE0681r-_svcxtSIK1VfY2EoqvUwBfM4HL-9XoLdgKy_QY7FtzGxeu-32c-g6fdF9zaXud9EVDiV2OwEr8sMQw9beJT5oayCubLOKzZ4hQ75">
+</div>
+<div>
+<h2 class="font-headline-md text-headline-md">Alex Chen</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Senior Software Engineer</p>
+</div>
+</div>
+<div class="space-y-sm">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[18px]">email</span>
+<span class="text-body-sm">alex.chen@example.com</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[18px]">phone_iphone</span>
+<span class="text-body-sm">+1 (555) 123-4567</span>
+</div>
+<div class="flex items-center gap-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[18px]">location_on</span>
+<span class="text-body-sm">San Francisco, CA</span>
+</div>
+</div>
+</section>
+<!-- Skills Section -->
+<section class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">psychology</span>
+<h3 class="font-headline-md text-headline-md">Skills</h3>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant">expand_more</button>
+</div>
+<div class="flex flex-wrap gap-sm">
+<span class="px-md py-xs bg-surface-container text-on-surface-variant text-label-caps font-label-caps rounded-full border border-outline-variant">TypeScript</span>
+<span class="px-md py-xs bg-surface-container text-on-surface-variant text-label-caps font-label-caps rounded-full border border-outline-variant">React / Next.js</span>
+<span class="px-md py-xs bg-surface-container text-on-surface-variant text-label-caps font-label-caps rounded-full border border-outline-variant">Node.js</span>
+<span class="px-md py-xs bg-surface-container text-on-surface-variant text-label-caps font-label-caps rounded-full border border-outline-variant">GraphQL</span>
+<span class="px-md py-xs bg-surface-container text-on-surface-variant text-label-caps font-label-caps rounded-full border border-outline-variant">PostgreSQL</span>
+<span class="px-md py-xs bg-surface-container text-on-surface-variant text-label-caps font-label-caps rounded-full border border-outline-variant">AWS</span>
+<span class="px-md py-xs bg-surface-container text-on-surface-variant text-label-caps font-label-caps rounded-full border border-outline-variant">Docker</span>
+<span class="px-md py-xs bg-surface-container text-on-surface-variant text-label-caps font-label-caps rounded-full border border-outline-variant">System Design</span>
+</div>
+</section>
+<!-- Languages & Certs -->
+<section class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
+<div class="mb-lg">
+<div class="flex items-center gap-sm mb-sm">
+<span class="material-symbols-outlined text-primary">translate</span>
+<h3 class="font-headline-md text-headline-md">Languages</h3>
+</div>
+<ul class="space-y-sm">
+<li class="flex justify-between text-body-sm">
+<span class="text-on-surface">English</span>
+<span class="text-on-surface-variant">Native</span>
+</li>
+<li class="flex justify-between text-body-sm">
+<span class="text-on-surface">Mandarin</span>
+<span class="text-on-surface-variant">Fluent</span>
+</li>
+</ul>
+</div>
+<div class="">
+<div class="flex items-center gap-sm mb-sm">
+<span class="material-symbols-outlined text-primary">verified</span>
+<h3 class="font-headline-md text-headline-md">Certifications</h3>
+</div>
+<ul class="space-y-sm">
+<li class="text-body-sm">
+<div class="font-bold text-on-surface">AWS Certified Solutions Architect</div>
+<div class="text-on-surface-variant">Amazon Web Services • 2023</div>
+</li>
+</ul>
+</div>
+</section>
+</div>
+<!-- Right Column: Experience, Education, Projects -->
+<div class="md:col-span-8 flex flex-col gap-lg">
+<!-- Work Experience -->
+<section class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
+<div class="flex items-center justify-between mb-lg">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">work</span>
+<h3 class="font-headline-md text-headline-md">Professional Experience</h3>
+</div>
+</div>
+<div class="relative pl-lg space-y-xl">
+<!-- -->
+<div class="timeline-line"></div>
+<!-- Job 1 -->
+<div class="relative">
+<div class="timeline-node"></div>
+<div class="flex flex-col md:flex-row md:justify-between items-start mb-xs">
+<h4 class="font-bold text-on-surface">Senior Software Engineer</h4>
+<span class="text-label-caps font-label-caps text-on-surface-variant px-sm py-xs bg-surface-container rounded">Jan 2021 — Present</span>
+</div>
+<div class="text-primary font-bold text-body-sm mb-sm">TechFlow Inc.</div>
+<ul class="list-disc list-inside text-body-sm text-on-surface-variant space-y-sm">
+<li class="">Architected and deployed a microservices-based dashboard serving 2M+ monthly active users using Next.js and Go.</li>
+<li class="">Reduced cloud infrastructure costs by 35% through container orchestration optimization and serverless migration.</li>
+<li class="">Led a team of 5 developers in implementing a real-time collaboration feature using WebSockets and Redis.</li>
+</ul>
+</div>
+<!-- Job 2 -->
+<div class="relative">
+<div class="timeline-node"></div>
+<div class="flex flex-col md:flex-row md:justify-between items-start mb-xs">
+<h4 class="font-bold text-on-surface">Software Developer</h4>
+<span class="text-label-caps font-label-caps text-on-surface-variant px-sm py-xs bg-surface-container rounded">Jun 2018 — Dec 2020</span>
+</div>
+<div class="text-primary font-bold text-body-sm mb-sm">Innovate Digital</div>
+<ul class="list-disc list-inside text-body-sm text-on-surface-variant space-y-sm">
+<li class="">Developed and maintained core API endpoints for a fintech mobile application.</li>
+<li class="">Implemented automated CI/CD pipelines decreasing deployment time by 50%.</li>
+<li class="">Worked closely with designers to build a custom internal UI component library.</li>
+</ul>
+</div>
+</div>
+</section>
+<!-- Education -->
+<section class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
+<div class="flex items-center gap-sm mb-lg">
+<span class="material-symbols-outlined text-primary">school</span>
+<h3 class="font-headline-md text-headline-md">Education</h3>
+</div>
+<div class="relative pl-lg space-y-lg">
+<div class="timeline-line"></div>
+<div class="relative">
+<div class="timeline-node"></div>
+<div class="flex justify-between items-start mb-xs">
+<h4 class="font-bold text-on-surface">M.S. in Computer Science</h4>
+<span class="text-label-caps font-label-caps text-on-surface-variant">2016 — 2018</span>
+</div>
+<div class="text-on-surface-variant text-body-sm">Stanford University • GPA 3.9/4.0</div>
+</div>
+<div class="relative">
+<div class="timeline-node"></div>
+<div class="flex justify-between items-start mb-xs">
+<h4 class="font-bold text-on-surface">B.S. in Software Engineering</h4>
+<span class="text-label-caps font-label-caps text-on-surface-variant">2012 — 2016</span>
+</div>
+<div class="text-on-surface-variant text-body-sm">University of Washington</div>
+</div>
+</div>
+</section>
+<!-- Projects -->
+<section class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
+<div class="flex items-center gap-sm mb-lg">
+<span class="material-symbols-outlined text-primary">rocket_launch</span>
+<h3 class="font-headline-md text-headline-md">Featured Projects</h3>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-md">
+<div class="p-md border border-outline-variant rounded-lg hover:border-primary transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-sm">
+<h5 class="font-bold text-on-surface group-hover:text-primary">Open-Source Engine</h5>
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">open_in_new</span>
+</div>
+<p class="text-body-sm text-on-surface-variant">A high-performance markdown parser built in Rust with 5k+ GitHub stars.</p>
+</div>
+<div class="p-md border border-outline-variant rounded-lg hover:border-primary transition-colors cursor-pointer group">
+<div class="flex items-center justify-between mb-sm">
+<h5 class="font-bold text-on-surface group-hover:text-primary">EcoTracker App</h5>
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">open_in_new</span>
+</div>
+<p class="text-body-sm text-on-surface-variant">Real-time carbon footprint monitoring dashboard for small businesses.</p>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-highest mt-xxl border-t border-outline-variant">
+<div class="max-w-container-max mx-auto px-lg py-xl flex flex-col md:flex-row justify-between items-center gap-md flex-wrap"><div class="flex flex-col gap-xs mb-md md:mb-0">
+    <div class="flex items-center gap-sm text-on-surface-variant font-label-caps text-label-caps">
+        <span class="material-symbols-outlined text-[16px]">history</span>
+        <span class="">Generated: Oct 24, 2023 • 14:32 UTC</span>
+    </div>
+    <div class="flex items-center gap-sm text-on-surface-variant font-label-caps text-label-caps">
+        <span class="material-symbols-outlined text-[16px]">description</span>
+        <span class="">Word Count: 842 words</span>
+    </div>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">© 2024 ResumeAI. All rights reserved.</span>
+<div class="flex gap-lg">
+<a class="text-on-surface-variant text-body-sm hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant text-body-sm hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="text-on-surface-variant text-body-sm hover:text-primary transition-colors" href="#">Help Center</a>
+<a class="text-on-surface-variant text-body-sm hover:text-primary transition-colors" href="#">API Reference</a>
+</div>
+</div>
+</footer>
+<!-- Simple Interactivity for Collapsibles (Simulated) -->
+<script>
+        document.querySelectorAll('.material-symbols-outlined').forEach(icon => {
+            if (icon.textContent === 'expand_more') {
+                icon.parentElement.style.cursor = 'pointer';
+                icon.parentElement.addEventListener('click', () => {
+                    const content = icon.parentElement.nextElementSibling;
+                    if (content) {
+                        content.classList.toggle('hidden');
+                        icon.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+                        icon.style.transition = 'transform 0.2s ease';
+                    }
+                });
+            }
+        });
+    </script>
+
+</body></html>
