@@ -291,3 +291,41 @@ This is the first stable release of ResumeAI, featuring:
 
 ---
 
+## Deprecations
+
+### v0.5.0 and Earlier
+- Legacy authentication endpoints (removed in v1.0.0)
+- Old resume parsing format (replaced with improved structure)
+- Basic ATS algorithm (replaced with AI-powered analysis)
+
+---
+
+## Roadmap
+
+### v1.1.0 (Q1 2024)
+- [ ] Resume templates library
+- [ ] PDF export functionality
+- [ ] Enhanced analytics with more chart types
+- [ ] Batch resume analysis
+- [ ] API documentation with Swagger
+
+### v1.2.0 (Q2 2024)
+- [ ] LinkedIn profile import
+- [ ] Chrome extension beta
+- [ ] Cover letter generator
+- [ ] Interview question generator (full implementation)
+- [ ] Mobile-responsive improvements
+
+### v2.0.0 (Q3 2024)
+- [ ] Mobile applications (iOS/Android)
+- [ ] Real-time collaboration features
+- [ ] Resume version control
+- [ ] Advanced AI features
+- [ ] Enterprise features
+
+---
+
+[Unreleased]: https://github.com/yourusername/resumeai/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/yourusername/resumeai/releases/tag/v1.0.0
+[0.5.0]: https://github.com/yourusername/resumeai/releases/tag/v0.5.0
+[0.1.0]: https://github.com/yourusername/resumeai/releases/tag/v0.1.0
