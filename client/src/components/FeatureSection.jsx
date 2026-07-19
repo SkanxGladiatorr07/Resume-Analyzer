@@ -20,3 +20,4 @@ const FeatureSection = ({ icon, title, description }) => {
 }
 
 export default FeatureSection
+export { FeatureSection }

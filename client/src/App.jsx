@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import PublicRoute from './components/PublicRoute'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
+import DashboardEnhanced from './pages/DashboardEnhanced'
 import AnalyticsDashboard from './pages/AnalyticsDashboard'
 import Upload from './pages/Upload'
 import { ResumeDetails } from './pages/ResumeDetails'
@@ -13,6 +14,8 @@ import JobMatch from './pages/JobMatch'
 import JobMatchHistory from './pages/JobMatchHistory'
 import ResumeChat from './pages/ResumeChat'
 import CareerAssistant from './pages/CareerAssistant'
+import ResumeVersionHistory from './pages/ResumeVersionHistory'
+import ResumeComparison from './pages/ResumeComparison'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import NotFound from './pages/NotFound'
@@ -73,6 +76,30 @@ function App() {
             }
           >
             <Route index element={<ResumeDetails />} />
+          </Route>
+
+          {/* Resume Version History page - protected route with main layout */}
+          <Route
+            path="/resume/:id/versions"
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<ResumeVersionHistory />} />
+          </Route>
+
+          {/* Resume Comparison page - protected route with main layout */}
+          <Route
+            path="/resume/:id/compare/:version1/:version2"
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<ResumeComparison />} />
           </Route>
 
           {/* Analysis page - protected route with main layout */}

@@ -68,3 +68,4 @@ const BackendStatus = () => {
 }
 
 export default BackendStatus
+export { BackendStatus }

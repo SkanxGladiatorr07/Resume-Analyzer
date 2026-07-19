@@ -175,3 +175,23 @@ export const getExportStats = async () => {
   const response = await apiClient.get('/report/export/stats');
   return response.data;
 };
+
+const resumeService = {
+  uploadResume,
+  getResumes,
+  deleteResume,
+  getResumeRawText,
+  getResumeParsedData,
+  getParsingStatus,
+  togglePin,
+  setDefault,
+  removeDefault,
+  getResumeVersions,
+  compareVersions,
+  getRecentExports,
+  getExportStats,
+  formatFileSize,
+  formatDate,
+};
+
+export default resumeService;

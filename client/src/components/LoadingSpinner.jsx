@@ -49,3 +49,5 @@ export const LoadingSpinner = ({
     </Card>
   );
 };
+
+export default LoadingSpinner;

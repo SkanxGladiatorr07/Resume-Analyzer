@@ -95,3 +95,5 @@ export const ConfirmDialog = ({
     </div>
   );
 };
+
+export default ConfirmDialog;

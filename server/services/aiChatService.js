@@ -357,15 +357,15 @@ export const processChatMessage = async (sessionId, userId, question) => {
     // Step 7: Validate response
     console.log(`${logPrefix} ✔️  Step 7/9: Validating AI response...`);
     const step7StartTime = Date.now();
-    const validation = validateAIResponse(aiResponse, retrievalResult.chunks);
+    const responseValidation = validateAIResponse(aiResponse, retrievalResult.chunks);
 
-    if (!validation.isValid) {
+    if (!responseValidation.isValid) {
       console.error(`${logPrefix} ❌ Step 7 Failed: Invalid response format`);
-      validation.errors.forEach(err => {
+      responseValidation.errors.forEach(err => {
         console.error(`${logPrefix}    • ${err}`);
       });
       console.log();
-      throw new Error(`Invalid AI response: ${validation.errors.join(', ')}`);
+      throw new Error(`Invalid AI response: ${responseValidation.errors.join(', ')}`);
     }
 
     const step7Time = Date.now() - step7StartTime;
