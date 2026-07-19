@@ -1,62 +1,103 @@
 import User from '../models/User.js';
 import { verifyToken } from '../utils/jwt.js';
+import { sendUnauthorized, sendServerError } from '../utils/responseFormatter.js';
 
 /**
  * Authentication Middleware
- * Protects routes by verifying JWT tokens
+ * Protects routes by verifying JWT tokens with comprehensive error handling
  */
 export const authenticate = async (req, res, next) => {
   try {
     // Get token from header
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. No token provided.',
-      });
+    if (!authHeader) {
+      return sendUnauthorized(res, 'Access denied. No authorization header provided.');
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
+      return sendUnauthorized(res, 'Invalid authorization format. Use: Bearer <token>');
     }
 
     // Extract token
     const token = authHeader.split(' ')[1];
 
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. Invalid token format.',
-      });
+    if (!token || token === 'null' || token === 'undefined') {
+      return sendUnauthorized(res, 'Access denied. No token provided.');
     }
 
-    // Verify token
+    // Verify token with enhanced error handling
     let decoded;
     try {
       decoded = verifyToken(token);
     } catch (error) {
+      // Specific JWT error handling
+      if (error.message === 'Token has expired') {
+        return res.status(401).json({
+          success: false,
+          message: 'Your session has expired. Please log in again.',
+          code: 'TOKEN_EXPIRED',
+          timestamp: new Date().toISOString(),
+        });
+      }
+      
+      if (error.message === 'Invalid token') {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid authentication token. Please log in again.',
+          code: 'TOKEN_INVALID',
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      // Generic token error
       return res.status(401).json({
         success: false,
-        message: error.message || 'Invalid or expired token',
+        message: 'Authentication failed. Please log in again.',
+        code: 'TOKEN_ERROR',
+        timestamp: new Date().toISOString(),
       });
     }
 
-    // Find user by ID from token
-    const user = await User.findById(decoded.id).select('-password');
+    // Validate decoded token structure
+    if (!decoded || !decoded.id) {
+      return sendUnauthorized(res, 'Invalid token payload. Please log in again.');
+    }
+
+    // Find user by ID from token with optimized query
+    const user = await User.findById(decoded.id)
+      .select('-password')
+      .lean(); // Use lean for better performance
 
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'User not found. Token invalid.',
+        message: 'User account not found. Token is no longer valid.',
+        code: 'USER_NOT_FOUND',
+        timestamp: new Date().toISOString(),
       });
     }
 
+    // Check if user account is active (if you have this field)
+    // if (user.status === 'inactive' || user.status === 'suspended') {
+    //   return sendUnauthorized(res, 'Account is inactive. Please contact support.');
+    // }
+
     // Attach user to request object
     req.user = user;
+    
+    // Attach user ID separately for convenience
+    req.userId = user._id.toString();
+    
     next();
   } catch (error) {
-    console.error('Authentication error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error during authentication',
+    console.error('Authentication middleware error:', {
+      error: error.message,
+      stack: error.stack,
+      path: req.path,
     });
+    
+    return sendServerError(res, 'Server error during authentication. Please try again.');
   }
 };
 

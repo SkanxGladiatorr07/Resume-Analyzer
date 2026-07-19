@@ -4,7 +4,8 @@
  */
 
 import express from 'express';
-import { authenticate } from '../middleware/authMiddleware.js';
+import { authenticate } from '../middleware/auth.js';
+import { aiLimiter } from '../middleware/rateLimiter.js';
 import {
   generateLearning,
   generateCareer,
@@ -16,17 +17,17 @@ const router = express.Router();
 
 /**
  * @route   POST /api/ai/roadmap/learning
- * @desc    Generate learning roadmap
+ * @desc    Generate learning roadmap with rate limiting
  * @access  Private
  */
-router.post('/roadmap/learning', authenticate, generateLearning);
+router.post('/roadmap/learning', authenticate, aiLimiter, generateLearning);
 
 /**
  * @route   POST /api/ai/roadmap/career
- * @desc    Generate career roadmap
+ * @desc    Generate career roadmap with rate limiting
  * @access  Private
  */
-router.post('/roadmap/career', authenticate, generateCareer);
+router.post('/roadmap/career', authenticate, aiLimiter, generateCareer);
 
 /**
  * @route   GET /api/ai/roadmap/history

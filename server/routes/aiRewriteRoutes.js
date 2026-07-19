@@ -12,19 +12,20 @@ import {
   getStats,
   getRewriteConfig,
 } from '../controllers/aiRewriteController.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { authenticate } from '../middleware/auth.js';
+import { aiLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
 /**
  * @route   POST /api/ai/rewrite
- * @desc    Rewrite resume content using AI
+ * @desc    Rewrite resume content using AI with rate limiting
  * @access  Private
  * 
  * @body    {resumeId, section, content, tone}
  * @returns {rewrittenContent, improvements, metadata}
  */
-router.post('/rewrite', protect, rewriteResumeContent);
+router.post('/rewrite', authenticate, aiLimiter, rewriteResumeContent);
 
 /**
  * @route   GET /api/ai/rewrite/history/:resumeId
@@ -37,7 +38,7 @@ router.post('/rewrite', protect, rewriteResumeContent);
  * @query   skip - Number to skip (default: 0)
  * @returns {history, total, resumeId}
  */
-router.get('/rewrite/history/:resumeId', protect, getHistory);
+router.get('/rewrite/history/:resumeId', authenticate, getHistory);
 
 /**
  * @route   GET /api/ai/rewrite/stats
@@ -46,7 +47,7 @@ router.get('/rewrite/history/:resumeId', protect, getHistory);
  * 
  * @returns {totalRewrites, sectionsRewritten, tonesUsed, averageResponseTime}
  */
-router.get('/rewrite/stats', protect, getStats);
+router.get('/rewrite/stats', authenticate, getStats);
 
 /**
  * @route   GET /api/ai/rewrite/config
@@ -55,6 +56,6 @@ router.get('/rewrite/stats', protect, getStats);
  * 
  * @returns {supportedSections, supportedTones, contentLimits}
  */
-router.get('/rewrite/config', protect, getRewriteConfig);
+router.get('/rewrite/config', authenticate, getRewriteConfig);
 
 export default router;

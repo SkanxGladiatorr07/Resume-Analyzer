@@ -4,7 +4,8 @@
  */
 
 import express from 'express';
-import { authenticate } from '../middleware/authMiddleware.js';
+import { authenticate } from '../middleware/auth.js';
+import { aiLimiter } from '../middleware/rateLimiter.js';
 import {
   generateProjects,
   getHistory,
@@ -15,10 +16,10 @@ const router = express.Router();
 
 /**
  * @route   POST /api/ai/projects
- * @desc    Generate project suggestions based on skills and career goals
+ * @desc    Generate project suggestions based on skills and career goals with rate limiting
  * @access  Private
  */
-router.post('/projects', authenticate, generateProjects);
+router.post('/projects', authenticate, aiLimiter, generateProjects);
 
 /**
  * @route   GET /api/ai/projects/history

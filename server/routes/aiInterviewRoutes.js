@@ -4,7 +4,8 @@
  */
 
 import express from 'express';
-import { authenticate } from '../middleware/authMiddleware.js';
+import { authenticate } from '../middleware/auth.js';
+import { aiLimiter } from '../middleware/rateLimiter.js';
 import {
   generateInterview,
   getHistory,
@@ -15,10 +16,10 @@ const router = express.Router();
 
 /**
  * @route   POST /api/ai/interview
- * @desc    Generate interview questions based on resume and job description
+ * @desc    Generate interview questions based on resume and job description with rate limiting
  * @access  Private
  */
-router.post('/interview', authenticate, generateInterview);
+router.post('/interview', authenticate, aiLimiter, generateInterview);
 
 /**
  * @route   GET /api/ai/interview/history/:resumeId

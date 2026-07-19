@@ -1,7 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-import multer from 'multer';
+import helmet from 'helmet';
 import config from './config/index.js';
+import { getLogger } from './middleware/logger.js';
+import { sanitizeInput } from './middleware/sanitizer.js';
+import { apiLimiter } from './middleware/rateLimiter.js';
+import { errorHandler, notFound } from './middleware/errorHandler.js';
+import { attachFormatter } from './utils/responseFormatter.js';
 import authRoutes from './routes/authRoutes.js';
 import resumeRoutes from './routes/resumeRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
@@ -21,6 +26,25 @@ import exportRoutes from './routes/exportRoutes.js';
 
 const app = express();
 
+// ========================================
+// SECURITY MIDDLEWARE
+// ========================================
+
+// Helmet - Security headers
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+      },
+    },
+    crossOriginEmbedderPolicy: false, // Allow loading external resources
+  })
+);
+
 // CORS Configuration
 app.use(
   cors({
@@ -31,29 +55,60 @@ app.use(
   })
 );
 
+// ========================================
+// REQUEST PARSING MIDDLEWARE
+// ========================================
+
 // Body Parser Middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Request Logger Middleware (Development)
-if (config.server.env === 'development') {
-  app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path}`);
-    next();
-  });
-}
+// ========================================
+// LOGGING MIDDLEWARE
+// ========================================
 
-// Health Check Endpoint
+// Request logging (environment-aware)
+app.use(getLogger());
+
+// ========================================
+// SANITIZATION MIDDLEWARE
+// ========================================
+
+// MongoDB injection and XSS protection
+app.use(sanitizeInput);
+
+// ========================================
+// UTILITY MIDDLEWARE
+// ========================================
+
+// Attach response formatter to all requests
+app.use(attachFormatter);
+
+// ========================================
+// RATE LIMITING
+// ========================================
+
+// Apply general rate limiting to all API routes
+app.use('/api', apiLimiter);
+
+// ========================================
+// HEALTH CHECK ENDPOINT
+// ========================================
+
 app.get('/api/health', (req, res) => {
   res.status(200).json({
-    status: 'OK',
+    success: true,
     message: 'ResumeAI Backend Running',
     environment: config.server.env,
     timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
   });
 });
 
-// API Routes
+// ========================================
+// API ROUTES
+// ========================================
+
 app.use('/api/auth', authRoutes);
 app.use('/api/resumes', resumeRoutes);
 app.use('/api/ai', aiRoutes);
@@ -71,49 +126,14 @@ app.use('/api/ai', aiRoadmapRoutes);
 app.use('/api/ai', aiHistoryRoutes);
 app.use('/api/report', exportRoutes);
 
-// 404 Handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found',
-    path: req.path,
-  });
-});
+// ========================================
+// ERROR HANDLING
+// ========================================
 
-// Global Error Handler
-app.use((err, req, res, next) => {
-  console.error('❌ Error:', err.stack);
+// 404 Handler - Must be after all routes
+app.use(notFound);
 
-  // Handle Multer errors
-  if (err instanceof multer.MulterError) {
-    if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({
-        success: false,
-        message: 'File size exceeds 5MB limit',
-      });
-    }
-    return res.status(400).json({
-      success: false,
-      message: err.message,
-    });
-  }
-
-  // Handle file type errors
-  if (err.message && err.message.includes('Invalid file type')) {
-    return res.status(400).json({
-      success: false,
-      message: err.message,
-    });
-  }
-  
-  const statusCode = err.statusCode || 500;
-  const message = err.message || 'Internal server error';
-
-  res.status(statusCode).json({
-    success: false,
-    message,
-    ...(config.server.env === 'development' && { stack: err.stack }),
-  });
-});
+// Global Error Handler - Must be last
+app.use(errorHandler);
 
 export default app;

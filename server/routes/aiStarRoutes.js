@@ -12,19 +12,20 @@ import {
   getStats,
   getStarConfig,
 } from '../controllers/aiStarController.js';
-import { protect } from '../middleware/authMiddleware.js';
+import { authenticate } from '../middleware/auth.js';
+import { aiLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
 /**
  * @route   POST /api/ai/star
- * @desc    Generate STAR-formatted bullet point
+ * @desc    Generate STAR-formatted bullet point with rate limiting
  * @access  Private
  * 
  * @body    {resumeId, experience}
  * @returns {original, starVersion, breakdown: {situation, task, action, result}}
  */
-router.post('/star', protect, generateStar);
+router.post('/star', authenticate, aiLimiter, generateStar);
 
 /**
  * @route   GET /api/ai/star/history/:resumeId
@@ -36,7 +37,7 @@ router.post('/star', protect, generateStar);
  * @query   skip - Number to skip (default: 0)
  * @returns {history, total, resumeId}
  */
-router.get('/star/history/:resumeId', protect, getHistory);
+router.get('/star/history/:resumeId', authenticate, getHistory);
 
 /**
  * @route   GET /api/ai/star/stats
@@ -45,7 +46,7 @@ router.get('/star/history/:resumeId', protect, getHistory);
  * 
  * @returns {totalGenerated, averageOriginalLength, averageStarLength, averageResponseTime}
  */
-router.get('/star/stats', protect, getStats);
+router.get('/star/stats', authenticate, getStats);
 
 /**
  * @route   GET /api/ai/star/config
@@ -54,6 +55,6 @@ router.get('/star/stats', protect, getStats);
  * 
  * @returns {contentLimits, starGuidelines}
  */
-router.get('/star/config', protect, getStarConfig);
+router.get('/star/config', authenticate, getStarConfig);
 
 export default router;

@@ -19,6 +19,7 @@ import {
 } from '../controllers/versionController.js';
 import { authenticate } from '../middleware/auth.js';
 import { validateResumeId, checkResumeOwnership } from '../middleware/resumeAuth.js';
+import { uploadLimiter } from '../middleware/rateLimiter.js';
 import upload from '../config/multer.js';
 
 const router = express.Router();
@@ -28,10 +29,10 @@ router.use(authenticate);
 
 /**
  * @route   POST /api/resumes/upload
- * @desc    Upload a resume file
+ * @desc    Upload a resume file with rate limiting
  * @access  Private
  */
-router.post('/upload', upload.single('resume'), uploadResume);
+router.post('/upload', uploadLimiter, upload.single('resume'), uploadResume);
 
 /**
  * @route   GET /api/resumes
