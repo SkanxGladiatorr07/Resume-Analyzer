@@ -1,0 +1,29 @@
+[
+  {
+    "_id": "507f1f77bcf86cd799439011",
+    "name": "John Developer",
+    "email": "john.dev@resumeai.com",
+    "password": "$2b$10$rKjVJZKJZKZKZKZKZKZKZeeHtGHv6JQPqE7xKxKxKxKxKxKxKxKxK",
+    "isVerified": true,
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "updatedAt": "2024-02-20T14:22:00.000Z"
+  },
+  {
+    "_id": "507f1f77bcf86cd799439012",
+    "name": "Sarah Product Manager",
+    "email": "sarah.pm@resumeai.com",
+    "password": "$2b$10$rKjVJZKJZKZKZKZKZKZKZeeHtGHv6JQPqE7xKxKxKxKxKxKxKxKxK",
+    "isVerified": true,
+    "createdAt": "2024-01-18T09:15:00.000Z",
+    "updatedAt": "2024-02-18T16:45:00.000Z"
+  },
+  {
+    "_id": "507f1f77bcf86cd799439013",
+    "name": "Demo User",
+    "email": "demo@resumeai.com",
+    "password": "$2b$10$rKjVJZKJZKZKZKZKZKZKZeeHtGHv6JQPqE7xKxKxKxKxKxKxKxKxK",
+    "isVerified": true,
+    "createdAt": "2024-01-10T08:00:00.000Z",
+    "updatedAt": "2024-02-22T11:30:00.000Z"
+  }
+]

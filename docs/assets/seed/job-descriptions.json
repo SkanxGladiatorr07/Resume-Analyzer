@@ -1,0 +1,82 @@
+[
+  {
+    "_id": "807f1f77bcf86cd799439041",
+    "title": "Senior Full Stack Developer",
+    "company": "TechCorp Solutions",
+    "location": "San Francisco, CA (Remote)",
+    "description": "We're looking for an experienced Full Stack Developer to join our engineering team. You'll work on building scalable web applications using modern technologies.\n\nResponsibilities:\n- Design and develop full-stack web applications using React, Node.js, and PostgreSQL\n- Collaborate with product managers and designers to implement new features\n- Write clean, maintainable code with comprehensive test coverage\n- Participate in code reviews and mentor junior developers\n- Optimize application performance and scalability\n\nRequirements:\n- 5+ years of experience in full-stack development\n- Strong proficiency in JavaScript, React, Node.js\n- Experience with SQL and NoSQL databases\n- Familiarity with AWS or other cloud platforms\n- Understanding of RESTful APIs and microservices architecture\n- Bachelor's degree in Computer Science or related field\n\nNice to Have:\n- Experience with TypeScript\n- Knowledge of Docker and Kubernetes\n- CI/CD pipeline experience\n- Open source contributions",
+    "salary": "$140,000 - $180,000",
+    "type": "Full-time",
+    "posted": "2024-02-18T10:00:00.000Z"
+  },
+  {
+    "_id": "807f1f77bcf86cd799439042",
+    "title": "Product Manager",
+    "company": "InnovateTech Inc",
+    "location": "New York, NY (Hybrid)",
+    "description": "Join our product team to drive the development of our flagship SaaS platform serving over 10,000 customers.\n\nWhat You'll Do:\n- Define product vision and strategy aligned with business goals\n- Conduct user research and gather customer feedback\n- Create and maintain product roadmaps\n- Work closely with engineering, design, and marketing teams\n- Define and track key product metrics and KPIs\n- Lead sprint planning and prioritization\n\nQualifications:\n- 5+ years of product management experience in B2B SaaS\n- Strong analytical and problem-solving skills\n- Experience with Agile/Scrum methodologies\n- Excellent communication and stakeholder management\n- Data-driven decision making approach\n- MBA or equivalent experience preferred\n\nBonus Points:\n- Experience with enterprise software\n- Technical background or CS degree\n- Prior startup experience",
+    "salary": "$130,000 - $170,000",
+    "type": "Full-time",
+    "posted": "2024-02-17T14:30:00.000Z"
+  },
+  {
+    "_id": "807f1f77bcf86cd799439043",
+    "title": "Data Scientist",
+    "company": "DataDriven Analytics",
+    "location": "Austin, TX (Remote)",
+    "description": "We're seeking a talented Data Scientist to help us unlock insights from our massive datasets and build ML models that drive business decisions.\n\nKey Responsibilities:\n- Develop and deploy machine learning models for predictive analytics\n- Analyze large datasets to extract actionable insights\n- Design and implement A/B tests to measure impact\n- Collaborate with product and engineering teams\n- Present findings to stakeholders and executives\n- Build data pipelines and automate reporting\n\nRequired Skills:\n- Master's or PhD in Data Science, Statistics, or related field\n- 3+ years of experience in data science or ML engineering\n- Strong proficiency in Python (pandas, scikit-learn, TensorFlow)\n- Experience with SQL and data warehousing\n- Knowledge of statistical analysis and hypothesis testing\n- Experience deploying models to production\n\nPreferred:\n- Cloud platform experience (AWS, GCP, or Azure)\n- Big data technologies (Spark, Hadoop)\n- Deep learning frameworks (PyTorch, Keras)\n- MLOps experience",
+    "salary": "$120,000 - $160,000",
+    "type": "Full-time",
+    "posted": "2024-02-16T09:00:00.000Z"
+  },
+  {
+    "_id": "807f1f77bcf86cd799439044",
+    "title": "Senior UX Designer",
+    "company": "DesignFirst Studio",
+    "location": "Los Angeles, CA (Hybrid)",
+    "description": "We're looking for a creative and user-focused UX Designer to craft exceptional digital experiences for our clients.\n\nWhat You'll Do:\n- Lead end-to-end design process from research to final delivery\n- Conduct user research, usability testing, and gather insights\n- Create wireframes, prototypes, and high-fidelity designs\n- Collaborate with developers to ensure design implementation\n- Develop and maintain design systems\n- Present design concepts to clients and stakeholders\n\nRequirements:\n- 4+ years of UX/UI design experience\n- Strong portfolio demonstrating user-centered design\n- Proficiency in Figma, Sketch, or Adobe XD\n- Experience with user research methodologies\n- Understanding of accessibility standards (WCAG)\n- Excellent communication and presentation skills\n\nBonus:\n- Front-end development skills (HTML, CSS)\n- Motion design experience\n- Experience with design systems\n- Knowledge of A/B testing and analytics",
+    "salary": "$100,000 - $140,000",
+    "type": "Full-time",
+    "posted": "2024-02-15T11:20:00.000Z"
+  },
+  {
+    "_id": "807f1f77bcf86cd799439045",
+    "title": "Frontend Engineer",
+    "company": "WebTech Innovations",
+    "location": "Seattle, WA (Remote)",
+    "description": "Join our frontend team to build beautiful, performant, and accessible web applications that millions of users love.\n\nResponsibilities:\n- Build responsive web applications using React and modern JavaScript\n- Implement pixel-perfect designs with attention to detail\n- Optimize application performance and loading times\n- Write unit and integration tests\n- Collaborate with backend engineers on API integration\n- Participate in design reviews and provide technical input\n\nQualifications:\n- 3+ years of frontend development experience\n- Expert knowledge of React, JavaScript/TypeScript, HTML, CSS\n- Experience with state management (Redux, Context API)\n- Understanding of web performance optimization\n- Knowledge of accessibility best practices\n- Experience with modern build tools (Webpack, Vite)\n\nNice to Have:\n- Next.js or other React frameworks\n- GraphQL experience\n- UI component library development\n- Testing libraries (Jest, React Testing Library)",
+    "salary": "$110,000 - $150,000",
+    "type": "Full-time",
+    "posted": "2024-02-14T13:45:00.000Z"
+  },
+  {
+    "_id": "807f1f77bcf86cd799439046",
+    "title": "DevOps Engineer",
+    "company": "CloudScale Systems",
+    "location": "Boston, MA (Hybrid)",
+    "description": "We need a skilled DevOps Engineer to help us build and maintain scalable infrastructure for our growing platform.\n\nKey Responsibilities:\n- Design and implement CI/CD pipelines\n- Manage cloud infrastructure (AWS/Azure/GCP)\n- Implement monitoring and alerting systems\n- Automate deployment and scaling processes\n- Ensure system security and compliance\n- Troubleshoot production issues and incidents\n\nRequired Experience:\n- 4+ years in DevOps, SRE, or related role\n- Strong experience with AWS, Azure, or GCP\n- Proficiency in Infrastructure as Code (Terraform, CloudFormation)\n- Experience with containerization (Docker, Kubernetes)\n- Knowledge of CI/CD tools (Jenkins, GitLab CI, GitHub Actions)\n- Scripting skills (Python, Bash, or similar)\n\nPreferred:\n- Experience with monitoring tools (Prometheus, Grafana, DataDog)\n- Knowledge of security best practices\n- Experience with microservices architecture\n- On-call experience",
+    "salary": "$130,000 - $170,000",
+    "type": "Full-time",
+    "posted": "2024-02-13T10:15:00.000Z"
+  },
+  {
+    "_id": "807f1f77bcf86cd799439047",
+    "title": "Marketing Manager",
+    "company": "GrowthHackers Co",
+    "location": "Chicago, IL (Remote)",
+    "description": "We're seeking a creative Marketing Manager to lead our digital marketing efforts and drive customer acquisition.\n\nWhat You'll Do:\n- Develop and execute comprehensive marketing strategies\n- Manage multi-channel campaigns (SEO, SEM, social, email)\n- Analyze campaign performance and optimize for ROI\n- Manage marketing budget and vendor relationships\n- Collaborate with sales team on lead generation\n- Create compelling content and marketing materials\n\nQualifications:\n- 5+ years in digital marketing or growth marketing\n- Proven track record of successful campaigns\n- Strong analytical skills and data-driven mindset\n- Experience with marketing automation tools\n- Excellent written and verbal communication\n- Google Analytics and SEO expertise\n\nBonus:\n- Experience in B2B SaaS marketing\n- Content marketing and copywriting skills\n- A/B testing and conversion optimization\n- Team leadership experience",
+    "salary": "$90,000 - $130,000",
+    "type": "Full-time",
+    "posted": "2024-02-12T15:00:00.000Z"
+  },
+  {
+    "_id": "807f1f77bcf86cd799439048",
+    "title": "Backend Engineer (Node.js)",
+    "company": "API Solutions Ltd",
+    "location": "Denver, CO (Remote)",
+    "description": "Join our backend team to build robust, scalable APIs that power applications used by millions.\n\nResponsibilities:\n- Design and implement RESTful APIs using Node.js and Express\n- Optimize database queries and application performance\n- Implement authentication and authorization systems\n- Write comprehensive tests and documentation\n- Collaborate with frontend engineers on API contracts\n- Participate in architectural decisions\n\nRequirements:\n- 4+ years of backend development experience\n- Strong proficiency in Node.js and Express\n- Experience with MongoDB and/or PostgreSQL\n- Understanding of microservices architecture\n- Knowledge of authentication protocols (JWT, OAuth)\n- Experience with API documentation (Swagger/OpenAPI)\n\nPreferred:\n- TypeScript experience\n- Message queue systems (RabbitMQ, Kafka)\n- Caching strategies (Redis)\n- GraphQL experience",
+    "salary": "$120,000 - $160,000",
+    "type": "Full-time",
+    "posted": "2024-02-11T08:30:00.000Z"
+  }
+]

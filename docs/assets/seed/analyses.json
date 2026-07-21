@@ -1,0 +1,429 @@
+[
+  {
+    "_id": "707f1f77bcf86cd799439031",
+    "resumeId": "607f1f77bcf86cd799439021",
+    "userId": "507f1f77bcf86cd799439011",
+    "atsScore": 87,
+    "scores": {
+      "formatting": 92,
+      "keywords": 85,
+      "experience": 88,
+      "education": 90,
+      "skills": 84,
+      "impact": 86
+    },
+    "strengths": [
+      "Strong technical skills with 5+ years of experience in full-stack development",
+      "Clear and quantifiable achievements with metrics (increased performance by 40%)",
+      "Well-structured education section with relevant degree",
+      "Modern tech stack including React, Node.js, and cloud technologies",
+      "Active GitHub profile and open-source contributions mentioned"
+    ],
+    "weaknesses": [
+      "Missing specific certifications (AWS, Azure, or similar)",
+      "Could include more leadership experience",
+      "Summary section could be more compelling",
+      "Some bullet points lack action verbs"
+    ],
+    "suggestions": [
+      {
+        "category": "Skills",
+        "priority": "high",
+        "suggestion": "Add specific certifications like AWS Certified Developer or similar cloud certifications",
+        "impact": "Increases credibility and ATS keyword matching"
+      },
+      {
+        "category": "Experience",
+        "priority": "medium",
+        "suggestion": "Include metrics for all major achievements (e.g., 'Led team of X developers')",
+        "impact": "Demonstrates leadership and quantifiable impact"
+      },
+      {
+        "category": "Summary",
+        "priority": "medium",
+        "suggestion": "Rewrite summary to be more dynamic and highlight unique value proposition",
+        "impact": "Better first impression for recruiters"
+      },
+      {
+        "category": "Format",
+        "priority": "low",
+        "suggestion": "Consider adding a projects section showcasing side projects or open-source work",
+        "impact": "Shows continuous learning and passion"
+      }
+    ],
+    "sectionAnalysis": {
+      "contactInfo": {
+        "score": 95,
+        "feedback": "Complete contact information with LinkedIn and GitHub links"
+      },
+      "summary": {
+        "score": 80,
+        "feedback": "Good but could be more impactful and tailored to target roles"
+      },
+      "experience": {
+        "score": 88,
+        "feedback": "Strong experience section with relevant roles and achievements"
+      },
+      "education": {
+        "score": 90,
+        "feedback": "Solid educational background from reputable institution"
+      },
+      "skills": {
+        "score": 85,
+        "feedback": "Comprehensive skill set but could categorize for better readability"
+      }
+    },
+    "analyzedAt": "2024-02-15T10:31:00.000Z"
+  },
+  {
+    "_id": "707f1f77bcf86cd799439032",
+    "resumeId": "607f1f77bcf86cd799439022",
+    "userId": "507f1f77bcf86cd799439012",
+    "atsScore": 92,
+    "scores": {
+      "formatting": 95,
+      "keywords": 90,
+      "experience": 93,
+      "education": 92,
+      "skills": 89,
+      "impact": 94
+    },
+    "strengths": [
+      "Exceptional product management experience with 7+ years at leading tech companies",
+      "Strong track record of successful product launches with measurable impact",
+      "MBA from top-tier business school adds significant credibility",
+      "Excellent use of metrics and KPIs throughout experience section",
+      "Clear demonstration of cross-functional leadership",
+      "Relevant certifications including Scrum Master and Product Management"
+    ],
+    "weaknesses": [
+      "Technical skills section could be expanded",
+      "Could include more about stakeholder management",
+      "Missing information about team size managed"
+    ],
+    "suggestions": [
+      {
+        "category": "Skills",
+        "priority": "low",
+        "suggestion": "Add specific tools used (JIRA, Confluence, Figma, etc.)",
+        "impact": "Helps with ATS keyword matching for PM tools"
+      },
+      {
+        "category": "Experience",
+        "priority": "medium",
+        "suggestion": "Include number of stakeholders and team members managed",
+        "impact": "Demonstrates scale of responsibility"
+      }
+    ],
+    "sectionAnalysis": {
+      "contactInfo": {
+        "score": 100,
+        "feedback": "Perfect - all relevant links and contact methods included"
+      },
+      "summary": {
+        "score": 92,
+        "feedback": "Compelling summary that highlights unique value and achievements"
+      },
+      "experience": {
+        "score": 94,
+        "feedback": "Outstanding experience section with clear progression and impact"
+      },
+      "education": {
+        "score": 95,
+        "feedback": "Strong educational background with MBA from prestigious school"
+      },
+      "skills": {
+        "score": 88,
+        "feedback": "Good skill coverage but could expand technical tools"
+      }
+    },
+    "analyzedAt": "2024-02-16T14:20:50.000Z"
+  },
+  {
+    "_id": "707f1f77bcf86cd799439033",
+    "resumeId": "607f1f77bcf86cd799439023",
+    "userId": "507f1f77bcf86cd799439013",
+    "atsScore": 82,
+    "scores": {
+      "formatting": 88,
+      "keywords": 80,
+      "experience": 83,
+      "education": 85,
+      "skills": 78,
+      "impact": 81
+    },
+    "strengths": [
+      "Strong foundation in data science with master's degree",
+      "Good mix of statistical analysis and machine learning experience",
+      "Clear examples of business impact from data projects",
+      "Relevant tools and technologies listed (Python, SQL, TensorFlow)",
+      "Research publications add academic credibility"
+    ],
+    "weaknesses": [
+      "Missing cloud platform experience (AWS, GCP, Azure)",
+      "Could emphasize more on big data technologies",
+      "Some technical jargon could be simplified for non-technical recruiters",
+      "Lacks specific deployment/production experience",
+      "Could include more about stakeholder communication"
+    ],
+    "suggestions": [
+      {
+        "category": "Skills",
+        "priority": "high",
+        "suggestion": "Add cloud platforms (AWS SageMaker, GCP AI Platform) to skill set",
+        "impact": "Critical for modern data science roles"
+      },
+      {
+        "category": "Experience",
+        "priority": "high",
+        "suggestion": "Include examples of models deployed to production with scale metrics",
+        "impact": "Shows practical application beyond theory"
+      },
+      {
+        "category": "Skills",
+        "priority": "medium",
+        "suggestion": "Add big data tools like Spark, Hadoop, or data warehousing experience",
+        "impact": "Broadens applicability to data engineering roles"
+      },
+      {
+        "category": "Communication",
+        "priority": "medium",
+        "suggestion": "Highlight examples of explaining technical concepts to non-technical stakeholders",
+        "impact": "Shows soft skills crucial for senior roles"
+      }
+    ],
+    "sectionAnalysis": {
+      "contactInfo": {
+        "score": 90,
+        "feedback": "Good contact info, consider adding personal website or blog"
+      },
+      "summary": {
+        "score": 85,
+        "feedback": "Solid summary but could emphasize business impact more"
+      },
+      "experience": {
+        "score": 82,
+        "feedback": "Good projects but needs more production/deployment experience"
+      },
+      "education": {
+        "score": 88,
+        "feedback": "Strong academic background with relevant degree"
+      },
+      "skills": {
+        "score": 78,
+        "feedback": "Core skills present but missing modern cloud/big data tools"
+      }
+    },
+    "analyzedAt": "2024-02-10T09:15:45.000Z"
+  },
+  {
+    "_id": "707f1f77bcf86cd799439034",
+    "resumeId": "607f1f77bcf86cd799439024",
+    "userId": "507f1f77bcf86cd799439013",
+    "atsScore": 78,
+    "scores": {
+      "formatting": 85,
+      "keywords": 75,
+      "experience": 80,
+      "education": 82,
+      "skills": 72,
+      "impact": 76
+    },
+    "strengths": [
+      "Strong portfolio showcasing diverse design projects",
+      "Good use of design terminology and industry-standard tools",
+      "Clear demonstration of user-centered design process",
+      "Quantified improvements in user engagement metrics",
+      "Relevant education in Human-Computer Interaction"
+    ],
+    "weaknesses": [
+      "Missing specific UX research methodologies",
+      "Could include more about accessibility standards (WCAG)",
+      "Lacks mention of design systems or component libraries",
+      "Would benefit from A/B testing experience",
+      "Missing collaboration with engineering teams"
+    ],
+    "suggestions": [
+      {
+        "category": "Skills",
+        "priority": "high",
+        "suggestion": "Add UX research methods (user interviews, usability testing, card sorting)",
+        "impact": "Shows comprehensive UX skillset beyond visual design"
+      },
+      {
+        "category": "Skills",
+        "priority": "high",
+        "suggestion": "Include accessibility knowledge and WCAG compliance experience",
+        "impact": "Critical for modern web/app design roles"
+      },
+      {
+        "category": "Experience",
+        "priority": "medium",
+        "suggestion": "Highlight design system creation or component library work",
+        "impact": "Shows scalable thinking and systematic approach"
+      },
+      {
+        "category": "Experience",
+        "priority": "medium",
+        "suggestion": "Add examples of A/B testing and data-driven design decisions",
+        "impact": "Demonstrates ROI and business impact"
+      }
+    ],
+    "sectionAnalysis": {
+      "contactInfo": {
+        "score": 95,
+        "feedback": "Excellent - includes portfolio, Behance, and Dribbble links"
+      },
+      "summary": {
+        "score": 80,
+        "feedback": "Good summary but could emphasize problem-solving approach"
+      },
+      "experience": {
+        "score": 78,
+        "feedback": "Solid experience but needs more methodology and process details"
+      },
+      "education": {
+        "score": 85,
+        "feedback": "Relevant degree with focus on HCI"
+      },
+      "skills": {
+        "score": 72,
+        "feedback": "Good tool proficiency but missing research and accessibility skills"
+      }
+    },
+    "analyzedAt": "2024-02-12T11:45:35.000Z"
+  },
+  {
+    "_id": "707f1f77bcf86cd799439035",
+    "resumeId": "607f1f77bcf86cd799439025",
+    "userId": "507f1f77bcf86cd799439011",
+    "atsScore": 90,
+    "scores": {
+      "formatting": 93,
+      "keywords": 89,
+      "experience": 91,
+      "education": 90,
+      "skills": 88,
+      "impact": 92
+    },
+    "strengths": [
+      "Senior-level experience with clear progression to leadership roles",
+      "Strong technical depth with modern architecture patterns",
+      "Excellent quantified achievements across all positions",
+      "Demonstrated mentorship and team leadership",
+      "Relevant certifications including AWS Solutions Architect",
+      "Active involvement in tech community and speaking engagements"
+    ],
+    "weaknesses": [
+      "Could emphasize more on business strategy alignment",
+      "Missing specific budget management experience"
+    ],
+    "suggestions": [
+      {
+        "category": "Experience",
+        "priority": "low",
+        "suggestion": "Add information about budget/resource management responsibilities",
+        "impact": "Important for director-level or VP roles"
+      },
+      {
+        "category": "Summary",
+        "priority": "low",
+        "suggestion": "Emphasize business impact and strategic thinking alongside technical skills",
+        "impact": "Better positioning for C-level or senior leadership roles"
+      }
+    ],
+    "sectionAnalysis": {
+      "contactInfo": {
+        "score": 95,
+        "feedback": "Complete with professional links and contact information"
+      },
+      "summary": {
+        "score": 90,
+        "feedback": "Strong summary highlighting both technical and leadership skills"
+      },
+      "experience": {
+        "score": 92,
+        "feedback": "Excellent progression showing clear career growth and impact"
+      },
+      "education": {
+        "score": 90,
+        "feedback": "Solid educational foundation with relevant degree"
+      },
+      "skills": {
+        "score": 89,
+        "feedback": "Comprehensive technical and leadership skills"
+      }
+    },
+    "analyzedAt": "2024-02-20T16:31:00.000Z"
+  },
+  {
+    "_id": "707f1f77bcf86cd799439036",
+    "resumeId": "607f1f77bcf86cd799439026",
+    "userId": "507f1f77bcf86cd799439012",
+    "atsScore": 85,
+    "scores": {
+      "formatting": 90,
+      "keywords": 83,
+      "experience": 86,
+      "education": 88,
+      "skills": 81,
+      "impact": 87
+    },
+    "strengths": [
+      "Strong digital marketing experience across multiple channels",
+      "Excellent use of metrics and ROI-focused achievements",
+      "Good balance of strategic planning and execution",
+      "Relevant certifications in Google Analytics and HubSpot",
+      "Clear demonstration of campaign success"
+    ],
+    "weaknesses": [
+      "Could include more about content strategy",
+      "Missing specific SEO/SEM metrics",
+      "Lacks mention of marketing automation tools",
+      "Could emphasize team leadership more"
+    ],
+    "suggestions": [
+      {
+        "category": "Skills",
+        "priority": "medium",
+        "suggestion": "Add marketing automation platforms (Marketo, Pardot, HubSpot)",
+        "impact": "Critical for modern marketing roles"
+      },
+      {
+        "category": "Experience",
+        "priority": "medium",
+        "suggestion": "Include specific SEO improvements (e.g., 'Increased organic traffic by X%')",
+        "impact": "Shows measurable digital marketing impact"
+      },
+      {
+        "category": "Experience",
+        "priority": "low",
+        "suggestion": "Highlight content strategy development and execution",
+        "impact": "Important for content-driven marketing roles"
+      }
+    ],
+    "sectionAnalysis": {
+      "contactInfo": {
+        "score": 92,
+        "feedback": "Good contact info with LinkedIn, consider adding personal blog"
+      },
+      "summary": {
+        "score": 88,
+        "feedback": "Strong summary emphasizing data-driven approach"
+      },
+      "experience": {
+        "score": 86,
+        "feedback": "Solid experience with good metrics, could add more strategy"
+      },
+      "education": {
+        "score": 90,
+        "feedback": "Relevant degree with focus on marketing"
+      },
+      "skills": {
+        "score": 82,
+        "feedback": "Good core skills but missing some modern marketing tools"
+      }
+    },
+    "analyzedAt": "2024-02-18T13:20:45.000Z"
+  }
+]

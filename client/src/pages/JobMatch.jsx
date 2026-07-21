@@ -12,10 +12,9 @@ import {
   getJobMatch,
   pollJobMatchStatus,
 } from '../services/jobMatchService';
+import { MaterialIcon, LoadingSpinner } from '../components';
 import MatchScoreCard from '../components/MatchScoreCard';
 import MatchSection from '../components/MatchSection';
-import LoadingSpinner from '../components/LoadingSpinner';
-import EmptyState from '../components/EmptyState';
 
 const JobMatch = () => {
   const navigate = useNavigate();
@@ -223,51 +222,78 @@ const JobMatch = () => {
   // Step 1: Select Resume
   const renderResumeSelection = () => {
     if (loadingResumes) {
-      return <LoadingSpinner message="Loading your resumes..." />;
+      return (
+        <div className="flex items-center justify-center py-xl">
+          <LoadingSpinner />
+        </div>
+      );
     }
 
     if (resumes.length === 0) {
       return (
-        <EmptyState
-          icon="📄"
-          title="No Resumes Available"
-          message="Please upload and parse a resume first before matching with job descriptions."
-          actionText="Go to Upload"
-          onAction={() => navigate('/upload')}
-        />
+        <div className="text-center py-xl">
+          <MaterialIcon className="text-[64px] text-on-surface-variant mb-md">description</MaterialIcon>
+          <h3 className="font-headline-md text-headline-md text-on-surface mb-md">No Resumes Available</h3>
+          <p className="font-body-base text-body-base text-on-surface-variant mb-xl">
+            Please upload and parse a resume first before matching with job descriptions.
+          </p>
+          <button
+            onClick={() => navigate('/upload')}
+            className="bg-primary hover:bg-primary-container text-on-primary px-xl py-md rounded-lg font-bold transition-all active:scale-95 inline-flex items-center gap-sm"
+          >
+            <MaterialIcon className="text-sm">upload</MaterialIcon>
+            Go to Upload
+          </button>
+        </div>
       );
     }
 
     return (
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Select a Resume</h2>
-        <p className="text-gray-600 mb-6">Choose which resume you want to match with a job description</p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {resumes.map((resume) => (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
+        {resumes.map((resume) => (
+          <label key={resume._id} className="relative cursor-pointer group">
+            <input
+              type="radio"
+              name="resume-select"
+              className="peer sr-only"
+              checked={selectedResume?._id === resume._id}
+              onChange={() => {}}
+            />
             <div
-              key={resume._id}
-              onClick={() => handleResumeSelect(resume)}
-              className="bg-white border-2 border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-md cursor-pointer transition-all"
+              onClick={() => setSelectedResume(resume)}
+              className="p-lg rounded-xl bg-surface-container-lowest border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary-fixed hover:shadow-md transition-all h-full flex flex-col"
             >
-              <div className="flex items-start gap-3">
-                <span className="text-3xl">📄</span>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 mb-1">{resume.originalName}</h3>
-                  <p className="text-sm text-gray-600 mb-2">
-                    Uploaded {new Date(resume.createdAt).toLocaleDateString()}
-                  </p>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded">
-                      Parsed
-                    </span>
-                    <span>{(resume.fileSize / 1024).toFixed(0)} KB</span>
-                  </div>
-                </div>
+              <div className="flex justify-between items-start mb-md">
+                <MaterialIcon className="text-primary text-4xl">description</MaterialIcon>
+                <span className="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-lg text-label-caps font-label-caps">
+                  PARSED
+                </span>
               </div>
+              <h3 className="font-headline-md text-headline-md mb-xs">{resume.originalName}</h3>
+              <p className="text-body-sm text-body-sm text-on-surface-variant flex-1">
+                Updated {new Date(resume.createdAt).toLocaleDateString()} • {resume.fileType?.toUpperCase()}
+              </p>
+              {selectedResume?._id === resume._id && (
+                <div className="mt-md pt-md border-t border-outline-variant flex items-center gap-xs text-primary font-bold">
+                  <MaterialIcon style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</MaterialIcon>
+                  <span className="text-label-caps font-label-caps">SELECTED</span>
+                </div>
+              )}
             </div>
-          ))}
-        </div>
+          </label>
+        ))}
+
+        {/* Upload New Resume Card */}
+        <button
+          onClick={() => navigate('/upload')}
+          className="p-lg rounded-xl border-2 border-dashed border-outline-variant hover:border-primary hover:bg-surface-container-low transition-all h-full flex flex-col items-center justify-center group"
+        >
+          <div className="w-12 h-12 rounded-full bg-surface-container-highest group-hover:bg-primary-fixed flex items-center justify-center mb-md transition-colors">
+            <MaterialIcon className="text-on-surface-variant group-hover:text-primary">add</MaterialIcon>
+          </div>
+          <span className="font-headline-md text-headline-md">Upload New</span>
+          <span className="text-body-sm text-body-sm text-on-surface-variant">Max 5MB (PDF, DOCX)</span>
+        </button>
       </div>
     );
   };
@@ -276,114 +302,97 @@ const JobMatch = () => {
   const renderJobSelection = () => {
     return (
       <div>
-        <button
-          onClick={handleReset}
-          className="mb-4 text-blue-600 hover:text-blue-700 flex items-center gap-1"
-        >
-          ← Back to Resume Selection
-        </button>
-
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <h3 className="font-semibold text-blue-900 mb-1">Selected Resume</h3>
-          <p className="text-blue-700">{selectedResume?.originalName}</p>
-        </div>
-
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Select or Create Job Description</h2>
-        <p className="text-gray-600 mb-6">Choose an existing job description or create a new one</p>
-
-        {/* Create New Button */}
-        <button
-          onClick={() => setShowNewJobForm(!showNewJobForm)}
-          className="mb-6 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors w-full md:w-auto"
-        >
-          {showNewJobForm ? '✕ Cancel' : '+ Create New Job Description'}
-        </button>
-
-        {/* New Job Form */}
-        {showNewJobForm && (
-          <div className="bg-white border-2 border-blue-200 rounded-lg p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">New Job Description</h3>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Job Title *
-                </label>
-                <input
-                  type="text"
-                  value={newJobTitle}
-                  onChange={(e) => setNewJobTitle(e.target.value)}
-                  placeholder="e.g., Senior Software Engineer"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Company (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={newJobCompany}
-                  onChange={(e) => setNewJobCompany(e.target.value)}
-                  placeholder="e.g., Tech Corp"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Job Description * (minimum 100 characters)
-                </label>
-                <textarea
-                  value={newJobDescription}
-                  onChange={(e) => setNewJobDescription(e.target.value)}
-                  placeholder="Paste the full job description here..."
-                  rows={8}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-y"
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  {newJobDescription.trim().length} / 100 characters minimum
-                </p>
-              </div>
-
-              <button
-                onClick={handleCreateNewJob}
-                disabled={loading}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Creating...' : 'Create and Match'}
-              </button>
+        <div className="max-w-3xl mx-auto bg-surface-container-lowest p-xl rounded-xl shadow-sm border border-outline-variant">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-lg mb-lg">
+            <div className="flex flex-col gap-xs">
+              <label className="font-body-sm text-body-sm text-on-surface-variant">Job Title</label>
+              <input
+                type="text"
+                value={newJobTitle}
+                onChange={(e) => setNewJobTitle(e.target.value)}
+                placeholder="e.g. Senior Frontend Engineer"
+                className="w-full bg-surface border border-outline-variant rounded-lg p-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+              />
+            </div>
+            <div className="flex flex-col gap-xs">
+              <label className="font-body-sm text-body-sm text-on-surface-variant">Company Name</label>
+              <input
+                type="text"
+                value={newJobCompany}
+                onChange={(e) => setNewJobCompany(e.target.value)}
+                placeholder="e.g. TechFlow Inc."
+                className="w-full bg-surface border border-outline-variant rounded-lg p-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all"
+              />
             </div>
           </div>
-        )}
+          <div className="flex flex-col gap-xs mb-md">
+            <label className="font-body-sm text-body-sm text-on-surface-variant">Job Description</label>
+            <div className="relative">
+              <textarea
+                value={newJobDescription}
+                onChange={(e) => setNewJobDescription(e.target.value)}
+                rows={10}
+                placeholder="Paste the full job description here (responsibilities, requirements, benefits)..."
+                className="w-full bg-surface border border-outline-variant rounded-lg p-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all resize-none"
+              />
+              <div className="absolute bottom-md right-md bg-surface-container-highest px-sm py-xs rounded text-label-caps font-label-caps text-on-surface-variant">
+                <span className={newJobDescription.trim().length >= 100 ? 'text-secondary' : ''}>
+                  {newJobDescription.trim().length}
+                </span>{' '}
+                / 100 min
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-between items-center mt-xl flex-wrap gap-md">
+            <button
+              onClick={() => setCurrentStep(1)}
+              className="text-on-surface-variant hover:text-primary font-bold flex items-center gap-sm transition-colors"
+            >
+              <MaterialIcon>arrow_back</MaterialIcon> Back to Resume
+            </button>
+            <button
+              onClick={handleCreateNewJob}
+              disabled={loading || newJobDescription.trim().length < 100 || !newJobTitle}
+              className="bg-primary text-on-primary px-xl py-md rounded-lg font-bold hover:bg-primary-container disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-sm"
+            >
+              {loading ? 'Analyzing...' : 'Analyze Match'} <MaterialIcon>insights</MaterialIcon>
+            </button>
+          </div>
+        </div>
 
         {/* Existing Job Descriptions */}
         {loadingJobs ? (
-          <LoadingSpinner message="Loading job descriptions..." />
-        ) : jobDescriptions.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <p>No existing job descriptions. Create one above to get started.</p>
+          <div className="flex items-center justify-center py-xl mt-xl">
+            <LoadingSpinner />
           </div>
-        ) : (
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Or Choose Existing:</h3>
-            <div className="grid grid-cols-1 gap-4">
-              {jobDescriptions.map((job) => (
+        ) : jobDescriptions.length > 0 ? (
+          <div className="max-w-3xl mx-auto mt-xl">
+            <div className="flex items-center justify-center mb-lg">
+              <div className="h-px bg-outline-variant flex-1"></div>
+              <span className="px-md text-on-surface-variant font-body-sm text-body-sm">OR SELECT EXISTING</span>
+              <div className="h-px bg-outline-variant flex-1"></div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-md">
+              {jobDescriptions.slice(0, 3).map((job) => (
                 <div
                   key={job._id}
                   onClick={() => handleJobDescriptionSelect(job)}
-                  className="bg-white border-2 border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-md cursor-pointer transition-all"
+                  className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg hover:border-primary hover:shadow-md cursor-pointer transition-all group"
                 >
-                  <div className="flex items-start gap-3">
-                    <span className="text-3xl">💼</span>
+                  <div className="flex items-start gap-md">
+                    <MaterialIcon className="text-primary text-3xl">work</MaterialIcon>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-1">{job.title}</h3>
+                      <h3 className="font-headline-md text-headline-md group-hover:text-primary transition-colors">
+                        {job.title}
+                      </h3>
                       {job.company && (
-                        <p className="text-sm text-gray-600 mb-2">{job.company}</p>
+                        <p className="text-body-sm text-body-sm text-on-surface-variant mb-sm">{job.company}</p>
                       )}
-                      <p className="text-sm text-gray-500 line-clamp-2">{job.preview}</p>
-                      <p className="text-xs text-gray-400 mt-2">
+                      <p className="text-body-sm text-body-sm text-on-surface-variant line-clamp-2">
+                        {job.preview || job.description?.substring(0, 150)}...
+                      </p>
+                      <p className="font-label-caps text-label-caps text-on-surface-variant mt-sm">
                         Created {new Date(job.createdAt).toLocaleDateString()}
                       </p>
                     </div>
@@ -392,7 +401,7 @@ const JobMatch = () => {
               ))}
             </div>
           </div>
-        )}
+        ) : null}
       </div>
     );
   };
@@ -401,147 +410,183 @@ const JobMatch = () => {
   const renderMatchResults = () => {
     if (generating || !matchResults) {
       return (
-        <div className="text-center py-12">
+        <div className="text-center py-xxl">
           <LoadingSpinner message={statusMessage} />
-          <p className="text-gray-600 mt-4">
+          <p className="text-on-surface-variant mt-lg font-body-base">
             Our AI is analyzing your resume against the job description...
           </p>
-          <p className="text-sm text-gray-500 mt-2">This usually takes 10-20 seconds</p>
+          <p className="text-body-sm text-on-surface-variant mt-sm">This usually takes 10-20 seconds</p>
         </div>
       );
     }
 
     return (
-      <div>
-        {/* Header with Back Button */}
-        <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
+      <div className="max-w-5xl mx-auto">
+        {/* Header Actions */}
+        <div className="mb-xl flex items-center justify-between flex-wrap gap-md">
           <button
             onClick={handleReset}
-            className="text-blue-600 hover:text-blue-700 flex items-center gap-1"
+            className="text-primary hover:text-primary-container flex items-center gap-xs font-bold transition-colors"
           >
-            ← Start New Match
+            <MaterialIcon>arrow_back</MaterialIcon> Start New Match
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-sm">
             <button
               onClick={() => navigate('/job-match-history')}
-              className="text-gray-600 hover:text-gray-700 flex items-center gap-1 px-4 py-2 border border-gray-300 rounded-lg"
+              className="text-on-surface-variant hover:text-primary flex items-center gap-xs px-md py-sm border border-outline-variant rounded-lg font-body-sm transition-all"
             >
-              📚 View History
+              <MaterialIcon>history</MaterialIcon> View History
             </button>
             <button
               onClick={handleRegenerate}
               disabled={generating}
-              className="text-gray-600 hover:text-gray-700 flex items-center gap-1 px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-on-surface-variant hover:text-primary flex items-center gap-xs px-md py-sm border border-outline-variant rounded-lg font-body-sm disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
-              🔄 Regenerate Match
+              <MaterialIcon>refresh</MaterialIcon> Regenerate
             </button>
           </div>
         </div>
 
-        {/* Success Message (if shown) */}
+        {/* Success Message */}
         {statusMessage && !error && (
-          <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg mb-6">
-            <p>{statusMessage}</p>
+          <div className="bg-secondary-container border border-secondary text-on-secondary-container px-lg py-md rounded-xl mb-lg">
+            <p className="font-body-base">{statusMessage}</p>
           </div>
         )}
 
-        {/* Selected Items Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 className="font-semibold text-blue-900 mb-1">Resume</h3>
-            <p className="text-blue-700">{selectedResume?.originalName}</p>
+        {/* Animated Score Gauge */}
+        <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-xl mb-xl text-center">
+          <h3 className="font-headline-md text-headline-md mb-lg">Match Score</h3>
+          <div className="relative w-48 h-48 mx-auto mb-lg">
+            <svg className="transform -rotate-90 w-48 h-48">
+              <circle
+                cx="96"
+                cy="96"
+                r="80"
+                stroke="#e1e2ed"
+                strokeWidth="16"
+                fill="transparent"
+              />
+              <circle
+                cx="96"
+                cy="96"
+                r="80"
+                stroke="#004ac6"
+                strokeWidth="16"
+                fill="transparent"
+                strokeDasharray="502.65"
+                strokeDashoffset={502.65 - (502.65 * matchResults.matchScore) / 100}
+                className="transition-all duration-1000"
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-display-lg font-display-lg text-primary">{matchResults.matchScore}%</span>
+              <span className="text-label-caps text-on-surface-variant">MATCH</span>
+            </div>
           </div>
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-            <h3 className="font-semibold text-purple-900 mb-1">Job Description</h3>
-            <p className="text-purple-700">{selectedJobDescription?.title}</p>
-            {selectedJobDescription?.company && (
-              <p className="text-sm text-purple-600">{selectedJobDescription.company}</p>
-            )}
-          </div>
+          <p className="text-body-base text-on-surface-variant max-w-2xl mx-auto">
+            {matchResults.matchScore >= 80 ? 'Excellent match! Your resume aligns strongly with this role.' : 
+             matchResults.matchScore >= 60 ? 'Good match with room for optimization.' : 
+             'Consider strengthening key areas to improve your match.'}
+          </p>
         </div>
 
-        {/* Match Score Card */}
-        <div className="mb-8">
-          <MatchScoreCard score={matchResults.matchScore} />
+        {/* Bento Grid Breakdown */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-lg mb-xl">
+          {/* Summary Card */}
+          {matchResults.summary && (
+            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg md:col-span-2">
+              <div className="flex items-center gap-md mb-md">
+                <MaterialIcon className="text-primary text-3xl">summarize</MaterialIcon>
+                <h3 className="font-headline-md text-headline-md">AI Summary</h3>
+              </div>
+              <p className="text-body-base text-on-surface leading-relaxed">{matchResults.summary}</p>
+            </div>
+          )}
+
+          {/* Matching Skills */}
+          <MatchSection
+            title="Matching Skills"
+            items={matchResults.matchingSkills}
+            emptyMessage="No matching skills identified"
+            icon="check_circle"
+            colorClass="text-secondary"
+          />
+
+          {/* Missing Technical Skills */}
+          <MatchSection
+            title="Missing Technical Skills"
+            items={matchResults.missingTechnicalSkills}
+            emptyMessage="No missing technical skills"
+            icon="engineering"
+            colorClass="text-tertiary"
+          />
+
+          {/* Missing Soft Skills */}
+          <MatchSection
+            title="Missing Soft Skills"
+            items={matchResults.missingSoftSkills}
+            emptyMessage="No missing soft skills"
+            icon="psychology"
+            colorClass="text-primary"
+          />
+
+          {/* Missing Keywords */}
+          <MatchSection
+            title="Missing Keywords"
+            items={matchResults.missingKeywords}
+            emptyMessage="No missing keywords"
+            icon="key"
+            colorClass="text-on-surface-variant"
+          />
+
+          {/* Strengths */}
+          <MatchSection
+            title="Your Strengths"
+            items={matchResults.strengths}
+            emptyMessage="No strengths identified"
+            icon="stars"
+            colorClass="text-secondary"
+          />
+
+          {/* Recommendations */}
+          <MatchSection
+            title="AI Recommendations"
+            items={matchResults.recommendations}
+            emptyMessage="No recommendations"
+            icon="lightbulb"
+            colorClass="text-primary"
+          />
+
+          {/* ATS Optimization Tips */}
+          {matchResults.atsOptimizationTips && matchResults.atsOptimizationTips.length > 0 && (
+            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg md:col-span-2">
+              <div className="flex items-center gap-md mb-md">
+                <MaterialIcon className="text-tertiary text-3xl">target</MaterialIcon>
+                <h3 className="font-headline-md text-headline-md">ATS Optimization Tips</h3>
+              </div>
+              <ul className="space-y-sm">
+                {matchResults.atsOptimizationTips.map((tip, index) => (
+                  <li key={index} className="flex items-start gap-sm">
+                    <MaterialIcon className="text-tertiary text-md mt-1">arrow_right</MaterialIcon>
+                    <span className="text-body-base text-on-surface">{tip}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
-
-        {/* Summary */}
-        {matchResults.summary && (
-          <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Summary</h3>
-            <p className="text-gray-700 leading-relaxed">{matchResults.summary}</p>
-          </div>
-        )}
-
-        {/* Matching Skills */}
-        <MatchSection
-          title="Matching Skills"
-          items={matchResults.matchingSkills}
-          emptyMessage="No matching skills identified"
-          icon="✓"
-          colorClass="text-green-600"
-        />
-
-        {/* Missing Technical Skills */}
-        <MatchSection
-          title="Missing Technical Skills"
-          items={matchResults.missingTechnicalSkills}
-          emptyMessage="No missing technical skills"
-          icon="⚙️"
-          colorClass="text-orange-600"
-        />
-
-        {/* Missing Soft Skills */}
-        <MatchSection
-          title="Missing Soft Skills"
-          items={matchResults.missingSoftSkills}
-          emptyMessage="No missing soft skills"
-          icon="💡"
-          colorClass="text-purple-600"
-        />
-
-        {/* Missing Keywords */}
-        <MatchSection
-          title="Missing Keywords"
-          items={matchResults.missingKeywords}
-          emptyMessage="No missing keywords"
-          icon="🔑"
-          colorClass="text-blue-600"
-        />
-
-        {/* Strengths */}
-        <MatchSection
-          title="Your Strengths"
-          items={matchResults.strengths}
-          emptyMessage="No strengths identified"
-          icon="⭐"
-          colorClass="text-yellow-600"
-        />
-
-        {/* Recommendations */}
-        <MatchSection
-          title="AI Recommendations"
-          items={matchResults.recommendations}
-          emptyMessage="No recommendations"
-          icon="💬"
-          colorClass="text-indigo-600"
-        />
-
-        {/* ATS Optimization Tips */}
-        <MatchSection
-          title="ATS Optimization Tips"
-          items={matchResults.atsOptimizationTips}
-          emptyMessage="No ATS tips"
-          icon="🎯"
-          colorClass="text-red-600"
-        />
 
         {/* Metadata */}
         {matchResults.generatedAt && (
-          <div className="mt-8 text-center text-sm text-gray-500">
-            <p>Analysis generated on {new Date(matchResults.generatedAt).toLocaleString()}</p>
+          <div className="text-center mt-xl pt-lg border-t border-outline-variant">
+            <p className="text-body-sm text-on-surface-variant">
+              Analysis generated {new Date(matchResults.generatedAt).toLocaleString()}
+            </p>
             {matchResults.confidenceScore && (
-              <p className="mt-1">Confidence Score: {matchResults.confidenceScore}%</p>
+              <p className="text-body-sm text-on-surface-variant mt-xs">
+                Confidence Score: {matchResults.confidenceScore}%
+              </p>
             )}
           </div>
         )}
@@ -550,28 +595,101 @@ const JobMatch = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Job Match</h1>
-          <p className="text-gray-600">
-            Compare your resume with a job description to see how well you match
+    <div className="min-h-screen bg-background flex flex-col">
+      <main className="flex-1 max-w-container-max mx-auto w-full px-lg py-xl">
+        {/* Wizard Header & Steps Indicator */}
+        <section className="mb-xxl text-center max-w-2xl mx-auto">
+          <h1 className="font-display-lg text-display-lg text-on-surface mb-md">Job Match Wizard</h1>
+          <p className="text-on-surface-variant mb-xl font-body-base text-body-base">
+            Analyze how well your experience aligns with specific roles using our advanced AI matching engine.
           </p>
-        </div>
+
+          {/* Progress Steps */}
+          <div className="flex items-center justify-between w-full relative">
+            {/* Progress Line */}
+            <div className="absolute top-1/2 left-0 w-full h-[2px] bg-outline-variant -translate-y-1/2 z-0"></div>
+            <div
+              className="absolute top-1/2 left-0 h-[2px] bg-primary -translate-y-1/2 z-0 transition-all duration-500"
+              style={{ width: currentStep === 1 ? '0%' : currentStep === 2 ? '50%' : '100%' }}
+            ></div>
+
+            {/* Step 1 */}
+            <div className="relative z-10 flex flex-col items-center gap-xs">
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 ${
+                  currentStep >= 1 ? 'bg-primary text-on-primary' : 'bg-surface-container-high text-on-surface-variant'
+                }`}
+              >
+                {currentStep > 1 ? <MaterialIcon>check</MaterialIcon> : '1'}
+              </div>
+              <span className={`font-label-caps text-label-caps ${currentStep >= 1 ? 'text-primary' : 'text-on-surface-variant'}`}>
+                Resume
+              </span>
+            </div>
+
+            {/* Step 2 */}
+            <div className="relative z-10 flex flex-col items-center gap-xs">
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 ${
+                  currentStep >= 2 ? 'bg-primary text-on-primary' : 'bg-surface-container-high text-on-surface-variant'
+                }`}
+              >
+                {currentStep > 2 ? <MaterialIcon>check</MaterialIcon> : '2'}
+              </div>
+              <span className={`font-label-caps text-label-caps ${currentStep >= 2 ? 'text-primary' : 'text-on-surface-variant'}`}>
+                Description
+              </span>
+            </div>
+
+            {/* Step 3 */}
+            <div className="relative z-10 flex flex-col items-center gap-xs">
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 ${
+                  currentStep >= 3 ? 'bg-primary text-on-primary' : 'bg-surface-container-high text-on-surface-variant'
+                }`}
+              >
+                3
+              </div>
+              <span className={`font-label-caps text-label-caps ${currentStep >= 3 ? 'text-primary' : 'text-on-surface-variant'}`}>
+                Results
+              </span>
+            </div>
+          </div>
+        </section>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-            <p>{error}</p>
+          <div className="bg-error-container border border-error text-on-error-container px-lg py-md rounded-xl mb-lg max-w-3xl mx-auto">
+            <p className="font-body-base text-body-base">{error}</p>
           </div>
         )}
 
         {/* Step Content */}
-        {currentStep === 1 && renderResumeSelection()}
-        {currentStep === 2 && renderJobSelection()}
-        {currentStep === 3 && renderMatchResults()}
-      </div>
+        <div className={`transition-opacity duration-300 ${currentStep === 1 ? 'block' : 'hidden'}`}>
+          {currentStep === 1 && renderResumeSelection()}
+          {currentStep === 1 && selectedResume && (
+            <div className="flex justify-end max-w-5xl mx-auto">
+              <button
+                onClick={() => {
+                  setCurrentStep(2);
+                  fetchJobDescriptions();
+                }}
+                className="bg-primary text-on-primary px-xl py-md rounded-lg font-bold hover:bg-primary-container transition-all flex items-center gap-sm"
+              >
+                Next: Job Details <MaterialIcon>arrow_forward</MaterialIcon>
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className={`transition-opacity duration-300 ${currentStep === 2 ? 'block' : 'hidden'}`}>
+          {currentStep === 2 && renderJobSelection()}
+        </div>
+
+        <div className={`transition-opacity duration-300 ${currentStep === 3 ? 'block' : 'hidden'}`}>
+          {currentStep === 3 && renderMatchResults()}
+        </div>
+      </main>
     </div>
   );
 };

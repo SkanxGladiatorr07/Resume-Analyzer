@@ -6,10 +6,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getJobMatchHistory, getJobMatchById, deleteJobMatch } from '../services/jobMatchService';
+import { MaterialIcon, LoadingSpinner } from '../components';
 import MatchScoreCard from '../components/MatchScoreCard';
 import MatchSection from '../components/MatchSection';
-import LoadingSpinner from '../components/LoadingSpinner';
-import EmptyState from '../components/EmptyState';
 import ConfirmDialog from '../components/ConfirmDialog';
 
 const JobMatchHistory = () => {
@@ -133,113 +132,203 @@ const JobMatchHistory = () => {
   // Render list view
   const renderListView = () => {
     if (loading) {
-      return <LoadingSpinner message="Loading comparison history..." />;
+      return (
+        <div className="flex items-center justify-center py-xl">
+          <LoadingSpinner />
+        </div>
+      );
     }
 
     if (matches.length === 0) {
       return (
-        <EmptyState
-          icon="📊"
-          title="No Comparisons Yet"
-          message="Start comparing your resumes with job descriptions to see them here."
-          actionText="Start New Comparison"
-          onAction={() => navigate('/job-match')}
-        />
+        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant p-xxl text-center">
+          <div className="w-24 h-24 bg-surface-container-high rounded-full flex items-center justify-center mb-lg mx-auto">
+            <MaterialIcon className="text-[48px] text-outline">search_off</MaterialIcon>
+          </div>
+          <h3 className="font-headline-md text-headline-md text-on-surface mb-xs">No Match History Found</h3>
+          <p className="text-on-surface-variant font-body-base text-body-base max-w-md mx-auto mb-xl">
+            You haven't run any job matches yet. Upload your resume and paste a job description to see how you stack up.
+          </p>
+          <button
+            onClick={() => navigate('/job-match')}
+            className="bg-primary text-on-primary px-lg py-md rounded-lg font-bold hover:bg-primary-container transition-all flex items-center gap-sm mx-auto"
+          >
+            <MaterialIcon>add_circle</MaterialIcon>
+            Start New Match
+          </button>
+        </div>
       );
     }
 
     return (
-      <div className="space-y-4">
-        {matches.map((match) => (
-          <div
-            key={match._id}
-            className="bg-white border-2 border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-md transition-all"
-          >
-            <div className="flex items-start justify-between">
-              <div className="flex-1 cursor-pointer" onClick={() => handleMatchClick(match)}>
-                {/* Status and Score */}
-                <div className="flex items-center gap-3 mb-3">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(match.matchStatus)}`}>
-                    {getStatusIcon(match.matchStatus)} {match.matchStatus}
-                  </span>
-                  {match.matchStatus === 'completed' && match.matchScore !== null && (
-                    <span className="text-2xl font-bold text-blue-600">
-                      {match.matchScore}%
-                    </span>
-                  )}
-                </div>
-
-                {/* Resume and Job Info */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">Resume</p>
-                    <p className="font-semibold text-gray-900">
-                      {match.resume?.originalName || 'Unknown Resume'}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">Job Description</p>
-                    <p className="font-semibold text-gray-900">
+      <div className="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+        {/* Table View */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-surface-container-low border-b border-outline-variant">
+                <th className="px-lg py-md font-label-caps text-label-caps text-on-surface-variant">Resume Name</th>
+                <th className="px-lg py-md font-label-caps text-label-caps text-on-surface-variant">Job Title</th>
+                <th className="px-lg py-md font-label-caps text-label-caps text-on-surface-variant">Company</th>
+                <th className="px-lg py-md font-label-caps text-label-caps text-on-surface-variant">Match Score</th>
+                <th className="px-lg py-md font-label-caps text-label-caps text-on-surface-variant">Status</th>
+                <th className="px-lg py-md font-label-caps text-label-caps text-on-surface-variant">Date</th>
+                <th className="px-lg py-md font-label-caps text-label-caps text-on-surface-variant text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-outline-variant">
+              {matches.map((match) => {
+                const radius = 15.9155;
+                const circumference = 2 * Math.PI * radius;
+                const score = match.matchScore || 0;
+                const dashArray = `${(score / 100) * 100}, 100`;
+                
+                return (
+                  <tr key={match._id} className="hover:bg-surface-bright transition-colors">
+                    <td className="px-lg py-md">
+                      <div className="flex items-center gap-sm">
+                        <MaterialIcon className="text-primary">description</MaterialIcon>
+                        <span className="font-body-sm text-body-sm font-semibold">
+                          {match.resume?.originalName || 'Unknown Resume'}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-lg py-md font-body-sm text-body-sm">
                       {match.jobDescription?.title || 'Unknown Job'}
-                    </p>
-                    {match.jobDescription?.company && (
-                      <p className="text-sm text-gray-600">{match.jobDescription.company}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Metadata */}
-                <div className="flex items-center gap-4 text-xs text-gray-500">
-                  <span>Created: {new Date(match.createdAt).toLocaleDateString()}</span>
-                  {match.generatedAt && (
-                    <span>Generated: {new Date(match.generatedAt).toLocaleDateString()}</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-2 ml-4">
-                <button
-                  onClick={() => handleMatchClick(match)}
-                  className="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                >
-                  View
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteClick(match);
-                  }}
-                  className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                  disabled={match.matchStatus === 'processing'}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+                    </td>
+                    <td className="px-lg py-md font-body-sm text-body-sm">
+                      {match.jobDescription?.company || '-'}
+                    </td>
+                    <td className="px-lg py-md">
+                      {match.matchStatus === 'completed' ? (
+                        <div className="flex items-center gap-sm">
+                          <div className="w-10 h-10 relative">
+                            <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                              <path
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none"
+                                stroke="#e5e7eb"
+                                strokeWidth="3"
+                              />
+                              <path
+                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none"
+                                stroke={score >= 80 ? '#006e2d' : score >= 60 ? '#973400' : '#ba1a1a'}
+                                strokeDasharray={dashArray}
+                                strokeWidth="3"
+                              />
+                            </svg>
+                            <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold">
+                              {score}%
+                            </span>
+                          </div>
+                          <span
+                            className={`font-bold font-body-sm text-body-sm ${
+                              score >= 80 ? 'text-secondary' : score >= 60 ? 'text-tertiary' : 'text-error'
+                            }`}
+                          >
+                            {score >= 80 ? 'Excellent' : score >= 60 ? 'Good' : 'Low'}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-sm">
+                          <div className="animate-pulse w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center">
+                            <MaterialIcon className="text-on-surface-variant text-sm">sync</MaterialIcon>
+                          </div>
+                          <span className="text-on-surface-variant italic font-body-sm text-body-sm">Calculating...</span>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-lg py-md">
+                      <span
+                        className={`px-sm py-xs rounded-full text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1 ${
+                          match.matchStatus === 'completed'
+                            ? 'bg-[#e7f6ed] text-[#006e2d]'
+                            : match.matchStatus === 'processing'
+                            ? 'bg-[#f0f0fb] text-primary'
+                            : match.matchStatus === 'failed'
+                            ? 'bg-[#fff0f0] text-[#ba1a1a]'
+                            : 'bg-[#f0f0fb] text-primary'
+                        }`}
+                      >
+                        {match.matchStatus === 'processing' && (
+                          <span className="w-1.5 h-1.5 bg-primary rounded-full animate-ping"></span>
+                        )}
+                        {match.matchStatus}
+                      </span>
+                    </td>
+                    <td className="px-lg py-md font-body-sm text-body-sm text-on-surface-variant">
+                      {new Date(match.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-lg py-md text-right">
+                      <div className="flex justify-end gap-sm">
+                        <button
+                          onClick={() => handleMatchClick(match)}
+                          className="p-2 hover:bg-surface-variant rounded-lg transition-colors text-primary"
+                          title="View Report"
+                        >
+                          <MaterialIcon>visibility</MaterialIcon>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteClick(match);
+                          }}
+                          className="p-2 hover:bg-error-container hover:text-on-error-container rounded-lg transition-colors text-on-surface-variant"
+                          title="Delete"
+                        >
+                          <MaterialIcon>delete</MaterialIcon>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
 
         {/* Pagination */}
         {pagination.pages > 1 && (
-          <div className="flex items-center justify-center gap-2 mt-6">
-            <button
-              onClick={() => setPagination({ ...pagination, page: pagination.page - 1 })}
-              disabled={pagination.page === 1}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Previous
-            </button>
-            <span className="px-4 py-2 text-gray-700">
-              Page {pagination.page} of {pagination.pages}
+          <div className="px-lg py-md bg-surface-container-low border-t border-outline-variant flex items-center justify-between">
+            <span className="font-body-sm text-body-sm text-on-surface-variant">
+              Showing <span className="font-bold">{(pagination.page - 1) * pagination.limit + 1}-{Math.min(pagination.page * pagination.limit, pagination.total)}</span> of{' '}
+              <span className="font-bold">{pagination.total}</span> results
             </span>
-            <button
-              onClick={() => setPagination({ ...pagination, page: pagination.page + 1 })}
-              disabled={pagination.page === pagination.pages}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Next
-            </button>
+            <div className="flex items-center gap-sm">
+              <button
+                onClick={() => setPagination({ ...pagination, page: pagination.page - 1 })}
+                disabled={pagination.page === 1}
+                className="p-2 border border-outline rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <MaterialIcon>chevron_left</MaterialIcon>
+              </button>
+              <div className="flex items-center">
+                {[...Array(Math.min(pagination.pages, 5))].map((_, i) => {
+                  const page = i + 1;
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setPagination({ ...pagination, page })}
+                      className={`w-10 h-10 rounded-lg font-bold ${
+                        pagination.page === page
+                          ? 'bg-primary text-on-primary'
+                          : 'hover:bg-surface-variant text-on-surface-variant'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                onClick={() => setPagination({ ...pagination, page: pagination.page + 1 })}
+                disabled={pagination.page === pagination.pages}
+                className="p-2 border border-outline rounded-lg text-on-surface-variant hover:bg-surface-variant transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <MaterialIcon>chevron_right</MaterialIcon>
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -249,7 +338,11 @@ const JobMatchHistory = () => {
   // Render detail view
   const renderDetailView = () => {
     if (loadingMatch) {
-      return <LoadingSpinner message="Loading match details..." />;
+      return (
+        <div className="flex items-center justify-center py-xl">
+          <LoadingSpinner />
+        </div>
+      );
     }
 
     if (!selectedMatch) {
@@ -257,29 +350,33 @@ const JobMatchHistory = () => {
     }
 
     return (
-      <div className="bg-white rounded-lg p-6">
+      <div className="bg-surface-container-lowest rounded-xl p-lg border border-outline-variant">
         {/* Back Button */}
         <button
           onClick={() => setSelectedMatch(null)}
-          className="mb-6 text-blue-600 hover:text-blue-700 flex items-center gap-1"
+          className="mb-lg text-primary hover:text-primary-container font-bold flex items-center gap-sm transition-colors"
         >
-          ← Back to History
+          <MaterialIcon>arrow_back</MaterialIcon> Back to History
         </button>
 
         {/* Status Banner */}
         {selectedMatch.matchStatus !== 'completed' && (
-          <div className={`mb-6 p-4 rounded-lg ${
-            selectedMatch.matchStatus === 'failed' ? 'bg-red-50 border border-red-200' :
-            selectedMatch.matchStatus === 'processing' ? 'bg-blue-50 border border-blue-200' :
-            'bg-gray-50 border border-gray-200'
-          }`}>
-            <p className="font-semibold">
+          <div
+            className={`mb-lg p-lg rounded-xl ${
+              selectedMatch.matchStatus === 'failed'
+                ? 'bg-error-container border border-error'
+                : selectedMatch.matchStatus === 'processing'
+                ? 'bg-primary-fixed border border-primary'
+                : 'bg-surface-container-high border border-outline-variant'
+            }`}
+          >
+            <p className="font-semibold font-body-base text-body-base">
               {selectedMatch.matchStatus === 'failed' && '❌ This comparison failed'}
               {selectedMatch.matchStatus === 'processing' && '⚙️ This comparison is still processing'}
               {selectedMatch.matchStatus === 'pending' && '⏳ This comparison is pending'}
             </p>
             {selectedMatch.errorMessage && (
-              <p className="text-sm mt-1 text-red-700">{selectedMatch.errorMessage}</p>
+              <p className="text-body-sm text-body-sm mt-sm text-error">{selectedMatch.errorMessage}</p>
             )}
           </div>
         )}
@@ -288,30 +385,38 @@ const JobMatchHistory = () => {
         {selectedMatch.matchStatus === 'completed' && (
           <>
             {/* Resume and Job Info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-semibold text-blue-900 mb-1">Resume</h3>
-                <p className="text-blue-700">{selectedMatch.resume?.originalName}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-lg mb-xl">
+              <div className="bg-primary-fixed border border-primary rounded-xl p-lg">
+                <h3 className="font-semibold text-primary mb-sm font-headline-md text-headline-md">Resume</h3>
+                <p className="text-on-primary-fixed-variant font-body-base text-body-base">
+                  {selectedMatch.resume?.originalName}
+                </p>
               </div>
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                <h3 className="font-semibold text-purple-900 mb-1">Job Description</h3>
-                <p className="text-purple-700">{selectedMatch.jobDescription?.title}</p>
+              <div className="bg-secondary-fixed border border-secondary rounded-xl p-lg">
+                <h3 className="font-semibold text-secondary mb-sm font-headline-md text-headline-md">Job Description</h3>
+                <p className="text-on-secondary-fixed-variant font-body-base text-body-base">
+                  {selectedMatch.jobDescription?.title}
+                </p>
                 {selectedMatch.jobDescription?.company && (
-                  <p className="text-sm text-purple-600">{selectedMatch.jobDescription.company}</p>
+                  <p className="text-body-sm text-body-sm text-on-secondary-fixed-variant">
+                    {selectedMatch.jobDescription.company}
+                  </p>
                 )}
               </div>
             </div>
 
             {/* Match Score Card */}
-            <div className="mb-8">
+            <div className="mb-xl">
               <MatchScoreCard score={selectedMatch.matchScore} />
             </div>
 
             {/* Summary */}
             {selectedMatch.summary && (
-              <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Summary</h3>
-                <p className="text-gray-700 leading-relaxed">{selectedMatch.summary}</p>
+              <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-lg">
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-md">Summary</h3>
+                <p className="text-on-surface-variant font-body-base text-body-base leading-relaxed">
+                  {selectedMatch.summary}
+                </p>
               </div>
             )}
 
@@ -374,10 +479,10 @@ const JobMatchHistory = () => {
 
             {/* Metadata */}
             {selectedMatch.generatedAt && (
-              <div className="mt-8 text-center text-sm text-gray-500">
+              <div className="mt-xl text-center text-body-sm text-body-sm text-on-surface-variant">
                 <p>Analysis generated on {new Date(selectedMatch.generatedAt).toLocaleString()}</p>
                 {selectedMatch.confidenceScore && (
-                  <p className="mt-1">Confidence Score: {selectedMatch.confidenceScore}%</p>
+                  <p className="mt-xs">Confidence Score: {selectedMatch.confidenceScore}%</p>
                 )}
               </div>
             )}
@@ -388,50 +493,48 @@ const JobMatchHistory = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Comparison History</h1>
-          <p className="text-gray-600">
-            View all your previous resume-to-job comparisons
-          </p>
-        </div>
-
-        {/* Actions Bar */}
-        <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
-          {/* Filter */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">Filter:</label>
-            <select
-              value={filterStatus}
-              onChange={(e) => {
-                setFilterStatus(e.target.value);
-                setPagination({ ...pagination, page: 1 });
-              }}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="all">All Status</option>
-              <option value="completed">Completed</option>
-              <option value="processing">Processing</option>
-              <option value="failed">Failed</option>
-              <option value="pending">Pending</option>
-            </select>
+    <div className="min-h-screen bg-background flex flex-col">
+      <main className="flex-grow w-full max-w-container-max mx-auto px-lg py-xl">
+        {/* Header & Filters */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-lg mb-xl">
+          <div>
+            <h1 className="font-display-lg text-display-lg text-on-surface mb-xs">Job Match History</h1>
+            <p className="text-on-surface-variant font-body-base text-body-base">
+              Review and manage your resume's compatibility with previous job applications.
+            </p>
           </div>
-
-          {/* New Comparison Button */}
-          <button
-            onClick={() => navigate('/job-match')}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            + New Comparison
-          </button>
+          <div className="flex flex-wrap items-center gap-md">
+            <div className="flex flex-col gap-xs">
+              <span className="font-label-caps text-label-caps text-on-surface-variant px-1">Status</span>
+              <select
+                value={filterStatus}
+                onChange={(e) => {
+                  setFilterStatus(e.target.value);
+                  setPagination({ ...pagination, page: 1 });
+                }}
+                className="bg-surface border border-outline rounded-lg px-md py-sm font-body-sm text-body-sm focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+              >
+                <option value="all">All Statuses</option>
+                <option value="completed">Completed</option>
+                <option value="processing">Processing</option>
+                <option value="failed">Failed</option>
+                <option value="pending">Pending</option>
+              </select>
+            </div>
+            <button
+              onClick={() => navigate('/job-match')}
+              className="bg-primary text-on-primary px-lg py-sm rounded-lg font-bold hover:bg-primary-container transition-all flex items-center gap-sm mt-auto"
+            >
+              <MaterialIcon>add_circle</MaterialIcon>
+              New Match
+            </button>
+          </div>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-            <p>{error}</p>
+          <div className="bg-error-container border border-error text-on-error-container px-lg py-md rounded-xl mb-lg">
+            <p className="font-body-base text-body-base">{error}</p>
           </div>
         )}
 
@@ -447,11 +550,11 @@ const JobMatchHistory = () => {
           }}
           onConfirm={handleDeleteConfirm}
           title="Delete Comparison"
-          message={`Are you sure you want to delete this comparison? This action cannot be undone.`}
+          message="Are you sure you want to delete this comparison? This action cannot be undone."
           confirmText="Delete"
           confirmStyle="danger"
         />
-      </div>
+      </main>
     </div>
   );
 };

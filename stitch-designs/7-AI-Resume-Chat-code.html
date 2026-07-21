@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ResumeAI | AI Chat Assistant</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface": "#faf8ff",
+            "on-surface": "#191b23",
+            "on-primary": "#ffffff",
+            "on-error-container": "#93000a",
+            "on-tertiary-container": "#ffede7",
+            "inverse-surface": "#2e3039",
+            "tertiary-fixed-dim": "#ffb599",
+            "on-surface-variant": "#434655",
+            "on-secondary": "#ffffff",
+            "on-primary-fixed-variant": "#003ea8",
+            "primary-fixed-dim": "#b4c5ff",
+            "tertiary-container": "#c04400",
+            "outline-variant": "#c3c6d7",
+            "on-tertiary": "#ffffff",
+            "surface-variant": "#e1e2ed",
+            "secondary-fixed": "#7ffc97",
+            "inverse-on-surface": "#f0f0fb",
+            "on-error": "#ffffff",
+            "surface-tint": "#0053db",
+            "inverse-primary": "#b4c5ff",
+            "primary-container": "#2563eb",
+            "on-secondary-fixed": "#002109",
+            "on-secondary-fixed-variant": "#005320",
+            "on-secondary-container": "#007230",
+            "tertiary": "#973400",
+            "on-background": "#191b23",
+            "secondary-container": "#7cf994",
+            "secondary": "#006e2d",
+            "surface-container-lowest": "#ffffff",
+            "surface-container": "#ededf9",
+            "on-primary-fixed": "#00174b",
+            "primary": "#004ac6",
+            "tertiary-fixed": "#ffdbce",
+            "surface-container-low": "#f3f3fe",
+            "surface-dim": "#d9d9e5",
+            "background": "#faf8ff",
+            "surface-bright": "#faf8ff",
+            "error": "#ba1a1a",
+            "error-container": "#ffdad6",
+            "outline": "#737686",
+            "secondary-fixed-dim": "#62df7d",
+            "on-tertiary-fixed-variant": "#7f2b00",
+            "on-primary-container": "#eeefff",
+            "on-tertiary-fixed": "#370e00",
+            "surface-container-highest": "#e1e2ed",
+            "primary-fixed": "#dbe1ff",
+            "surface-container-high": "#e7e7f3"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "sm": "8px",
+            "xl": "32px",
+            "gutter": "20px",
+            "base": "4px",
+            "xs": "4px",
+            "lg": "24px",
+            "container-max": "1200px",
+            "xxl": "48px",
+            "md": "16px"
+          },
+          "fontFamily": {
+            "label-caps": ["Inter"],
+            "body-base": ["Inter"],
+            "headline-md": ["Inter"],
+            "display-lg": ["Inter"],
+            "body-sm": ["Inter"],
+            "display-lg-mobile": ["Inter"]
+          },
+          "fontSize": {
+            "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+            "body-base": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+            "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+            "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+            "display-lg-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #c3c6d7;
+      border-radius: 10px;
+    }
+    .chat-bubble-ai {
+      position: relative;
+    }
+    .chat-bubble-ai::before {
+      content: '';
+      position: absolute;
+      left: -8px;
+      top: 12px;
+      border-width: 8px 8px 8px 0;
+      border-color: transparent #f3f3fe transparent transparent;
+    }
+    .typing-dot {
+      animation: dotPulse 1.4s infinite ease-in-out both;
+    }
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes dotPulse {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1.0); }
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface font-body-base overflow-hidden h-screen flex flex-col">
+<!-- TopNavBar (Shared Component Identity) -->
+<header class="bg-surface dark:bg-surface-dim border-b border-outline-variant dark:border-outline h-16 flex justify-between items-center w-full px-lg md:px-xxl z-30 shrink-0">
+<div class="flex items-center gap-md">
+<span class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed-dim">ResumeAI</span>
+<div class="hidden md:flex gap-md ml-xl h-full items-center">
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 font-body-base" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 font-body-base" href="#">Upload</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 font-body-base" href="#">Analysis</a>
+<a class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 font-body-base" href="#">Job Match</a>
+<a class="text-primary dark:text-inverse-primary border-b-2 border-primary dark:border-inverse-primary pb-1 font-bold h-full flex items-center mt-1" href="#">Chat</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">settings</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a middle-aged woman in business attire, with a soft-focus office background. The lighting is crisp and corporate, fitting a modern resume-building application. The color palette is composed of professional grays and soft blues." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDslNaEhNVD-H8DvE9PGjuC8k7bWpa5Wf3Pm24NYF_ntTmxXKo_pKvU2Y3H7NIt3g71ljstRbaYK3d1V82OvCVnSRsSfHpeeYvNX9hJ8gNGo6zTIgy-cUcvMtMiRp_23nnRx_ym2Go4_XGGrRJ--NG8IPwHQKfQ7NFk2aEEaoDSLukocFaKlGaz8r5QP-jTdhuRTjoR-5M5sWX8I3VsNoOfiUslT99oA2Ls3Fun3VBhSTw6dl5ePlky"/>
+</div>
+</div>
+</header>
+<main class="flex flex-1 overflow-hidden">
+<!-- Left Sidebar: Chat Sessions -->
+<aside class="w-80 bg-surface-container-low border-r border-outline-variant hidden md:flex flex-col h-full shrink-0">
+<div class="p-md border-b border-outline-variant flex justify-between items-center">
+<span class="text-label-caps font-label-caps uppercase tracking-wider text-on-surface-variant">Sessions</span>
+<button class="flex items-center gap-xs text-primary hover:bg-primary-container/10 p-1 rounded transition-colors">
+<span class="material-symbols-outlined text-md">add_circle</span>
+<span class="text-label-caps font-label-caps">New Chat</span>
+</button>
+</div>
+<nav class="flex-1 overflow-y-auto custom-scrollbar p-sm space-y-sm">
+<!-- Active Session -->
+<div class="group relative bg-primary-container/10 border-l-4 border-primary p-md rounded-r-lg transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-1">
+<span class="text-body-sm font-bold text-on-surface truncate pr-8">Software Engineer v2.1 Analysis</span>
+<span class="text-[10px] text-outline whitespace-nowrap">Today</span>
+</div>
+<p class="text-body-sm text-on-surface-variant truncate">How can I improve the metrics in my experience section?</p>
+<div class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-xs bg-surface-container-low p-1 rounded">
+<button class="hover:text-primary transition-colors" title="Rename"><span class="material-symbols-outlined text-md">edit</span></button>
+<button class="hover:text-error transition-colors" title="Delete"><span class="material-symbols-outlined text-md">delete</span></button>
+</div>
+</div>
+<!-- Inactive Session 1 -->
+<div class="group relative hover:bg-surface-container p-md rounded-lg transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-1">
+<span class="text-body-sm font-medium text-on-surface truncate pr-8">Marketing Manager Resume</span>
+<span class="text-[10px] text-outline">Oct 24</span>
+</div>
+<p class="text-body-sm text-on-surface-variant truncate">Should I include the summary or objective?</p>
+<div class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-xs bg-surface-container p-1 rounded">
+<button class="hover:text-primary transition-colors" title="Rename"><span class="material-symbols-outlined text-md">edit</span></button>
+<button class="hover:text-error transition-colors" title="Delete"><span class="material-symbols-outlined text-md">delete</span></button>
+</div>
+</div>
+<!-- Inactive Session 2 -->
+<div class="group relative hover:bg-surface-container p-md rounded-lg transition-all cursor-pointer">
+<div class="flex justify-between items-start mb-1">
+<span class="text-body-sm font-medium text-on-surface truncate pr-8">Frontend Intern Application</span>
+<span class="text-[10px] text-outline">Oct 22</span>
+</div>
+<p class="text-body-sm text-on-surface-variant truncate">Is the portfolio link properly formatted?</p>
+<div class="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-xs bg-surface-container p-1 rounded">
+<button class="hover:text-primary transition-colors" title="Rename"><span class="material-symbols-outlined text-md">edit</span></button>
+<button class="hover:text-error transition-colors" title="Delete"><span class="material-symbols-outlined text-md">delete</span></button>
+</div>
+</div>
+</nav>
+<div class="p-md border-t border-outline-variant bg-surface-container-low">
+<div class="flex items-center gap-md p-sm bg-white border border-outline-variant rounded-lg">
+<div class="bg-primary/10 text-primary p-1 rounded">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-tighter">Pro Plan</p>
+<p class="text-body-sm font-bold text-on-surface">Unlimited Analysis</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Chat Area -->
+<section class="flex-1 flex flex-col h-full bg-surface-container-lowest relative">
+<!-- Chat Header -->
+<header class="h-14 flex justify-between items-center px-lg border-b border-outline-variant bg-white z-20">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant md:hidden">menu</span>
+<h2 class="text-body-base font-bold text-on-surface">Software Engineer v2.1 Analysis</h2>
+</div>
+<div class="flex items-center gap-sm">
+<div class="flex items-center gap-sm px-md py-1.5 bg-surface-container-low border border-outline-variant rounded-full text-body-sm">
+<span class="material-symbols-outlined text-md text-primary">description</span>
+<span class="font-medium">SWE_Resume_2024.pdf</span>
+<span class="material-symbols-outlined text-sm cursor-pointer hover:text-primary">expand_more</span>
+</div>
+</div>
+</header>
+<!-- Messages History -->
+<div class="flex-1 overflow-y-auto custom-scrollbar p-lg md:px-xxl py-xl space-y-xl" id="chat-history">
+<!-- AI Message -->
+<div class="flex gap-md max-w-3xl">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-white text-md">smart_toy</span>
+</div>
+<div class="space-y-md">
+<div class="bg-surface-container-low p-lg rounded-xl rounded-tl-none chat-bubble-ai border border-outline-variant shadow-sm">
+<p class="text-body-base text-on-surface mb-sm">Hello! I've analyzed your <strong>Software Engineer v2.1</strong> resume. I noticed that your technical skills are impressive, but we can strengthen your "Experience" section by adding more quantified impact. </p>
+<p class="text-body-base text-on-surface">Would you like to focus on your role at <strong>TechNova Systems</strong> first?</p>
+</div>
+<span class="text-[10px] text-outline ml-sm">10:15 AM</span>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex flex-row-reverse gap-md max-w-3xl ml-auto">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant text-md">person</span>
+</div>
+<div class="flex flex-col items-end space-y-md">
+<div class="bg-primary-container text-on-primary-container p-lg rounded-xl rounded-tr-none shadow-sm">
+<p class="text-body-base">Yes, please. I worked on a migration project there, but I'm not sure how to express the value in numbers. We moved from monolithic to microservices.</p>
+</div>
+<span class="text-[10px] text-outline mr-sm">10:16 AM</span>
+</div>
+</div>
+<!-- AI Message with Markdown-like styling -->
+<div class="flex gap-md max-w-3xl">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-white text-md">smart_toy</span>
+</div>
+<div class="space-y-md w-full">
+<div class="bg-surface-container-low p-lg rounded-xl rounded-tl-none chat-bubble-ai border border-outline-variant shadow-sm">
+<p class="text-body-base text-on-surface mb-md">That's a great achievement! Microservices migrations are highly valued. Here are three ways we could phrase that using the **X-Y-Z formula**:</p>
+<ul class="space-y-sm list-none border-l-2 border-primary pl-md my-md">
+<li class="text-body-sm text-on-surface">
+<span class="font-bold text-primary">Option 1:</span> "Architected a migration from monolithic to microservices architecture, reducing system latency by <span class="bg-secondary-container px-1 rounded text-on-secondary-container">25%</span>."
+                </li>
+<li class="text-body-sm text-on-surface">
+<span class="font-bold text-primary">Option 2:</span> "Orchestrated the transition of 5 legacy modules to microservices, improving deployment frequency by <span class="bg-secondary-container px-1 rounded text-on-secondary-container">40%</span>."
+                </li>
+</ul>
+<p class="text-body-base text-on-surface">Do you happen to remember the approximate reduction in server costs or the increase in deployment speed?</p>
+</div>
+<span class="text-[10px] text-outline ml-sm">10:17 AM</span>
+</div>
+</div>
+<!-- AI Typing Indicator -->
+<div class="flex gap-md max-w-3xl hidden" id="typing-indicator">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-white text-md">smart_toy</span>
+</div>
+<div class="bg-surface-container-low p-md rounded-xl rounded-tl-none border border-outline-variant flex gap-sm items-center">
+<div class="w-2 h-2 bg-outline rounded-full typing-dot"></div>
+<div class="w-2 h-2 bg-outline rounded-full typing-dot"></div>
+<div class="w-2 h-2 bg-outline rounded-full typing-dot"></div>
+</div>
+</div>
+</div>
+<!-- Input Area -->
+<footer class="p-lg md:px-xxl pb-xl pt-0 bg-transparent">
+<div class="max-w-4xl mx-auto relative group">
+<div class="absolute inset-0 bg-primary/5 blur-xl group-focus-within:bg-primary/10 transition-all rounded-xl"></div>
+<div class="relative bg-white border border-outline-variant rounded-xl shadow-lg focus-within:border-primary transition-all p-2">
+<div class="flex items-end gap-sm">
+<div class="flex flex-col gap-sm p-sm">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">attach_file</span>
+</button>
+</div>
+<textarea class="flex-1 border-none focus:ring-0 text-body-base py-3 resize-none bg-transparent min-h-[48px] max-h-32 custom-scrollbar" id="chat-input" placeholder="Ask about your resume..." rows="1"></textarea>
+<div class="flex flex-col gap-sm p-sm">
+<button class="w-10 h-10 bg-primary text-white rounded-lg flex items-center justify-center shadow-md hover:bg-primary-container transition-all active:scale-95" id="send-button">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+<div class="px-md pb-sm flex justify-between items-center">
+<div class="flex gap-md">
+<button class="text-[10px] font-bold text-outline hover:text-primary flex items-center gap-xs uppercase tracking-widest transition-colors">
+<span class="material-symbols-outlined text-sm">auto_awesome</span>
+                  Optimize Bullet Points
+                </button>
+<button class="text-[10px] font-bold text-outline hover:text-primary flex items-center gap-xs uppercase tracking-widest transition-colors">
+<span class="material-symbols-outlined text-sm">spellcheck</span>
+                  Grammar Check
+                </button>
+</div>
+<span class="text-[10px] text-outline">Enter to send • Shift+Enter for new line</span>
+</div>
+</div>
+</div>
+</footer>
+</section>
+</main>
+<script>
+    const input = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-button');
+    const history = document.getElementById('chat-history');
+    const typing = document.getElementById('typing-indicator');
+
+    // Auto-resize textarea
+    input.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight) + 'px';
+    });
+
+    const addMessage = (text, isUser = true) => {
+      const wrapper = document.createElement('div');
+      wrapper.className = isUser ? 'flex flex-row-reverse gap-md max-w-3xl ml-auto animate-in fade-in slide-in-from-bottom-2 duration-300' : 'flex gap-md max-w-3xl animate-in fade-in slide-in-from-bottom-2 duration-300';
+      
+      const avatar = document.createElement('div');
+      avatar.className = isUser ? 'w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 border border-outline-variant' : 'w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0';
+      avatar.innerHTML = isUser ? '<span class="material-symbols-outlined text-on-surface-variant text-md">person</span>' : '<span class="material-symbols-outlined text-white text-md">smart_toy</span>';
+      
+      const content = document.createElement('div');
+      content.className = isUser ? 'flex flex-col items-end space-y-md' : 'space-y-md';
+      
+      const bubble = document.createElement('div');
+      bubble.className = isUser ? 'bg-primary-container text-on-primary-container p-lg rounded-xl rounded-tr-none shadow-sm' : 'bg-surface-container-low p-lg rounded-xl rounded-tl-none chat-bubble-ai border border-outline-variant shadow-sm';
+      bubble.innerHTML = `<p class="text-body-base">${text}</p>`;
+      
+      const time = document.createElement('span');
+      time.className = 'text-[10px] text-outline ' + (isUser ? 'mr-sm' : 'ml-sm');
+      time.innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      content.appendChild(bubble);
+      content.appendChild(time);
+      wrapper.appendChild(avatar);
+      wrapper.appendChild(content);
+      
+      history.insertBefore(wrapper, typing);
+      history.scrollTop = history.scrollHeight;
+    };
+
+    const handleSend = () => {
+      const text = input.value.trim();
+      if (!text) return;
+      
+      addMessage(text, true);
+      input.value = '';
+      input.style.height = 'auto';
+
+      // Simulate AI response
+      typing.classList.remove('hidden');
+      history.scrollTop = history.scrollHeight;
+
+      setTimeout(() => {
+        typing.classList.add('hidden');
+        addMessage("I've updated your metrics. Based on common industry benchmarks for monolithic to microservices transitions, we can estimate a 30% reduction in downtime. Shall I apply this change to your Resume draft?", false);
+      }, 2000);
+    };
+
+    sendBtn.addEventListener('click', handleSend);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    });
+
+    // Initial scroll
+    history.scrollTop = history.scrollHeight;
+  </script>
+</body></html>

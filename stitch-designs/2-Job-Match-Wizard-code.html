@@ -1,0 +1,394 @@
+<!DOCTYPE html><html lang="en" class="light"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet"><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">try{
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#c04400",
+                        "surface-dim": "#d9d9e5",
+                        "inverse-primary": "#b4c5ff",
+                        "surface-tint": "#0053db",
+                        "secondary-container": "#7cf994",
+                        "inverse-on-surface": "#f0f0fb",
+                        "tertiary-fixed": "#ffdbce",
+                        "outline": "#737686",
+                        "surface-variant": "#e1e2ed",
+                        "on-tertiary-container": "#ffede7",
+                        "on-secondary-fixed": "#002109",
+                        "on-tertiary-fixed-variant": "#7f2b00",
+                        "on-primary-fixed-variant": "#003ea8",
+                        "background": "#faf8ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#00174b",
+                        "inverse-surface": "#2e3039",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-container": "#ededf9",
+                        "on-background": "#191b23",
+                        "surface-container-high": "#e7e7f3",
+                        "outline-variant": "#c3c6d7",
+                        "surface-bright": "#faf8ff",
+                        "primary-container": "#2563eb",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#370e00",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#f3f3fe",
+                        "on-surface-variant": "#434655",
+                        "on-error": "#ffffff",
+                        "secondary-fixed": "#7ffc97",
+                        "surface": "#faf8ff",
+                        "primary-fixed": "#dbe1ff",
+                        "on-primary-container": "#eeefff",
+                        "secondary-fixed-dim": "#62df7d",
+                        "surface-container-highest": "#e1e2ed",
+                        "tertiary": "#973400",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#b4c5ff",
+                        "on-surface": "#191b23",
+                        "on-secondary-container": "#007230",
+                        "on-secondary": "#ffffff",
+                        "primary": "#004ac6",
+                        "on-secondary-fixed-variant": "#005320",
+                        "secondary": "#006e2d",
+                        "tertiary-fixed-dim": "#ffb599"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "xxl": "48px",
+                        "gutter": "20px",
+                        "base": "4px",
+                        "xl": "32px",
+                        "container-max": "1200px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-base": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-base": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    }catch(_e){}</script></head><body class="bg-background text-on-background font-body-base min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<header class="bg-surface shadow-sm sticky top-0 z-50 flex justify-between items-center w-full px-lg h-16">
+<div class="flex items-center gap-xl">
+<span class="text-headline-md font-headline-md font-extrabold text-primary">ResumeAI</span>
+<nav class="hidden md:flex gap-lg">
+<a href="#" class="text-on-surface-variant font-body-base text-body-base hover:text-primary transition-colors duration-200">Dashboard</a>
+<a href="#" class="text-on-surface-variant font-body-base text-body-base hover:text-primary transition-colors duration-200">Upload</a>
+<a href="#" class="text-on-surface-variant font-body-base text-body-base hover:text-primary transition-colors duration-200">Analysis</a>
+<a href="#" class="text-primary font-bold border-b-2 border-primary pb-1">Job Match</a>
+<a href="#" class="text-on-surface-variant font-body-base text-body-base hover:text-primary transition-colors duration-200">Chat</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all p-sm" data-icon="settings">settings</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all p-sm" data-icon="account_circle">account_circle</button>
+</div>
+</header>
+<main class="flex-1 max-w-container-max mx-auto w-full px-lg py-xl">
+<!-- Wizard Header & Steps Indicator -->
+<section class="mb-xxl text-center max-w-2xl mx-auto">
+<h1 class="font-display-lg text-display-lg text-on-surface mb-md">Job Match Wizard</h1>
+<p class="text-on-surface-variant mb-xl">Analyze how well your experience aligns with specific roles using our advanced AI matching engine.</p>
+<div class="flex items-center justify-between w-full relative">
+<!-- Progress Line -->
+<div class="absolute top-1/2 left-0 w-full h-[2px] bg-outline-variant -translate-y-1/2 z-0"></div>
+<div id="progress-bar" class="absolute top-1/2 left-0 h-[2px] bg-primary -translate-y-1/2 z-0 transition-all duration-500" style="width: 0%"></div>
+<!-- Steps -->
+<div class="relative z-10 flex flex-col items-center gap-xs">
+<div id="step-dot-1" class="w-10 h-10 rounded-full flex items-center justify-center bg-primary text-on-primary font-bold transition-all duration-300">1</div>
+<span class="font-label-caps text-label-caps text-primary">Resume</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-xs">
+<div id="step-dot-2" class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container-high text-on-surface-variant font-bold transition-all duration-300">2</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Description</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-xs">
+<div id="step-dot-3" class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container-high text-on-surface-variant font-bold transition-all duration-300">3</div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">Results</span>
+</div>
+</div>
+</section>
+<!-- STEP 1: RESUME SELECTION -->
+<div id="step-1-content" class="step-transition block">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
+<!-- Resume Card 1 -->
+<label class="relative cursor-pointer group">
+<input type="radio" name="resume-select" class="peer sr-only" checked="">
+<div class="p-lg rounded-xl glass-card border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary-fixed hover:shadow-md transition-all h-full flex flex-col">
+<div class="flex justify-between items-start mb-md">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="description">description</span>
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-lg text-label-caps">PARSED</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-xs">Senior Product Designer</h3>
+<p class="text-body-sm text-on-surface-variant flex-1">Updated 2 days ago • PDF</p>
+<div class="mt-md pt-md border-t border-outline-variant flex items-center gap-xs text-primary font-bold">
+<span class="material-symbols-outlined" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-label-caps">SELECTED</span>
+</div>
+</div>
+</label>
+<!-- Resume Card 2 -->
+<label class="relative cursor-pointer group">
+<input type="radio" name="resume-select" class="peer sr-only">
+<div class="p-lg rounded-xl glass-card border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary-fixed hover:shadow-md transition-all h-full flex flex-col">
+<div class="flex justify-between items-start mb-md">
+<span class="material-symbols-outlined text-outline text-4xl" data-icon="description">description</span>
+<span class="bg-surface-container-highest text-on-surface-variant px-sm py-xs rounded-lg text-label-caps">DRAFT</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-xs">UI Engineer Resume</h3>
+<p class="text-body-sm text-on-surface-variant flex-1">Updated 1 week ago • DOCX</p>
+<div class="mt-md pt-md border-t border-outline-variant flex items-center gap-xs text-on-surface-variant font-bold opacity-0 peer-checked:opacity-100">
+<span class="material-symbols-outlined" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-label-caps">SELECTED</span>
+</div>
+</div>
+</label>
+<!-- New Resume Action -->
+<button class="p-lg rounded-xl border-2 border-dashed border-outline-variant hover:border-primary hover:bg-surface-container-low transition-all h-full flex flex-col items-center justify-center group">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest group-hover:bg-primary-fixed flex items-center justify-center mb-md transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary" data-icon="add">add</span>
+</div>
+<span class="font-headline-md text-headline-md">Upload New</span>
+<span class="text-body-sm text-on-surface-variant">Max 5MB (PDF, DOCX)</span>
+</button>
+</div>
+<div class="flex justify-end">
+<button onclick="goToStep(2)" class="bg-primary text-on-primary px-xl py-md rounded-lg font-bold hover:bg-primary-container transition-all flex items-center gap-sm">
+                    Next: Job Details <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- STEP 2: JOB DESCRIPTION SELECTION -->
+<div id="step-2-content" class="step-transition hidden opacity-0 translate-y-4">
+<div class="max-w-3xl mx-auto glass-card p-xl rounded-xl">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg mb-lg">
+<div class="flex flex-col gap-xs">
+<label class="font-body-sm text-body-sm text-on-surface-variant">Job Title</label>
+<input type="text" placeholder="e.g. Senior Frontend Engineer" class="w-full bg-surface border border-outline-variant rounded-lg p-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all">
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-body-sm text-body-sm text-on-surface-variant">Company Name</label>
+<input type="text" placeholder="e.g. TechFlow Inc." class="w-full bg-surface border border-outline-variant rounded-lg p-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all">
+</div>
+</div>
+<div class="flex flex-col gap-xs mb-md">
+<label class="font-body-sm text-body-sm text-on-surface-variant">Job Description</label>
+<div class="relative">
+<textarea id="job-desc" oninput="updateCharCount()" rows="10" placeholder="Paste the full job description here (responsibilities, requirements, benefits)..." class="w-full bg-surface border border-outline-variant rounded-lg p-md focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all resize-none"></textarea>
+<div class="absolute bottom-md right-md bg-surface-container-highest px-sm py-xs rounded text-label-caps text-on-surface-variant">
+<span id="char-count">0</span> / 100 min
+                        </div>
+</div>
+</div>
+<div class="flex justify-between items-center mt-xl">
+<button onclick="goToStep(1)" class="text-on-surface-variant hover:text-primary font-bold flex items-center gap-sm transition-colors">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span> Back to Resume
+                    </button>
+<button id="btn-match" onclick="showResults()" disabled="" class="bg-primary text-on-primary px-xl py-md rounded-lg font-bold hover:bg-primary-container disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-sm">
+                        Analyze Match <span class="material-symbols-outlined" data-icon="insights">insights</span>
+</button>
+</div>
+</div>
+</div>
+<!-- STEP 3: MATCH RESULTS -->
+<div id="step-3-content" class="step-transition hidden opacity-0">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Score & Gauge Section -->
+<div class="lg:col-span-4 flex flex-col gap-lg">
+<div class="glass-card p-xl rounded-xl text-center">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-lg">MATCH SCORE</h3>
+<div class="relative inline-flex items-center justify-center w-48 h-48 mb-md">
+<svg class="w-full h-full -rotate-90">
+<circle cx="96" cy="96" r="88" stroke="currentColor" stroke-width="12" fill="transparent" class="text-surface-container-highest"></circle>
+<circle id="score-gauge" cx="96" cy="96" r="88" stroke="currentColor" stroke-width="12" fill="transparent" stroke-dasharray="552.92" stroke-dashoffset="552.92" stroke-linecap="round" class="text-secondary transition-all duration-1000"></circle>
+</svg>
+<div class="absolute flex flex-col items-center">
+<span class="text-5xl font-extrabold text-on-surface">84<span class="text-2xl text-on-surface-variant">%</span></span>
+<span class="text-label-caps text-secondary font-bold">EXCELLENT</span>
+</div>
+</div>
+<p class="text-body-sm text-on-surface-variant">Your profile is a strong match for this position's core requirements.</p>
+</div>
+<div class="glass-card p-lg rounded-xl">
+<h3 class="font-headline-md text-headline-md mb-md">AI Recommendations</h3>
+<ul class="flex flex-col gap-md">
+<li class="flex gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="tips_and_updates">tips_and_updates</span>
+<p class="text-body-sm">Highlight your <strong>Cloud Architecture</strong> experience more prominently in the summary.</p>
+</li>
+<li class="flex gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="tips_and_updates">tips_and_updates</span>
+<p class="text-body-sm">Quantify your <strong>Product Design</strong> impact with specific metrics mentioned in the job post.</p>
+</li>
+</ul>
+</div>
+</div>
+<!-- Detailed Breakdown -->
+<div class="lg:col-span-8 flex flex-col gap-lg">
+<!-- Bento Layout for Breakdown -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Matching Skills -->
+<div class="glass-card p-lg rounded-xl border-l-4 border-secondary">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-secondary" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+<h3 class="font-headline-md text-headline-md">Matching Skills</h3>
+</div>
+<div class="flex flex-wrap gap-xs">
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-lg text-label-caps">Figma</span>
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-lg text-label-caps">User Research</span>
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-lg text-label-caps">Design Systems</span>
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-lg text-label-caps">React</span>
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-lg text-label-caps">Agile</span>
+</div>
+</div>
+<!-- Missing Tech Skills -->
+<div class="glass-card p-lg rounded-xl border-l-4 border-tertiary">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-tertiary" data-icon="warning" style="font-variation-settings: 'FILL' 1;">warning</span>
+<h3 class="font-headline-md text-headline-md">Missing Technical</h3>
+</div>
+<div class="flex flex-wrap gap-xs">
+<span class="bg-tertiary-container text-on-tertiary-container px-sm py-xs rounded-lg text-label-caps">AWS Lambda</span>
+<span class="bg-tertiary-container text-on-tertiary-container px-sm py-xs rounded-lg text-label-caps">GraphQL</span>
+</div>
+</div>
+<!-- Missing Soft Skills -->
+<div class="glass-card p-lg rounded-xl border-l-4 border-primary">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-primary" data-icon="psychology" style="font-variation-settings: 'FILL' 1;">psychology</span>
+<h3 class="font-headline-md text-headline-md">Soft Skills Gap</h3>
+</div>
+<div class="flex flex-wrap gap-xs">
+<span class="bg-primary-fixed text-on-primary-fixed-variant px-sm py-xs rounded-lg text-label-caps">Stakeholder Mgmt</span>
+<span class="bg-primary-fixed text-on-primary-fixed-variant px-sm py-xs rounded-lg text-label-caps">Public Speaking</span>
+</div>
+</div>
+<!-- Action Shortcuts -->
+<div class="bg-primary text-on-primary p-lg rounded-xl flex flex-col justify-center items-center gap-md">
+<h3 class="font-headline-md text-headline-md">Ready to apply?</h3>
+<div class="flex gap-sm">
+<button class="bg-on-primary text-primary px-lg py-sm rounded-lg font-bold hover:bg-primary-fixed transition-all text-body-sm">Rewrite with AI</button>
+<button class="border border-on-primary px-lg py-sm rounded-lg font-bold hover:bg-on-primary/10 transition-all text-body-sm">Download PDF</button>
+</div>
+</div>
+</div>
+<!-- History / Bottom Actions -->
+<div class="flex justify-between items-center mt-xl">
+<button onclick="goToStep(1)" class="text-on-surface-variant hover:text-primary font-bold flex items-center gap-sm transition-colors">
+<span class="material-symbols-outlined" data-icon="refresh">refresh</span> Start New Match
+                        </button>
+<button class="bg-surface-container-highest text-on-surface-variant px-xl py-md rounded-lg font-bold hover:bg-outline-variant transition-all flex items-center gap-sm">
+                            View History <span class="material-symbols-outlined" data-icon="history">history</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-highest mt-xxl py-xl">
+<div class="max-w-container-max mx-auto px-lg flex flex-col md:flex-row justify-between items-center gap-md">
+<span class="font-headline-md text-primary font-bold">ResumeAI</span>
+<div class="flex gap-lg">
+<a href="#" class="text-on-surface-variant hover:text-primary transition-colors text-label-caps">Privacy Policy</a>
+<a href="#" class="text-on-surface-variant hover:text-primary transition-colors text-label-caps">Terms of Service</a>
+<a href="#" class="text-on-surface-variant hover:text-primary transition-colors text-label-caps">Help Center</a>
+<a href="#" class="text-on-surface-variant hover:text-primary transition-colors text-label-caps">API Reference</a>
+</div>
+<p class="text-body-sm text-on-surface-variant">© 2024 ResumeAI. All rights reserved.</p>
+</div>
+</footer>
+<script>
+        let currentStep = 1;
+
+        function goToStep(step) {
+            const steps = [1, 2, 3];
+            steps.forEach(s => {
+                const content = document.getElementById(`step-${s}-content`);
+                if (s === step) {
+                    content.classList.remove('hidden');
+                    setTimeout(() => content.classList.remove('opacity-0', 'translate-y-4'), 50);
+                } else {
+                    content.classList.add('opacity-0', 'translate-y-4');
+                    setTimeout(() => content.classList.add('hidden'), 400);
+                }
+
+                // Update indicators
+                const dot = document.getElementById(`step-dot-${s}`);
+                const label = dot.nextElementSibling;
+                if (s < step) {
+                    dot.classList.replace('bg-surface-container-high', 'bg-secondary');
+                    dot.classList.replace('bg-primary', 'bg-secondary');
+                    dot.classList.replace('text-on-surface-variant', 'text-on-secondary');
+                    dot.innerHTML = '<span class="material-symbols-outlined">check</span>';
+                    label.classList.replace('text-on-surface-variant', 'text-secondary');
+                } else if (s === step) {
+                    dot.classList.replace('bg-surface-container-high', 'bg-primary');
+                    dot.classList.replace('bg-secondary', 'bg-primary');
+                    dot.classList.replace('text-on-surface-variant', 'text-on-primary');
+                    dot.innerText = s;
+                    label.classList.replace('text-on-surface-variant', 'text-primary');
+                } else {
+                    dot.classList.replace('bg-primary', 'bg-surface-container-high');
+                    dot.classList.replace('bg-secondary', 'bg-surface-container-high');
+                    dot.classList.replace('text-on-primary', 'text-on-surface-variant');
+                    dot.innerText = s;
+                    label.classList.replace('text-primary', 'text-on-surface-variant');
+                }
+            });
+
+            const progress = document.getElementById('progress-bar');
+            progress.style.width = step === 1 ? '0%' : step === 2 ? '50%' : '100%';
+            currentStep = step;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateCharCount() {
+            const text = document.getElementById('job-desc').value;
+            const count = text.length;
+            const counterEl = document.getElementById('char-count');
+            const btn = document.getElementById('btn-match');
+            
+            counterEl.innerText = count;
+            if (count >= 100) {
+                counterEl.classList.replace('text-on-surface-variant', 'text-secondary');
+                btn.disabled = false;
+            } else {
+                counterEl.classList.replace('text-secondary', 'text-on-surface-variant');
+                btn.disabled = true;
+            }
+        }
+
+        function showResults() {
+            goToStep(3);
+            setTimeout(() => {
+                const gauge = document.getElementById('score-gauge');
+                const radius = 88;
+                const circumference = 2 * Math.PI * radius;
+                const score = 84;
+                const offset = circumference - (score / 100) * circumference;
+                gauge.style.strokeDashoffset = offset;
+            }, 500);
+        }
+    </script>
+</body></html>
