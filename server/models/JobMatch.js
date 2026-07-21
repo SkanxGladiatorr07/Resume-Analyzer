@@ -36,7 +36,6 @@ const jobMatchSchema = new mongoose.Schema(
       type: String,
       enum: ['pending', 'processing', 'completed', 'failed'],
       default: 'pending',
-      index: true,
     },
 
     // Match Score (0-100)

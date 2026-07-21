@@ -28,7 +28,6 @@ const analysisSchema = new mongoose.Schema(
       type: String,
       enum: ['pending', 'processing', 'completed', 'failed'],
       default: 'pending',
-      index: true,
     },
 
     // ATS Score (0-100)
