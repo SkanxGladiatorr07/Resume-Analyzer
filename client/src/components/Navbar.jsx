@@ -219,6 +219,7 @@ const Navbar = () => {
                 {/* Unauthenticated User Navigation */}
                 <NavLink
                   to="/"
+                  end
                   className={({ isActive }) =>
                     `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                       isActive
@@ -228,6 +229,42 @@ const Navbar = () => {
                   }
                 >
                   Home
+                </NavLink>
+                <NavLink
+                  to="/about"
+                  className={({ isActive }) =>
+                    `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-blue-50 text-blue-600'
+                        : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                    }`
+                  }
+                >
+                  About
+                </NavLink>
+                <NavLink
+                  to="/features"
+                  className={({ isActive }) =>
+                    `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-blue-50 text-blue-600'
+                        : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                    }`
+                  }
+                >
+                  Features
+                </NavLink>
+                <NavLink
+                  to="/demo-guide"
+                  className={({ isActive}) =>
+                    `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-blue-50 text-blue-600'
+                        : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
+                    }`
+                  }
+                >
+                  Demo
                 </NavLink>
                 <div className="flex items-center space-x-2 ml-4">
                   <Link to="/login">

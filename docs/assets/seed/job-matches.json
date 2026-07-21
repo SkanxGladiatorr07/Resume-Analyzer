@@ -1,0 +1,443 @@
+[
+  {
+    "_id": "907f1f77bcf86cd799439051",
+    "userId": "507f1f77bcf86cd799439011",
+    "resumeId": "607f1f77bcf86cd799439021",
+    "jobTitle": "Senior Full Stack Developer",
+    "jobDescription": "We're looking for an experienced Full Stack Developer...",
+    "company": "TechCorp Solutions",
+    "location": "San Francisco, CA",
+    "matchScore": 89,
+    "matchedSkills": [
+      { "skill": "React", "relevance": "high" },
+      { "skill": "Node.js", "relevance": "high" },
+      { "skill": "JavaScript", "relevance": "high" },
+      { "skill": "PostgreSQL", "relevance": "medium" },
+      { "skill": "AWS", "relevance": "medium" },
+      { "skill": "RESTful APIs", "relevance": "high" }
+    ],
+    "missingSkills": [
+      { "skill": "TypeScript", "importance": "medium" },
+      { "skill": "Docker", "importance": "low" },
+      { "skill": "Kubernetes", "importance": "low" }
+    ],
+    "recommendations": [
+      "Strong match! Your full-stack experience aligns perfectly with the role",
+      "Consider adding TypeScript to your skill set for an even better match",
+      "Highlight your mentoring experience in your application",
+      "Emphasize quantified achievements in your cover letter"
+    ],
+    "analysis": {
+      "skillsMatch": 92,
+      "experienceMatch": 88,
+      "educationMatch": 95,
+      "overallFit": "Excellent",
+      "keyStrengths": [
+        "5+ years of full-stack development experience",
+        "Strong React and Node.js proficiency",
+        "AWS cloud experience"
+      ],
+      "gapsToAddress": [
+        "TypeScript experience",
+        "Container orchestration (Docker/K8s)"
+      ]
+    },
+    "matchedAt": "2024-02-19T10:15:00.000Z"
+  },
+  {
+    "_id": "907f1f77bcf86cd799439052",
+    "userId": "507f1f77bcf86cd799439011",
+    "resumeId": "607f1f77bcf86cd799439021",
+    "jobTitle": "Frontend Engineer",
+    "jobDescription": "Join our frontend team to build beautiful web applications...",
+    "company": "WebTech Innovations",
+    "location": "Seattle, WA",
+    "matchScore": 94,
+    "matchedSkills": [
+      { "skill": "React", "relevance": "high" },
+      { "skill": "JavaScript", "relevance": "high" },
+      { "skill": "HTML/CSS", "relevance": "high" },
+      { "skill": "Redux", "relevance": "high" },
+      { "skill": "Responsive Design", "relevance": "high" },
+      { "skill": "Performance Optimization", "relevance": "medium" }
+    ],
+    "missingSkills": [
+      { "skill": "GraphQL", "importance": "low" }
+    ],
+    "recommendations": [
+      "Excellent match! Your frontend skills align perfectly",
+      "This role is well within your expertise",
+      "Highlight your performance optimization achievements",
+      "Mention any UI component library work you've done"
+    ],
+    "analysis": {
+      "skillsMatch": 96,
+      "experienceMatch": 93,
+      "educationMatch": 95,
+      "overallFit": "Excellent",
+      "keyStrengths": [
+        "Expert React and modern JavaScript",
+        "Strong focus on performance and accessibility",
+        "Experience with state management"
+      ],
+      "gapsToAddress": [
+        "GraphQL (nice to have)"
+      ]
+    },
+    "matchedAt": "2024-02-19T14:30:00.000Z"
+  },
+  {
+    "_id": "907f1f77bcf86cd799439053",
+    "userId": "507f1f77bcf86cd799439012",
+    "resumeId": "607f1f77bcf86cd799439022",
+    "jobTitle": "Product Manager",
+    "jobDescription": "Join our product team to drive development of our SaaS platform...",
+    "company": "InnovateTech Inc",
+    "location": "New York, NY",
+    "matchScore": 96,
+    "matchedSkills": [
+      { "skill": "Product Strategy", "relevance": "high" },
+      { "skill": "Agile/Scrum", "relevance": "high" },
+      { "skill": "User Research", "relevance": "high" },
+      { "skill": "Roadmap Planning", "relevance": "high" },
+      { "skill": "Stakeholder Management", "relevance": "high" },
+      { "skill": "Data Analysis", "relevance": "high" },
+      { "skill": "B2B SaaS", "relevance": "high" }
+    ],
+    "missingSkills": [],
+    "recommendations": [
+      "Perfect match! Your experience is exactly what they're looking for",
+      "Your B2B SaaS background is a huge advantage",
+      "Emphasize your cross-functional leadership",
+      "Share specific examples of successful product launches"
+    ],
+    "analysis": {
+      "skillsMatch": 98,
+      "experienceMatch": 95,
+      "educationMatch": 100,
+      "overallFit": "Perfect",
+      "keyStrengths": [
+        "7+ years PM experience in B2B SaaS",
+        "MBA from top-tier school",
+        "Proven track record of successful launches",
+        "Strong stakeholder management"
+      ],
+      "gapsToAddress": []
+    },
+    "matchedAt": "2024-02-18T09:45:00.000Z"
+  },
+  {
+    "_id": "907f1f77bcf86cd799439054",
+    "userId": "507f1f77bcf86cd799439013",
+    "resumeId": "607f1f77bcf86cd799439023",
+    "jobTitle": "Data Scientist",
+    "jobDescription": "We're seeking a talented Data Scientist to build ML models...",
+    "company": "DataDriven Analytics",
+    "location": "Austin, TX",
+    "matchScore": 82,
+    "matchedSkills": [
+      { "skill": "Python", "relevance": "high" },
+      { "skill": "Machine Learning", "relevance": "high" },
+      { "skill": "TensorFlow", "relevance": "high" },
+      { "skill": "SQL", "relevance": "high" },
+      { "skill": "Statistical Analysis", "relevance": "high" },
+      { "skill": "Master's Degree", "relevance": "high" }
+    ],
+    "missingSkills": [
+      { "skill": "AWS/GCP/Azure", "importance": "high" },
+      { "skill": "Apache Spark", "importance": "medium" },
+      { "skill": "MLOps", "importance": "medium" }
+    ],
+    "recommendations": [
+      "Good match but missing some cloud platform experience",
+      "Consider adding AWS SageMaker or GCP AI Platform to your skills",
+      "Emphasize any production deployment experience you have",
+      "Highlight stakeholder communication abilities"
+    ],
+    "analysis": {
+      "skillsMatch": 78,
+      "experienceMatch": 85,
+      "educationMatch": 90,
+      "overallFit": "Good",
+      "keyStrengths": [
+        "Strong ML and statistical foundation",
+        "Relevant master's degree",
+        "Python and TensorFlow proficiency"
+      ],
+      "gapsToAddress": [
+        "Cloud platform experience (AWS, GCP, Azure)",
+        "Big data technologies (Spark)",
+        "MLOps and model deployment"
+      ]
+    },
+    "matchedAt": "2024-02-15T11:20:00.000Z"
+  },
+  {
+    "_id": "907f1f77bcf86cd799439055",
+    "userId": "507f1f77bcf86cd799439013",
+    "resumeId": "607f1f77bcf86cd799439024",
+    "jobTitle": "Senior UX Designer",
+    "jobDescription": "We're looking for a creative UX Designer to craft exceptional experiences...",
+    "company": "DesignFirst Studio",
+    "location": "Los Angeles, CA",
+    "matchScore": 85,
+    "matchedSkills": [
+      { "skill": "User Research", "relevance": "high" },
+      { "skill": "Wireframing", "relevance": "high" },
+      { "skill": "Prototyping", "relevance": "high" },
+      { "skill": "Figma", "relevance": "high" },
+      { "skill": "Usability Testing", "relevance": "high" }
+    ],
+    "missingSkills": [
+      { "skill": "WCAG Compliance", "importance": "high" },
+      { "skill": "Design Systems", "importance": "medium" },
+      { "skill": "Motion Design", "importance": "low" }
+    ],
+    "recommendations": [
+      "Good match! Your UX process aligns well with their needs",
+      "Add accessibility/WCAG experience to strengthen your profile",
+      "Highlight any design system work you've done",
+      "Emphasize collaboration with engineering teams"
+    ],
+    "analysis": {
+      "skillsMatch": 82,
+      "experienceMatch": 88,
+      "educationMatch": 90,
+      "overallFit": "Good",
+      "keyStrengths": [
+        "Strong portfolio and user-centered approach",
+        "4+ years UX experience",
+        "Proficiency in industry-standard tools"
+      ],
+      "gapsToAddress": [
+        "Accessibility standards (WCAG)",
+        "Design system creation",
+        "Motion design skills"
+      ]
+    },
+    "matchedAt": "2024-02-14T16:45:00.000Z"
+  },
+  {
+    "_id": "907f1f77bcf86cd799439056",
+    "userId": "507f1f77bcf86cd799439011",
+    "resumeId": "607f1f77bcf86cd799439025",
+    "jobTitle": "Backend Engineer (Node.js)",
+    "jobDescription": "Join our backend team to build robust, scalable APIs...",
+    "company": "API Solutions Ltd",
+    "location": "Denver, CO",
+    "matchScore": 91,
+    "matchedSkills": [
+      { "skill": "Node.js", "relevance": "high" },
+      { "skill": "Express", "relevance": "high" },
+      { "skill": "MongoDB", "relevance": "high" },
+      { "skill": "RESTful APIs", "relevance": "high" },
+      { "skill": "Authentication", "relevance": "high" },
+      { "skill": "Microservices", "relevance": "medium" }
+    ],
+    "missingSkills": [
+      { "skill": "GraphQL", "importance": "low" },
+      { "skill": "Message Queues", "importance": "low" }
+    ],
+    "recommendations": [
+      "Excellent match! Your backend expertise is spot on",
+      "Highlight your API design and documentation experience",
+      "Mention any microservices architecture work",
+      "Consider learning GraphQL for bonus points"
+    ],
+    "analysis": {
+      "skillsMatch": 93,
+      "experienceMatch": 90,
+      "educationMatch": 90,
+      "overallFit": "Excellent",
+      "keyStrengths": [
+        "Strong Node.js and Express expertise",
+        "Database optimization experience",
+        "Authentication and security knowledge"
+      ],
+      "gapsToAddress": [
+        "GraphQL (nice to have)",
+        "Message queue systems"
+      ]
+    },
+    "matchedAt": "2024-02-21T10:00:00.000Z"
+  },
+  {
+    "_id": "907f1f77bcf86cd799439057",
+    "userId": "507f1f77bcf86cd799439012",
+    "resumeId": "607f1f77bcf86cd799439026",
+    "jobTitle": "Marketing Manager",
+    "jobDescription": "We're seeking a creative Marketing Manager to lead digital marketing...",
+    "company": "GrowthHackers Co",
+    "location": "Chicago, IL",
+    "matchScore": 88,
+    "matchedSkills": [
+      { "skill": "Digital Marketing", "relevance": "high" },
+      { "skill": "SEO/SEM", "relevance": "high" },
+      { "skill": "Google Analytics", "relevance": "high" },
+      { "skill": "Campaign Management", "relevance": "high" },
+      { "skill": "Data Analysis", "relevance": "high" },
+      { "skill": "Content Marketing", "relevance": "medium" }
+    ],
+    "missingSkills": [
+      { "skill": "Marketing Automation", "importance": "medium" },
+      { "skill": "A/B Testing", "importance": "low" }
+    ],
+    "recommendations": [
+      "Strong match! Your marketing experience aligns well",
+      "Add marketing automation platforms to your toolkit",
+      "Emphasize your ROI-focused achievements",
+      "Highlight any B2B SaaS marketing experience"
+    ],
+    "analysis": {
+      "skillsMatch": 86,
+      "experienceMatch": 90,
+      "educationMatch": 88,
+      "overallFit": "Good",
+      "keyStrengths": [
+        "5+ years digital marketing experience",
+        "Strong analytical and ROI focus",
+        "Multi-channel campaign expertise"
+      ],
+      "gapsToAddress": [
+        "Marketing automation tools",
+        "Advanced A/B testing experience"
+      ]
+    },
+    "matchedAt": "2024-02-19T13:15:00.000Z"
+  },
+  {
+    "_id": "907f1f77bcf86cd799439058",
+    "userId": "507f1f77bcf86cd799439011",
+    "resumeId": "607f1f77bcf86cd799439025",
+    "jobTitle": "DevOps Engineer",
+    "jobDescription": "We need a skilled DevOps Engineer to build scalable infrastructure...",
+    "company": "CloudScale Systems",
+    "location": "Boston, MA",
+    "matchScore": 78,
+    "matchedSkills": [
+      { "skill": "AWS", "relevance": "high" },
+      { "skill": "CI/CD", "relevance": "medium" },
+      { "skill": "Docker", "relevance": "medium" },
+      { "skill": "Infrastructure as Code", "relevance": "low" }
+    ],
+    "missingSkills": [
+      { "skill": "Terraform", "importance": "high" },
+      { "skill": "Kubernetes", "importance": "high" },
+      { "skill": "Monitoring (Prometheus)", "importance": "medium" },
+      { "skill": "Python Scripting", "importance": "medium" }
+    ],
+    "recommendations": [
+      "Moderate match - significant gaps in DevOps-specific tools",
+      "Consider learning Terraform and Kubernetes",
+      "Your AWS experience is valuable, but needs expansion",
+      "Add monitoring and observability skills"
+    ],
+    "analysis": {
+      "skillsMatch": 68,
+      "experienceMatch": 82,
+      "educationMatch": 85,
+      "overallFit": "Fair",
+      "keyStrengths": [
+        "AWS cloud experience",
+        "General system architecture knowledge",
+        "Problem-solving abilities"
+      ],
+      "gapsToAddress": [
+        "Infrastructure as Code (Terraform)",
+        "Container orchestration (Kubernetes)",
+        "Monitoring and observability",
+        "Scripting for automation"
+      ]
+    },
+    "matchedAt": "2024-02-20T15:30:00.000Z"
+  },
+  {
+    "_id": "907f1f77bcf86cd799439059",
+    "userId": "507f1f77bcf86cd799439013",
+    "resumeId": "607f1f77bcf86cd799439023",
+    "jobTitle": "Frontend Engineer",
+    "jobDescription": "Join our frontend team to build beautiful web applications...",
+    "company": "WebTech Innovations",
+    "location": "Seattle, WA",
+    "matchScore": 68,
+    "matchedSkills": [
+      { "skill": "JavaScript", "relevance": "high" },
+      { "skill": "HTML/CSS", "relevance": "high" },
+      { "skill": "Git", "relevance": "medium" }
+    ],
+    "missingSkills": [
+      { "skill": "React", "importance": "high" },
+      { "skill": "State Management", "importance": "high" },
+      { "skill": "Modern Build Tools", "importance": "high" },
+      { "skill": "Testing Libraries", "importance": "medium" }
+    ],
+    "recommendations": [
+      "This role requires frontend specialization you may not have",
+      "Consider focusing on data science roles that better match your background",
+      "If interested in frontend, complete React courses first",
+      "Your analytical skills could translate well with proper training"
+    ],
+    "analysis": {
+      "skillsMatch": 55,
+      "experienceMatch": 70,
+      "educationMatch": 80,
+      "overallFit": "Fair",
+      "keyStrengths": [
+        "Strong programming fundamentals",
+        "Problem-solving abilities",
+        "Quick learner"
+      ],
+      "gapsToAddress": [
+        "React and modern frontend frameworks",
+        "Component-based architecture",
+        "Frontend testing",
+        "State management patterns"
+      ]
+    },
+    "matchedAt": "2024-02-16T10:20:00.000Z"
+  },
+  {
+    "_id": "907f1f77bcf86cd799439060",
+    "userId": "507f1f77bcf86cd799439012",
+    "resumeId": "607f1f77bcf86cd799439022",
+    "jobTitle": "Senior Full Stack Developer",
+    "jobDescription": "We're looking for an experienced Full Stack Developer...",
+    "company": "TechCorp Solutions",
+    "location": "San Francisco, CA",
+    "matchScore": 72,
+    "matchedSkills": [
+      { "skill": "Project Management", "relevance": "medium" },
+      { "skill": "Technical Understanding", "relevance": "medium" },
+      { "skill": "Agile Methodology", "relevance": "medium" }
+    ],
+    "missingSkills": [
+      { "skill": "React", "importance": "high" },
+      { "skill": "Node.js", "importance": "high" },
+      { "skill": "Full-stack Development", "importance": "high" },
+      { "skill": "Database Management", "importance": "high" }
+    ],
+    "recommendations": [
+      "This technical role doesn't align with your PM background",
+      "Focus on product management roles that better suit your expertise",
+      "Your technical understanding is valuable in PM roles, not as developer",
+      "Consider technical PM or engineering manager roles instead"
+    ],
+    "analysis": {
+      "skillsMatch": 60,
+      "experienceMatch": 75,
+      "educationMatch": 85,
+      "overallFit": "Fair",
+      "keyStrengths": [
+        "Technical product understanding",
+        "Cross-functional collaboration",
+        "Project delivery experience"
+      ],
+      "gapsToAddress": [
+        "Hands-on coding experience",
+        "Full-stack development skills",
+        "Technical depth in specific languages"
+      ]
+    },
+    "matchedAt": "2024-02-17T14:10:00.000Z"
+  }
+]

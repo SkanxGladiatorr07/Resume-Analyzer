@@ -4,6 +4,9 @@ import MainLayout from './layouts/MainLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import PublicRoute from './components/PublicRoute'
 import Home from './pages/Home'
+import About from './pages/About'
+import Features from './pages/Features'
+import DemoGuide from './pages/DemoGuide'
 import DashboardEnhanced from './pages/DashboardEnhanced'
 import AnalyticsDashboard from './pages/AnalyticsDashboard'
 import Upload from './pages/Upload'
@@ -25,6 +28,9 @@ function App() {
           {/* Public routes with main layout */}
           <Route path="/" element={<MainLayout />}>
             <Route index element={<Home />} />
+            <Route path="about" element={<About />} />
+            <Route path="features" element={<Features />} />
+            <Route path="demo-guide" element={<DemoGuide />} />
           </Route>
 
           {/* Protected routes with main layout */}
