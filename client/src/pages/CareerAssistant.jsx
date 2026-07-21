@@ -102,7 +102,7 @@ const CareerAssistant = () => {
     setSuccess(null);
   };
 
-  const activeTool Data = tools.find(t => t.id === activeTool);
+  const activeToolData = tools.find(t => t.id === activeTool);
 
   return (
     <div className="min-h-screen bg-surface">
