@@ -11,8 +11,8 @@ export { default as Navbar } from './Navbar';
 export { default as Footer } from './Footer';
 
 // Feature Components
-export { BackendStatus } from './BackendStatus';
-export { FeatureSection } from './FeatureSection';
+export { default as BackendStatus } from './BackendStatus';
+export { default as FeatureSection } from './FeatureSection';
 export { ResumeUpload } from './ResumeUpload';
 export { ResumeList } from './ResumeList';
 export { ResumeCard } from './ResumeCard';
