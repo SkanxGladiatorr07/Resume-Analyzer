@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Card } from '../components/ui';
+import { ConfirmDialog } from '../components';
 import { resumeService } from '../services';
 
 const Upload = () => {
@@ -20,6 +21,13 @@ const Upload = () => {
   const [resumes, setResumes] = useState([]);
   const [isLoadingResumes, setIsLoadingResumes] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  
+  // Confirm dialog state
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    resumeId: null,
+    resumeName: '',
+  });
 
   // File validation constants
   const ACCEPTED_TYPES = ['.pdf', '.docx'];
@@ -220,21 +228,30 @@ const Upload = () => {
   };
 
   /**
-   * Handle resume delete
+   * Open delete confirmation dialog
    */
-  const handleDeleteResume = async (resumeId, fileName) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${fileName}"? This action cannot be undone.`
-    );
+  const handleDeleteClick = (resumeId, resumeName) => {
+    setConfirmDialog({
+      isOpen: true,
+      resumeId,
+      resumeName,
+    });
+  };
 
-    if (!confirmed) return;
+  /**
+   * Handle resume delete after confirmation
+   */
+  const handleDeleteResume = async () => {
+    const { resumeId, resumeName } = confirmDialog;
 
     setDeletingId(resumeId);
+    setConfirmDialog({ isOpen: false, resumeId: null, resumeName: '' });
+
     try {
       await resumeService.deleteResume(resumeId);
       
       // Show success message
-      setSuccessMessage(`${fileName} deleted successfully!`);
+      setSuccessMessage(`${resumeName} deleted successfully!`);
       
       // Refresh resume list
       await fetchResumes();
@@ -248,6 +265,16 @@ const Upload = () => {
       const errorMsg = error.response?.data?.message || 'Failed to delete resume. Please try again.';
       setErrorMessage(errorMsg);
     } finally {
+      setDeletingId(null);
+    }
+  };
+
+  /**
+   * Cancel delete operation
+   */
+  const handleCancelDelete = () => {
+    setConfirmDialog({ isOpen: false, resumeId: null, resumeName: '' });
+  };
       setDeletingId(null);
     }
   };
@@ -620,7 +647,7 @@ const Upload = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
-                          onClick={() => handleDeleteResume(resume._id, resume.originalName)}
+                          onClick={() => handleDeleteClick(resume._id, resume.originalName)}
                           disabled={deletingId === resume._id}
                           className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
@@ -673,7 +700,7 @@ const Upload = () => {
                     </p>
                   </div>
                   <button
-                    onClick={() => handleDeleteResume(resume._id, resume.originalName)}
+                    onClick={() => handleDeleteClick(resume._id, resume.originalName)}
                     disabled={deletingId === resume._id}
                     className="w-full px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -715,6 +742,18 @@ const Upload = () => {
           </button>
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title="Delete Resume"
+        message={`Are you sure you want to delete "${confirmDialog.resumeName}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDeleteResume}
+        onCancel={handleCancelDelete}
+        isLoading={deletingId !== null}
+      />
     </div>
   );
 };
