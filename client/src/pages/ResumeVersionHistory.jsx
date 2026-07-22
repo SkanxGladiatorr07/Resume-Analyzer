@@ -240,7 +240,7 @@ const ResumeVersionHistory = () => {
                 <div className="flex items-center space-x-2 ml-4">
                   <Button
                     variant="ghost"
-                    size="small"
+                    size="sm"
                     onClick={() => navigate(`/resume/${id}/version/${version.versionNumber}`)}
                     title="View this version"
                   >

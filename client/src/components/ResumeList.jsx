@@ -126,7 +126,7 @@ export const ResumeList = ({ resumes, onDelete, isLoading }) => {
               {/* Analyze Button (Coming Soon) */}
               <Button
                 variant="primary"
-                size="small"
+                size="sm"
                 disabled
                 title="Coming Soon"
               >
@@ -149,7 +149,7 @@ export const ResumeList = ({ resumes, onDelete, isLoading }) => {
               {/* Delete Button */}
               <Button
                 variant="danger"
-                size="small"
+                size="sm"
                 onClick={() => handleDelete(resume._id, resume.originalName)}
                 disabled={deletingId === resume._id}
               >

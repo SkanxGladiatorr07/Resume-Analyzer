@@ -15,8 +15,8 @@ const analysisService = {
   generateAnalysis: async (resumeId, force = false) => {
     try {
       const url = force 
-        ? `/api/analysis/${resumeId}?force=true`
-        : `/api/analysis/${resumeId}`;
+        ? `/analysis/${resumeId}?force=true`
+        : `/analysis/${resumeId}`;
       
       const response = await apiClient.post(url);
       return response.data;
@@ -32,7 +32,7 @@ const analysisService = {
    */
   getAnalysis: async (resumeId) => {
     try {
-      const response = await apiClient.get(`/api/analysis/${resumeId}`);
+      const response = await apiClient.get(`/analysis/${resumeId}`);
       return response.data;
     } catch (error) {
       throw error;
@@ -46,7 +46,7 @@ const analysisService = {
    */
   getAnalysisStatus: async (resumeId) => {
     try {
-      const response = await apiClient.get(`/api/analysis/${resumeId}/status`);
+      const response = await apiClient.get(`/analysis/${resumeId}/status`);
       return response.data;
     } catch (error) {
       throw error;
@@ -60,7 +60,7 @@ const analysisService = {
    */
   retryAnalysis: async (resumeId) => {
     try {
-      const response = await apiClient.post(`/api/analysis/${resumeId}/retry`);
+      const response = await apiClient.post(`/analysis/${resumeId}/retry`);
       return response.data;
     } catch (error) {
       throw error;
@@ -74,7 +74,7 @@ const analysisService = {
    */
   deleteAnalysis: async (resumeId) => {
     try {
-      const response = await apiClient.delete(`/api/analysis/${resumeId}`);
+      const response = await apiClient.delete(`/analysis/${resumeId}`);
       return response.data;
     } catch (error) {
       throw error;
@@ -88,7 +88,7 @@ const analysisService = {
    */
   checkAnalysisExists: async (resumeId) => {
     try {
-      const response = await apiClient.get(`/api/analysis/${resumeId}/exists`);
+      const response = await apiClient.get(`/analysis/${resumeId}/exists`);
       return response.data;
     } catch (error) {
       throw error;

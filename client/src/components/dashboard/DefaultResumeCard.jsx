@@ -47,7 +47,7 @@ export const DefaultResumeCard = ({ resume, onRemoveDefault }) => {
         </h2>
         <Button
           variant="ghost"
-          size="small"
+          size="sm"
           onClick={onRemoveDefault}
           title="Remove default status"
         >
@@ -106,7 +106,7 @@ export const DefaultResumeCard = ({ resume, onRemoveDefault }) => {
           <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0 ml-4">
             <Button
               variant="secondary"
-              size="small"
+              size="sm"
               onClick={() => navigate(`/resume/${resume._id}`)}
             >
               <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,7 +118,7 @@ export const DefaultResumeCard = ({ resume, onRemoveDefault }) => {
             {resume.parsingStatus === 'completed' && (
               <Button
                 variant="primary"
-                size="small"
+                size="sm"
                 onClick={() => navigate(`/analysis/${resume._id}`)}
               >
                 <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

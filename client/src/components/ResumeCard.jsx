@@ -179,7 +179,7 @@ export const ResumeCard = ({
           <div className="relative">
             <Button
               variant="ghost"
-              size="small"
+              size="sm"
               onClick={() => setShowActions(!showActions)}
               title="More actions"
             >
@@ -248,7 +248,7 @@ export const ResumeCard = ({
           {resume.parsingStatus === 'completed' && (
             <Button
               variant="secondary"
-              size="small"
+              size="sm"
               onClick={() => onViewDetails(resume._id)}
               title="View parsed resume details"
             >
@@ -279,7 +279,7 @@ export const ResumeCard = ({
           {resume.parsingStatus === 'completed' && (
             <Button
               variant="primary"
-              size="small"
+              size="sm"
               onClick={() => window.location.href = `/analysis/${resume._id}`}
               title="View AI Analysis"
             >
@@ -303,7 +303,7 @@ export const ResumeCard = ({
           {/* Delete Button */}
           <Button
             variant="danger"
-            size="small"
+            size="sm"
             onClick={() => onDelete(resume._id, resume.originalName)}
             disabled={isDeleting}
           >

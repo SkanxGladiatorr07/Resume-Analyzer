@@ -12,7 +12,7 @@ const authService = {
    * @returns {Promise} Response with user and token
    */
   register: async (userData) => {
-    const response = await apiClient.post('/api/auth/register', userData);
+    const response = await apiClient.post('/auth/register', userData);
     return response.data;
   },
 
@@ -22,7 +22,7 @@ const authService = {
    * @returns {Promise} Response with user and token
    */
   login: async (credentials) => {
-    const response = await apiClient.post('/api/auth/login', credentials);
+    const response = await apiClient.post('/auth/login', credentials);
     return response.data;
   },
 
@@ -31,7 +31,7 @@ const authService = {
    * @returns {Promise} Response with user data
    */
   getProfile: async () => {
-    const response = await apiClient.get('/api/auth/profile');
+    const response = await apiClient.get('/auth/profile');
     return response.data;
   },
 

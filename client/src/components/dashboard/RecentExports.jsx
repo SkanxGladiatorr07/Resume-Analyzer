@@ -118,7 +118,7 @@ export const RecentExports = ({ exports, onViewAll }) => {
             {exportItem.status === 'success' && (
               <Button
                 variant="ghost"
-                size="small"
+                size="sm"
                 title="Download PDF"
                 className="flex-shrink-0"
               >

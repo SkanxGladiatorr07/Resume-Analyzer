@@ -260,7 +260,7 @@ const Dashboard = () => {
                 <p className="text-sm font-medium text-gray-600">Quick Actions</p>
                 <Button
                   variant="primary"
-                  size="small"
+                  size="sm"
                   onClick={() => setShowUploadSection(!showUploadSection)}
                   className="mt-1"
                 >

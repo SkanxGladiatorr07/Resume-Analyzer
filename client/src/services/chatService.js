@@ -12,7 +12,7 @@ const chatService = {
    * @returns {Promise} API response
    */
   createSession: async (resumeId) => {
-    const response = await apiClient.post('/api/chat/session', { resumeId });
+    const response = await apiClient.post('/chat/session', { resumeId });
     return response.data;
   },
 
@@ -22,7 +22,7 @@ const chatService = {
    * @returns {Promise} API response
    */
   getSessions: async (params = {}) => {
-    const response = await apiClient.get('/api/chat/sessions', { params });
+    const response = await apiClient.get('/chat/sessions', { params });
     return response.data;
   },
 
@@ -33,7 +33,7 @@ const chatService = {
    * @returns {Promise} API response
    */
   getSession: async (sessionId, params = {}) => {
-    const response = await apiClient.get(`/api/chat/session/${sessionId}`, { params });
+    const response = await apiClient.get(`/chat/session/${sessionId}`, { params });
     return response.data;
   },
 
@@ -44,7 +44,7 @@ const chatService = {
    * @returns {Promise} API response
    */
   sendMessage: async (sessionId, message) => {
-    const response = await apiClient.post(`/api/chat/${sessionId}`, { message });
+    const response = await apiClient.post(`/chat/${sessionId}`, { message });
     return response.data;
   },
 
@@ -55,7 +55,7 @@ const chatService = {
    * @returns {Promise} API response
    */
   deleteSession: async (sessionId, hard = false) => {
-    const response = await apiClient.delete(`/api/chat/session/${sessionId}`, {
+    const response = await apiClient.delete(`/chat/session/${sessionId}`, {
       params: { hard },
     });
     return response.data;
@@ -68,7 +68,7 @@ const chatService = {
    * @returns {Promise} API response
    */
   updateSessionTitle: async (sessionId, title) => {
-    const response = await apiClient.patch(`/api/chat/session/${sessionId}/title`, { title });
+    const response = await apiClient.patch(`/chat/session/${sessionId}/title`, { title });
     return response.data;
   },
 
@@ -78,7 +78,7 @@ const chatService = {
    * @returns {Promise} API response
    */
   archiveSession: async (sessionId) => {
-    const response = await apiClient.patch(`/api/chat/session/${sessionId}/archive`);
+    const response = await apiClient.patch(`/chat/session/${sessionId}/archive`);
     return response.data;
   },
 
@@ -89,7 +89,7 @@ const chatService = {
    * @returns {Promise} API response
    */
   searchMessages: async (sessionId, query) => {
-    const response = await apiClient.get(`/api/chat/session/${sessionId}/search`, {
+    const response = await apiClient.get(`/chat/session/${sessionId}/search`, {
       params: { q: query },
     });
     return response.data;
@@ -101,7 +101,7 @@ const chatService = {
    * @returns {Promise} API response
    */
   getStatistics: async (sessionId) => {
-    const response = await apiClient.get(`/api/chat/${sessionId}/stats`);
+    const response = await apiClient.get(`/chat/${sessionId}/stats`);
     return response.data;
   },
 };

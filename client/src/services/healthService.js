@@ -12,7 +12,7 @@ const healthService = {
    */
   checkHealth: async () => {
     try {
-      const response = await apiClient.get('/api/health');
+      const response = await apiClient.get('/health');
       return {
         success: true,
         data: response.data,
