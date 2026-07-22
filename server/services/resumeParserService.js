@@ -5,13 +5,11 @@
 
 import fs from 'fs';
 import mammoth from 'mammoth';
+import { createRequire } from 'module';
 
-// Dynamic import for pdf-parse (CommonJS module)
-let pdfParse;
-(async () => {
-  const pdfModule = await import('pdf-parse');
-  pdfParse = pdfModule.default;
-})();
+// Import pdf-parse using createRequire for CommonJS compatibility
+const require = createRequire(import.meta.url);
+const pdfParse = require('pdf-parse');
 
 /**
  * Parse resume based on file type
@@ -48,12 +46,6 @@ export const parseResume = async (filePath, fileType) => {
  */
 const parsePDF = async (filePath) => {
   try {
-    // Ensure pdfParse is loaded
-    if (!pdfParse) {
-      const pdfModule = await import('pdf-parse');
-      pdfParse = pdfModule.default;
-    }
-
     // Check if file exists
     if (!fs.existsSync(filePath)) {
       throw new Error('PDF file not found');
