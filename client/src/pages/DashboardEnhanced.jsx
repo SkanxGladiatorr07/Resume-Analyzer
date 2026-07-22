@@ -420,7 +420,7 @@ const DashboardEnhanced = () => {
             <h2 className="text-xl font-semibold text-gray-900">Upload New Resume</h2>
             <Button
               variant="ghost"
-              size="small"
+              size="sm"
               onClick={() => setShowUploadSection(false)}
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

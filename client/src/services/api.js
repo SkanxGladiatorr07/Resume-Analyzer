@@ -2,7 +2,7 @@ import axios from 'axios';
 import authService from './authService';
 
 // Get base URL from environment variables
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
 
 // Create Axios instance with default configuration
 const apiClient = axios.create({

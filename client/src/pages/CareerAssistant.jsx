@@ -27,7 +27,7 @@ const CareerAssistant = () => {
 
   const loadResumes = async () => {
     try {
-      const response = await resumeService.getAllResumes();
+      const response = await resumeService.getResumes();
       if (response.success && response.data) {
         setResumes(response.data);
         if (response.data.length > 0) {
