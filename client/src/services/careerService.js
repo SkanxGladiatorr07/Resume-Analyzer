@@ -13,7 +13,7 @@ const careerService = {
    */
   rewriteContent: async (data) => {
     try {
-      const response = await apiClient.post('/api/ai/rewrite', data);
+      const response = await apiClient.post('/ai/rewrite', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -27,7 +27,7 @@ const careerService = {
    */
   generateStar: async (data) => {
     try {
-      const response = await apiClient.post('/api/ai/star', data);
+      const response = await apiClient.post('/ai/star', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -41,7 +41,7 @@ const careerService = {
    */
   generateInterviewQuestions: async (data) => {
     try {
-      const response = await apiClient.post('/api/ai/interview', data);
+      const response = await apiClient.post('/ai/interview', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -55,7 +55,7 @@ const careerService = {
    */
   getProjectSuggestions: async (data) => {
     try {
-      const response = await apiClient.post('/api/ai/projects', data);
+      const response = await apiClient.post('/ai/projects', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -69,7 +69,7 @@ const careerService = {
    */
   generateLearningRoadmap: async (data) => {
     try {
-      const response = await apiClient.post('/api/ai/roadmap/learning', data);
+      const response = await apiClient.post('/ai/roadmap/learning', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -83,7 +83,7 @@ const careerService = {
    */
   generateCareerRoadmap: async (data) => {
     try {
-      const response = await apiClient.post('/api/ai/roadmap/career', data);
+      const response = await apiClient.post('/ai/roadmap/career', data);
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -96,7 +96,7 @@ const careerService = {
    */
   getRewriteConfig: async () => {
     try {
-      const response = await apiClient.get('/api/ai/rewrite/config');
+      const response = await apiClient.get('/ai/rewrite/config');
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -109,7 +109,7 @@ const careerService = {
    */
   getStarConfig: async () => {
     try {
-      const response = await apiClient.get('/api/ai/star/config');
+      const response = await apiClient.get('/ai/star/config');
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
