@@ -5,22 +5,37 @@
 
 import { useState } from 'react';
 import { Button, Card } from './ui';
+import { ConfirmDialog } from './';
 import { formatFileSize, formatDate } from '../services/resumeService';
 
 export const ResumeList = ({ resumes, onDelete, isLoading }) => {
   const [deletingId, setDeletingId] = useState(null);
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    resumeId: null,
+    resumeName: '',
+  });
 
   /**
-   * Handle delete with confirmation
+   * Open delete confirmation dialog
    */
-  const handleDelete = async (resumeId, fileName) => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${fileName}"? This action cannot be undone.`
-    );
+  const handleDeleteClick = (resumeId, resumeName) => {
+    setConfirmDialog({
+      isOpen: true,
+      resumeId,
+      resumeName,
+    });
+  };
 
-    if (!confirmed) return;
-
+  /**
+   * Handle delete after confirmation
+   */
+  const handleDelete = async () => {
+    const { resumeId } = confirmDialog;
+    
     setDeletingId(resumeId);
+    setConfirmDialog({ isOpen: false, resumeId: null, resumeName: '' });
+
     try {
       await onDelete(resumeId);
     } catch (error) {
@@ -29,6 +44,13 @@ export const ResumeList = ({ resumes, onDelete, isLoading }) => {
       setDeletingId(null);
     }
   };
+
+  /**
+   * Cancel delete operation
+   */
+  const handleCancelDelete = () => {
+    setConfirmDialog({ isOpen: false, resumeId: null, resumeName: '' });
+  };  };
 
   /**
    * Get file icon based on type
@@ -150,7 +172,7 @@ export const ResumeList = ({ resumes, onDelete, isLoading }) => {
               <Button
                 variant="danger"
                 size="sm"
-                onClick={() => handleDelete(resume._id, resume.originalName)}
+                onClick={() => handleDeleteClick(resume._id, resume.originalName)}
                 disabled={deletingId === resume._id}
               >
                 {deletingId === resume._id ? (
@@ -181,6 +203,18 @@ export const ResumeList = ({ resumes, onDelete, isLoading }) => {
           </div>
         </Card>
       ))}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        title="Delete Resume"
+        message={`Are you sure you want to delete "${confirmDialog.resumeName}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDelete}
+        onCancel={handleCancelDelete}
+        isLoading={deletingId !== null}
+      />
     </div>
   );
 };
