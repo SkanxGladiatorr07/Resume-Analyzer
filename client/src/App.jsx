@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import MainLayout from './layouts/MainLayout'
+import NavbarOnlyLayout from './layouts/NavbarOnlyLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import PublicRoute from './components/PublicRoute'
 import Home from './pages/Home'
@@ -117,15 +118,17 @@ function App() {
             <Route index element={<JobMatchHistory />} />
           </Route>
 
-          {/* Resume Chat page - protected route without main layout (full screen) */}
+          {/* Resume Chat page - protected route with navbar only (no footer) */}
           <Route
             path="/chat"
             element={
               <ProtectedRoute>
-                <ResumeChat />
+                <NavbarOnlyLayout />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route index element={<ResumeChat />} />
+          </Route>
 
           {/* Career Assistant page - protected route with main layout */}
           <Route

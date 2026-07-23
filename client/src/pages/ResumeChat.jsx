@@ -305,7 +305,7 @@ const ResumeChat = () => {
   };
 
   return (
-    <div className="flex h-screen bg-surface">
+    <div className="flex h-full bg-surface">
       {/* Left Sidebar: Chat Sessions */}
       <aside className={`${
         showSidebar ? 'w-80' : 'w-0'
