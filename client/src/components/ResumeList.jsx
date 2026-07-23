@@ -50,7 +50,7 @@ export const ResumeList = ({ resumes, onDelete, isLoading }) => {
    */
   const handleCancelDelete = () => {
     setConfirmDialog({ isOpen: false, resumeId: null, resumeName: '' });
-  };  };
+  };
 
   /**
    * Get file icon based on type

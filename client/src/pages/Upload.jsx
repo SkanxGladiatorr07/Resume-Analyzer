@@ -272,11 +272,11 @@ const Upload = () => {
   /**
    * Cancel delete operation
    */
+  /**
+   * Cancel delete operation
+   */
   const handleCancelDelete = () => {
     setConfirmDialog({ isOpen: false, resumeId: null, resumeName: '' });
-  };
-      setDeletingId(null);
-    }
   };
 
   /**
