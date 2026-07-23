@@ -5,11 +5,23 @@
 
 import fs from 'fs';
 import mammoth from 'mammoth';
-import { createRequire } from 'module';
 
-// Import pdf-parse using createRequire for CommonJS compatibility
-const require = createRequire(import.meta.url);
-const pdfParse = require('pdf-parse');
+// Dynamic import for pdf-parse
+let pdfParse;
+
+async function initPdfParse() {
+  if (!pdfParse) {
+    try {
+      const module = await import('pdf-parse');
+      // pdf-parse v2.x exports as PDFParse (capital letters)
+      pdfParse = module.PDFParse || module.default || module;
+    } catch (err) {
+      console.error('Failed to import pdf-parse:', err);
+      throw new Error('pdf-parse module not available');
+    }
+  }
+  return pdfParse;
+}
 
 /**
  * Parse resume based on file type
@@ -51,11 +63,14 @@ const parsePDF = async (filePath) => {
       throw new Error('PDF file not found');
     }
 
+    // Initialize pdf-parse
+    const parser = await initPdfParse();
+
     // Read the PDF file
     const dataBuffer = fs.readFileSync(filePath);
 
     // Parse PDF
-    const data = await pdfParse(dataBuffer);
+    const data = await parser(dataBuffer);
 
     // Return extracted text
     return data.text || '';
