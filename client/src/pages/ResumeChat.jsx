@@ -313,7 +313,10 @@ const ResumeChat = () => {
         <div className="p-md border-b border-outline-variant flex justify-between items-center">
           <span className="text-label-caps font-label-caps uppercase tracking-wider text-on-surface-variant">Sessions</span>
           <button 
-            onClick={() => setShowNewChatModal(true)}
+            onClick={() => {
+              setShowNewChatModal(true);
+              setError(null);
+            }}
             className="flex items-center gap-xs text-primary hover:bg-primary-container/10 p-1 rounded transition-colors"
           >
             <MaterialIcon className="text-md">add_circle</MaterialIcon>
@@ -442,7 +445,10 @@ const ResumeChat = () => {
                   experience, or get insights to improve your resume.
                 </p>
                 <button
-                  onClick={() => setShowNewChatModal(true)}
+                  onClick={() => {
+                    setShowNewChatModal(true);
+                    setError(null);
+                  }}
                   className="bg-primary hover:bg-primary-container text-on-primary py-sm px-xl rounded-lg font-bold transition-colors"
                 >
                   Start New Chat
