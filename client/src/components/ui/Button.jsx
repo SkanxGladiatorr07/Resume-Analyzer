@@ -31,8 +31,8 @@ const Button = ({
     primary: 'bg-blue-600 text-white border-2 border-white hover:bg-blue-700 focus:ring-blue-500 active:bg-blue-800 shadow-lg hover:shadow-xl',
     secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-500 active:bg-gray-400',
     outline: 'border-2 border-blue-600 bg-white text-blue-600 hover:bg-blue-50 focus:ring-blue-500 active:bg-blue-100',
-    danger: 'bg-error-600 text-white hover:bg-error-700 focus:ring-error-500 active:bg-error-800 shadow-sm hover:shadow-md',
-    success: 'bg-success-600 text-white hover:bg-success-700 focus:ring-success-500 active:bg-success-800 shadow-sm hover:shadow-md',
+    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 active:bg-red-800 shadow-sm hover:shadow-md',
+    success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 active:bg-green-800 shadow-sm hover:shadow-md',
     ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-400 active:bg-gray-200',
     link: 'text-primary-600 hover:text-primary-700 hover:underline focus:ring-primary-500 p-0',
   };

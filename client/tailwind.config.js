@@ -63,9 +63,11 @@ export default {
         },
         green: {
           600: '#006e2d',
+          700: '#005320',
         },
         red: {
           600: '#ba1a1a',
+          700: '#93000a',
         },
       },
       borderRadius: {
