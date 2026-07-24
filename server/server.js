@@ -76,14 +76,22 @@ const startServer = async () => {
 
     // Handle unhandled promise rejections
     process.on('unhandledRejection', (reason, promise) => {
-      console.error('\n❌ UNHANDLED REJECTION! Shutting down...');
+      console.error('\n❌ UNHANDLED REJECTION!');
       console.error('='.repeat(60));
       console.error('Reason:', reason);
       console.error('Promise:', promise);
       console.error('='.repeat(60));
-      server.close(() => {
-        process.exit(1);
-      });
+      
+      // In development, log the error but don't shut down
+      // This prevents background jobs from crashing the server
+      if (process.env.NODE_ENV === 'production') {
+        console.error('⚠️  Shutting down server due to unhandled rejection...');
+        server.close(() => {
+          process.exit(1);
+        });
+      } else {
+        console.error('⚠️  Server continuing in development mode. Please fix this error!');
+      }
     });
 
   } catch (error) {

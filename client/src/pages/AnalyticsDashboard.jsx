@@ -87,13 +87,27 @@ const AnalyticsDashboard = () => {
       setIsChartsLoading(true);
       setError(null);
 
-      // Fetch overview first (faster response)
-      const overviewRes = await dashboardService.getDashboardOverview();
-      setOverview(overviewRes.data);
+      // Fetch complete dashboard data (includes overview, latest items, etc.)
+      const dashboardRes = await dashboardService.getDashboard();
+      
+      // Extract overview from dashboard data
+      const dashboardData = dashboardRes.data;
+      const overviewData = {
+        totalResumes: dashboardData.overview?.totalResumes || 0,
+        totalAnalyses: dashboardData.overview?.totalAnalyses || 0,
+        totalJobMatches: dashboardData.overview?.totalJobMatches || 0,
+        avgAtsScore: dashboardData.overview?.averageATSScore || 0,
+        avgCompletenessScore: dashboardData.overview?.averageMatchScore || 0,
+        latestResume: dashboardData.latest?.resume || null,
+        latestAnalysis: dashboardData.latest?.analysis || null,
+        latestJobMatch: dashboardData.latest?.jobMatch || null,
+      };
+      
+      setOverview(overviewData);
       setIsLoading(false);
 
       // Transform overview data to activity timeline
-      const activities = transformToActivities(overviewRes.data);
+      const activities = transformToActivities(overviewData);
       setRecentActivity(activities);
 
       // Fetch chart data (can be slower)
