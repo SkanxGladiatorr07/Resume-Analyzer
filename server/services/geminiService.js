@@ -153,6 +153,8 @@ export const generateContent = async (prompt, expectJSON = true) => {
     } catch (error) {
       lastError = error;
       console.error(`❌ Gemini AI error on attempt ${attempt + 1}:`, error.message);
+      console.error(`   Error type: ${error.constructor.name}`);
+      console.error(`   Full error:`, error);
       
       // If this is not the last attempt, wait before retrying
       if (attempt < maxRetries) {
