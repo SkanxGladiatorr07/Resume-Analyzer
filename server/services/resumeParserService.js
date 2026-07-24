@@ -64,16 +64,34 @@ const parsePDF = async (filePath) => {
     }
 
     // Initialize pdf-parse
-    const parser = await initPdfParse();
+    const PDFParser = await initPdfParse();
 
-    // Read the PDF file
+    // Read the PDF file as Buffer
     const dataBuffer = fs.readFileSync(filePath);
+    
+    // Convert Buffer to Uint8Array (required by pdf-parse v2)
+    const uint8Array = new Uint8Array(dataBuffer);
 
-    // Parse PDF
-    const data = await parser(dataBuffer);
+    // Parse PDF - instantiate and load the PDF
+    const parser = new PDFParser(uint8Array);
+    await parser.load();
+    
+    // Extract text - getText() returns an array of page texts or a complex object
+    const textResult = await parser.getText();
+    
+    // Convert result to string
+    let text = '';
+    if (typeof textResult === 'string') {
+      text = textResult;
+    } else if (Array.isArray(textResult)) {
+      text = textResult.join('\n\n');
+    } else if (textResult && typeof textResult === 'object') {
+      // Handle object with text property or pages
+      text = textResult.text || textResult.content || JSON.stringify(textResult);
+    }
 
     // Return extracted text
-    return data.text || '';
+    return text || '';
   } catch (error) {
     console.error('PDF parsing error:', error);
     throw new Error(`PDF parsing failed: ${error.message}`);
