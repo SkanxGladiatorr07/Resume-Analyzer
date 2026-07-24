@@ -152,10 +152,19 @@ export const ResumeDetails = () => {
             </div>
           </div>
           <div className="flex gap-sm flex-wrap">
-            <button className="px-lg py-sm border border-outline text-primary font-label-caps rounded-lg hover:bg-surface-container-low transition-colors">
+            <button 
+              onClick={() => navigate(`/ai/rewrite?resumeId=${id}`)}
+              className="px-lg py-sm border border-outline text-primary font-label-caps rounded-lg hover:bg-surface-container-low transition-colors"
+            >
               Edit Content
             </button>
-            <button className="px-lg py-sm bg-primary-container text-on-primary font-label-caps rounded-lg hover:opacity-90 transition-opacity">
+            <button 
+              onClick={() => {
+                // TODO: Implement PDF export functionality
+                alert('PDF export feature coming soon!');
+              }}
+              className="px-lg py-sm bg-primary-container text-on-primary font-label-caps rounded-lg hover:opacity-90 transition-opacity"
+            >
               Export PDF
             </button>
           </div>

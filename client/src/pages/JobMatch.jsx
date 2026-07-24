@@ -52,11 +52,16 @@ const JobMatch = () => {
     try {
       setLoadingResumes(true);
       const response = await getResumes();
-      // Filter only completed resumes
-      const completedResumes = response.data.data.filter(
+      // Filter only completed resumes (parsing completed)
+      const completedResumes = (response.data?.data || response.data || []).filter(
         (resume) => resume.parsingStatus === 'completed'
       );
       setResumes(completedResumes);
+      
+      if (completedResumes.length === 0) {
+        console.log('No completed resumes found');
+      }
+      
       setError(null);
     } catch (err) {
       setError('Failed to load resumes. Please try again.');
@@ -70,11 +75,12 @@ const JobMatch = () => {
     try {
       setLoadingJobs(true);
       const response = await getJobDescriptions();
-      setJobDescriptions(response.data.data);
+      setJobDescriptions(response.data?.data || response.data || []);
       setError(null);
     } catch (err) {
-      setError('Failed to load job descriptions. Please try again.');
-      console.error('Error fetching job descriptions:', err);
+      console.log('Note: No previous job descriptions found. You can create a new one.');
+      setJobDescriptions([]);
+      // Don't set error for empty job descriptions
     } finally {
       setLoadingJobs(false);
     }
