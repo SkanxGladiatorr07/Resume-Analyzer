@@ -1326,50 +1326,250 @@ const CareerTool = ({
   setSuccess,
   clearMessages,
 }) => {
+  const [currentRole, setCurrentRole] = useState('');
+  const [targetCareerRole, setTargetCareerRole] = useState('');
+  const [yearsOfExperience, setYearsOfExperience] = useState('');
+  const [result, setResult] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    clearMessages();
+
+    if (!currentRole.trim()) {
+      setError('Please enter your current role');
+      return;
+    }
+
+    if (!targetCareerRole.trim()) {
+      setError('Please enter your target career role');
+      return;
+    }
+
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const response = await careerService.generateCareerRoadmap({
+        currentRole: currentRole.trim(),
+        targetCareerRole: targetCareerRole.trim(),
+        yearsOfExperience: parseInt(yearsOfExperience) || 0,
+      });
+
+      console.log('Career Roadmap Response:', response);
+
+      if (response.success && response.data) {
+        setResult(response.data);
+        setSuccess('Career roadmap generated successfully!');
+      } else {
+        setError(response.message || 'Failed to generate career roadmap');
+      }
+    } catch (err) {
+      console.error('Career Roadmap Error:', err);
+      setError(err.message || 'Failed to generate career roadmap. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div>
-      <div className="bg-tertiary-container/10 border border-tertiary-container rounded-lg p-lg mb-lg">
-        <p className="text-body-sm text-on-surface flex items-center gap-sm">
-          <MaterialIcon className="text-tertiary">construction</MaterialIcon>
-          This tool is coming soon! Backend API endpoint needs to be implemented.
-        </p>
-      </div>
-
-      <div className="space-y-lg opacity-50 pointer-events-none">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-xl">
+      {/* Input Side */}
+      <div className="space-y-lg">
         <div>
-          <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Current Role</label>
+          <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">
+            Current Role <span className="text-error">*</span>
+          </label>
           <input
             type="text"
-            placeholder="e.g., Software Engineer"
-            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-body-base"
+            value={currentRole}
+            onChange={(e) => setCurrentRole(e.target.value)}
+            placeholder="e.g., Software Engineer, Product Manager..."
+            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-body-base focus:ring-1 focus:ring-primary focus:border-primary"
+            disabled={loading}
           />
         </div>
 
         <div>
-          <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Target Role</label>
+          <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">
+            Target Role <span className="text-error">*</span>
+          </label>
           <input
             type="text"
-            placeholder="e.g., Engineering Manager"
-            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-body-base"
+            value={targetCareerRole}
+            onChange={(e) => setTargetCareerRole(e.target.value)}
+            placeholder="e.g., Engineering Manager, VP of Engineering..."
+            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-body-base focus:ring-1 focus:ring-primary focus:border-primary"
+            disabled={loading}
           />
         </div>
 
         <div>
-          <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Years of Experience</label>
+          <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">
+            Years of Experience
+          </label>
           <input
             type="number"
+            value={yearsOfExperience}
+            onChange={(e) => setYearsOfExperience(e.target.value)}
             placeholder="e.g., 5"
-            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-body-base"
+            min="0"
+            max="50"
+            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-body-base focus:ring-1 focus:ring-primary focus:border-primary"
+            disabled={loading}
           />
+          <p className="text-label-caps text-on-surface-variant mt-xs">
+            Your total years of professional experience
+          </p>
         </div>
 
         <button
-          type="button"
-          disabled
-          className="w-full py-md px-lg bg-surface-container text-on-surface-variant rounded-lg cursor-not-allowed font-bold"
+          onClick={handleSubmit}
+          disabled={loading || !currentRole.trim() || !targetCareerRole.trim()}
+          className="w-full py-md px-lg bg-primary text-on-primary rounded-lg hover:bg-primary-container disabled:bg-surface-container disabled:text-on-surface-variant disabled:cursor-not-allowed transition-colors font-bold"
         >
-          Generate Career Roadmap
+          {loading ? 'Generating Roadmap...' : 'Generate Career Roadmap'}
         </button>
+      </div>
+
+      {/* Output Side */}
+      <div>
+        {result ? (
+          <div className="space-y-lg">
+            {/* Overview */}
+            {result.roadmap?.overview && (
+              <div className="bg-secondary-container/20 rounded-lg p-lg border border-secondary-container">
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-md flex items-center gap-sm">
+                  <MaterialIcon className="text-secondary">trending_up</MaterialIcon>
+                  Career Progression Overview
+                </h3>
+                <p className="text-body-base text-on-surface">{result.roadmap.overview}</p>
+                {result.roadmap.estimatedTimeline && (
+                  <div className="mt-md flex items-center gap-sm text-body-sm text-on-surface-variant">
+                    <MaterialIcon className="text-sm">schedule</MaterialIcon>
+                    <span>Timeline: {result.roadmap.estimatedTimeline}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Phases */}
+            {result.roadmap?.phases && Array.isArray(result.roadmap.phases) && result.roadmap.phases.length > 0 ? (
+              <div>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-md flex items-center gap-sm">
+                  <MaterialIcon className="text-secondary">stairs</MaterialIcon>
+                  Career Stages
+                </h3>
+                <div className="space-y-md">
+                  {result.roadmap.phases.map((phase, index) => (
+                    <div
+                      key={index}
+                      className="bg-surface-container-low rounded-lg p-lg border border-outline-variant"
+                    >
+                      <div className="flex items-start gap-md mb-sm">
+                        <div className="w-8 h-8 bg-secondary text-on-secondary rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                          {index + 1}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-headline-sm text-headline-sm text-on-surface mb-xs">
+                            {phase.name || phase.phase || `Stage ${index + 1}`}
+                          </h4>
+                          {phase.duration && (
+                            <p className="text-label-caps text-on-surface-variant mb-sm">
+                              Duration: {phase.duration}
+                            </p>
+                          )}
+                          {phase.description && (
+                            <p className="text-body-base text-on-surface mb-md">
+                              {phase.description}
+                            </p>
+                          )}
+
+                          {/* Skills to Develop */}
+                          {phase.skillsToLearn && Array.isArray(phase.skillsToLearn) && phase.skillsToLearn.length > 0 && (
+                            <div className="mb-md">
+                              <p className="text-label-caps text-on-surface-variant mb-xs">
+                                Skills to Develop:
+                              </p>
+                              <div className="flex flex-wrap gap-xs">
+                                {phase.skillsToLearn.map((skill, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="text-label-caps bg-tertiary-container text-on-tertiary-container px-sm py-xs rounded"
+                                  >
+                                    {skill}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Key Actions */}
+                          {phase.resources && Array.isArray(phase.resources) && phase.resources.length > 0 && (
+                            <div className="mb-md">
+                              <p className="text-label-caps text-on-surface-variant mb-xs">
+                                Key Actions & Resources:
+                              </p>
+                              <ul className="list-disc list-inside space-y-xs text-body-sm text-on-surface">
+                                {phase.resources.map((resource, idx) => (
+                                  <li key={idx}>
+                                    {typeof resource === 'string'
+                                      ? resource
+                                      : (resource.title || resource.name || resource.description || 'Action item')}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {/* Milestones */}
+                          {phase.milestones && Array.isArray(phase.milestones) && phase.milestones.length > 0 && (
+                            <div>
+                              <p className="text-label-caps text-on-surface-variant mb-xs">
+                                Career Milestones:
+                              </p>
+                              <ul className="space-y-xs">
+                                {phase.milestones.map((milestone, idx) => (
+                                  <li
+                                    key={idx}
+                                    className="flex items-start gap-sm text-body-sm text-on-surface"
+                                  >
+                                    <MaterialIcon className="text-sm text-secondary mt-xs">
+                                      emoji_events
+                                    </MaterialIcon>
+                                    <span>{milestone}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="bg-surface-container-low rounded-lg p-lg text-center">
+                <p className="text-body-base text-on-surface-variant">
+                  Roadmap generated but no career stages data available
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-surface-container-low rounded-xl p-lg border border-dashed border-outline flex flex-col justify-center items-center text-center h-full">
+            <div className="w-16 h-16 bg-surface-container-highest rounded-full flex items-center justify-center mb-md">
+              <MaterialIcon className="text-secondary text-3xl">trending_up</MaterialIcon>
+            </div>
+            <h4 className="font-headline-md text-headline-md text-on-surface">
+              Career Roadmap will appear here
+            </h4>
+            <p className="text-body-sm text-on-surface-variant mt-sm max-w-sm">
+              Enter your current role and target role to get a personalized career progression path
+              with stages, actions, and milestones.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
