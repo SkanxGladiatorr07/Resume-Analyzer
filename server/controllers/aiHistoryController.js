@@ -15,7 +15,7 @@ import RoadmapHistory from '../models/RoadmapHistory.js';
  */
 export const getRewriteHistory = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { resumeId, limit = 20, skip = 0 } = req.query;
 
     let query = { user: userId, status: 'completed' };
@@ -56,7 +56,7 @@ export const getRewriteHistory = async (req, res) => {
  */
 export const getStarHistory = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { resumeId, limit = 20, skip = 0 } = req.query;
 
     let query = { user: userId, status: 'completed' };
@@ -97,7 +97,7 @@ export const getStarHistory = async (req, res) => {
  */
 export const getInterviewHistory = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { resumeId, limit = 20, skip = 0 } = req.query;
 
     let query = { user: userId, status: 'completed' };
@@ -138,7 +138,7 @@ export const getInterviewHistory = async (req, res) => {
  */
 export const getProjectsHistory = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { limit = 20, skip = 0 } = req.query;
 
     const query = { user: userId, status: 'completed' };
@@ -176,7 +176,7 @@ export const getProjectsHistory = async (req, res) => {
  */
 export const getRoadmapHistory = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { type, limit = 20, skip = 0 } = req.query;
 
     let query = { user: userId, status: 'completed' };
@@ -218,7 +218,7 @@ export const getRoadmapHistory = async (req, res) => {
  */
 export const getAllHistory = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { limit = 20 } = req.query;
 
     const [rewrites, stars, interviews, projects, roadmaps] = await Promise.all([
@@ -290,7 +290,7 @@ export const getAllHistory = async (req, res) => {
 export const regenerateFromHistory = async (req, res) => {
   try {
     const { feature, id } = req.params;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     // Map feature to model and service
     const featureMap = {

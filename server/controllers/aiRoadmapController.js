@@ -17,7 +17,7 @@ import {
 export const generateLearning = async (req, res) => {
   try {
     const { currentSkills, targetRole, timeframe } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     // Validate input
     if (!targetRole) {
@@ -52,7 +52,7 @@ export const generateLearning = async (req, res) => {
 export const generateCareer = async (req, res) => {
   try {
     const { currentRole, targetCareerRole, yearsOfExperience } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     // Validate input
     if (!currentRole) {
@@ -94,7 +94,7 @@ export const generateCareer = async (req, res) => {
  */
 export const getHistory = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { type, limit, skip } = req.query;
 
     const options = {};
@@ -119,7 +119,7 @@ export const getHistory = async (req, res) => {
  */
 export const getStats = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const result = await getUserRoadmapStats(userId);
 

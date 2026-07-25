@@ -21,7 +21,7 @@ import {
 export const generateStar = async (req, res) => {
   try {
     const { resumeId, experience } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     // Validate request body
     if (!resumeId || !experience) {
@@ -83,7 +83,7 @@ export const generateStar = async (req, res) => {
 export const getHistory = async (req, res) => {
   try {
     const { resumeId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { limit, skip } = req.query;
 
     if (!resumeId) {
@@ -135,7 +135,7 @@ export const getHistory = async (req, res) => {
  */
 export const getStats = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const result = await getUserStarStats(userId);
 

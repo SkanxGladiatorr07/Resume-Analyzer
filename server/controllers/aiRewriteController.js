@@ -21,7 +21,7 @@ import {
 export const rewriteResumeContent = async (req, res) => {
   try {
     const { resumeId, section, content, tone } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     // Validate request body
     if (!resumeId || !section || !content || !tone) {
@@ -85,7 +85,7 @@ export const rewriteResumeContent = async (req, res) => {
 export const getHistory = async (req, res) => {
   try {
     const { resumeId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { section, limit, skip } = req.query;
 
     if (!resumeId) {
@@ -138,7 +138,7 @@ export const getHistory = async (req, res) => {
  */
 export const getStats = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const result = await getUserRewriteStats(userId);
 

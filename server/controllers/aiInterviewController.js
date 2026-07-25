@@ -16,7 +16,7 @@ import {
 export const generateInterview = async (req, res) => {
   try {
     const { resumeId, jobDescription } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     // Validate input
     if (!resumeId) {
@@ -50,7 +50,7 @@ export const generateInterview = async (req, res) => {
 export const getHistory = async (req, res) => {
   try {
     const { resumeId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { limit, skip } = req.query;
 
     const options = {};
@@ -75,7 +75,7 @@ export const getHistory = async (req, res) => {
  */
 export const getStats = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const result = await getUserInterviewStats(userId);
 

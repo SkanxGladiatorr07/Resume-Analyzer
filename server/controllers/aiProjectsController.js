@@ -16,7 +16,7 @@ import {
 export const generateProjects = async (req, res) => {
   try {
     const { existingSkills, missingSkills, careerGoal } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     // Validate input
     if (
@@ -53,7 +53,7 @@ export const generateProjects = async (req, res) => {
  */
 export const getHistory = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { limit, skip } = req.query;
 
     const options = {};
@@ -78,7 +78,7 @@ export const getHistory = async (req, res) => {
  */
 export const getStats = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const result = await getUserProjectStats(userId);
 
