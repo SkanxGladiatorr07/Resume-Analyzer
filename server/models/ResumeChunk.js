@@ -293,7 +293,7 @@ resumeChunkSchema.statics.countByStatus = async function () {
  */
 resumeChunkSchema.statics.getResumeStats = async function (resumeId) {
   const stats = await this.aggregate([
-    { $match: { resumeId: mongoose.Types.ObjectId(resumeId) } },
+    { $match: { resumeId: new mongoose.Types.ObjectId(resumeId) } },
     {
       $group: {
         _id: '$sectionName',

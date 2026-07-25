@@ -193,7 +193,7 @@ chatSessionSchema.statics.findByResume = function (resumeId, userId) {
  */
 chatSessionSchema.statics.getUserStats = async function (userId) {
   const stats = await this.aggregate([
-    { $match: { user: mongoose.Types.ObjectId(userId) } },
+    { $match: { user: new mongoose.Types.ObjectId(userId) } },
     {
       $group: {
         _id: '$status',

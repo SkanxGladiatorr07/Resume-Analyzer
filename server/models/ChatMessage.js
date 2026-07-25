@@ -266,7 +266,7 @@ chatMessageSchema.statics.deleteBySession = function (sessionId) {
  */
 chatMessageSchema.statics.getSessionStats = async function (sessionId) {
   const stats = await this.aggregate([
-    { $match: { session: mongoose.Types.ObjectId(sessionId) } },
+    { $match: { session: new mongoose.Types.ObjectId(sessionId) } },
     {
       $group: {
         _id: '$sender',

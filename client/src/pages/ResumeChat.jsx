@@ -114,6 +114,9 @@ const ResumeChat = () => {
    * Create new chat session
    */
   const handleCreateSession = async () => {
+    // Clear any previous errors
+    setError(null);
+    
     if (!selectedResume) {
       setError('Please select a resume to chat about');
       return;
@@ -121,6 +124,7 @@ const ResumeChat = () => {
 
     try {
       setIsLoading(true);
+      setError(null); // Clear error before starting
       const response = await chatService.createSession(selectedResume);
       
       // Add to sessions list
