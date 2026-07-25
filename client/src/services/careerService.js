@@ -13,7 +13,10 @@ const careerService = {
    */
   rewriteContent: async (data) => {
     try {
-      const response = await apiClient.post('/ai/rewrite', data);
+      // Use longer timeout for AI generation (45 seconds)
+      const response = await apiClient.post('/ai/rewrite', data, {
+        timeout: 45000,
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -27,7 +30,10 @@ const careerService = {
    */
   generateStar: async (data) => {
     try {
-      const response = await apiClient.post('/ai/star', data);
+      // Use longer timeout for AI generation (45 seconds)
+      const response = await apiClient.post('/ai/star', data, {
+        timeout: 45000,
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -41,7 +47,10 @@ const careerService = {
    */
   generateInterviewQuestions: async (data) => {
     try {
-      const response = await apiClient.post('/ai/interview', data);
+      // Use longer timeout for AI generation (60 seconds)
+      const response = await apiClient.post('/ai/interview', data, {
+        timeout: 60000,
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -55,7 +64,10 @@ const careerService = {
    */
   getProjectSuggestions: async (data) => {
     try {
-      const response = await apiClient.post('/ai/projects', data);
+      // Use longer timeout for AI generation (60 seconds)
+      const response = await apiClient.post('/ai/projects', data, {
+        timeout: 60000,
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -69,7 +81,10 @@ const careerService = {
    */
   generateLearningRoadmap: async (data) => {
     try {
-      const response = await apiClient.post('/ai/roadmap/learning', data);
+      // Use longer timeout for AI generation (60 seconds)
+      const response = await apiClient.post('/ai/roadmap/learning', data, {
+        timeout: 60000,
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;
@@ -83,7 +98,10 @@ const careerService = {
    */
   generateCareerRoadmap: async (data) => {
     try {
-      const response = await apiClient.post('/ai/roadmap/career', data);
+      // Use longer timeout for AI generation (60 seconds)
+      const response = await apiClient.post('/ai/roadmap/career', data, {
+        timeout: 60000,
+      });
       return response.data;
     } catch (error) {
       throw error.response?.data || error;

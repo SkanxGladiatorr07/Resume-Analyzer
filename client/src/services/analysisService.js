@@ -18,7 +18,10 @@ const analysisService = {
         ? `/analysis/${resumeId}?force=true`
         : `/analysis/${resumeId}`;
       
-      const response = await apiClient.post(url);
+      // Use longer timeout for AI analysis (90 seconds)
+      const response = await apiClient.post(url, {}, {
+        timeout: 90000,
+      });
       return response.data;
     } catch (error) {
       throw error;
@@ -60,7 +63,10 @@ const analysisService = {
    */
   retryAnalysis: async (resumeId) => {
     try {
-      const response = await apiClient.post(`/analysis/${resumeId}/retry`);
+      // Use longer timeout for AI analysis (90 seconds)
+      const response = await apiClient.post(`/analysis/${resumeId}/retry`, {}, {
+        timeout: 90000,
+      });
       return response.data;
     } catch (error) {
       throw error;

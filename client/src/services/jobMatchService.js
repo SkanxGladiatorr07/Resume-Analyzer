@@ -14,7 +14,10 @@ import api from './api';
  */
 export const generateJobMatch = async (resumeId, jobDescriptionId, force = false) => {
   const url = `/job-match/${resumeId}/${jobDescriptionId}${force ? '?force=true' : ''}`;
-  return api.post(url);
+  // Use longer timeout for AI job matching (90 seconds)
+  return api.post(url, {}, {
+    timeout: 90000,
+  });
 };
 
 /**

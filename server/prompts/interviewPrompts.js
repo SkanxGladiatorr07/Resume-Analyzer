@@ -27,7 +27,8 @@ export const QUESTION_CATEGORIES = {
     description: 'Technical knowledge and problem-solving questions',
     count: 5,
     guidelines: [
-      'Mix difficulty levels (2 easy, 2 medium, 1 hard)',
+      'IMPORTANT: Generate exactly 2 easy, 2 medium, and 1 hard question',
+      'Order questions by difficulty: easy questions first, then medium, then hard',
       'Cover key technologies from resume',
       'Include both conceptual and practical questions',
       'Test depth of understanding',
@@ -176,11 +177,12 @@ export const buildInterviewPrompt = ({ resumeContext, aiAnalysis, jobDescription
   prompt += 'TASK:\n';
   prompt += 'Generate personalized interview questions based on the candidate information above.\n';
   prompt += 'Include:\n';
-  prompt += `- ${QUESTION_CATEGORIES.technical.count} technical questions (varied difficulty)\n`;
+  prompt += `- ${QUESTION_CATEGORIES.technical.count} technical questions: 2 easy, 2 medium, 1 hard (IN THIS ORDER)\n`;
   prompt += `- ${QUESTION_CATEGORIES.behavioral.count} behavioral questions (different categories)\n`;
   prompt += `- ${QUESTION_CATEGORIES.projectBased.count} project-based questions (from actual resume projects)\n`;
   prompt += `- ${QUESTION_CATEGORIES.followUp.count} follow-up questions (to probe deeper)\n\n`;
-  prompt += 'Each question must include an ideal answer to help the candidate prepare.\n\n';
+  prompt += 'Each question must include an ideal answer to help the candidate prepare.\n';
+  prompt += 'CRITICAL: For technical questions, label difficulty as "easy", "medium", or "hard" and order them accordingly.\n\n';
 
   // JSON format
   prompt += 'Your response MUST be in this EXACT JSON format (no markdown, no code blocks):\n';

@@ -605,49 +605,209 @@ const InterviewTool = ({
   setSuccess,
   clearMessages,
 }) => {
-  return (
-    <div>
-      <div className="bg-tertiary-container/10 border border-tertiary-container rounded-lg p-lg mb-lg">
-        <p className="text-body-sm text-on-surface flex items-center gap-sm">
-          <MaterialIcon className="text-tertiary">construction</MaterialIcon>
-          This tool is coming soon! Backend API endpoint needs to be implemented.
-        </p>
-      </div>
+  const [jobDescription, setJobDescription] = useState('');
+  const [result, setResult] = useState(null);
 
-      <div className="space-y-lg opacity-50 pointer-events-none">
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    clearMessages();
+
+    if (!selectedResume) {
+      setError('Please select a resume first');
+      return;
+    }
+
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const response = await careerService.generateInterviewQuestions({
+        resumeId: selectedResume,
+        jobDescription: jobDescription.trim() || null,
+      });
+
+      if (response.success) {
+        setResult(response.data);
+        setSuccess('Interview questions generated successfully!');
+      } else {
+        setError(response.message || 'Failed to generate interview questions');
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to generate interview questions. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-xl">
+      {/* Input Side */}
+      <div className="space-y-lg">
         <div>
           <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Select Resume</label>
-          <select className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-body-base">
-            <option>Select a resume...</option>
+          <select
+            value={selectedResume}
+            onChange={(e) => setSelectedResume(e.target.value)}
+            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-body-base focus:ring-1 focus:ring-primary focus:border-primary"
+            disabled={loading}
+          >
+            {resumes.length === 0 ? (
+              <option>No resumes available</option>
+            ) : (
+              resumes.map((resume) => (
+                <option key={resume._id} value={resume._id}>
+                  {resume.fileName || resume.originalName}
+                </option>
+              ))
+            )}
           </select>
         </div>
 
         <div>
-          <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Job Title</label>
-          <input
-            type="text"
-            placeholder="e.g., Senior Software Engineer"
-            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-body-base"
+          <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">
+            Job Description (Optional)
+          </label>
+          <textarea
+            value={jobDescription}
+            onChange={(e) => setJobDescription(e.target.value)}
+            placeholder="Paste the job description to get more targeted interview questions..."
+            rows={8}
+            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-md text-body-base focus:ring-1 focus:ring-primary focus:border-primary"
+            disabled={loading}
           />
-        </div>
-
-        <div>
-          <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Experience Level</label>
-          <select className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-body-base">
-            <option value="entry">Entry Level</option>
-            <option value="mid">Mid Level</option>
-            <option value="senior">Senior Level</option>
-            <option value="lead">Lead Level</option>
-          </select>
+          <p className="text-label-caps text-on-surface-variant mt-xs">
+            Leave empty for general questions based on your resume
+          </p>
         </div>
 
         <button
-          type="button"
-          disabled
-          className="w-full py-md px-lg bg-surface-container text-on-surface-variant rounded-lg cursor-not-allowed font-bold"
+          onClick={handleSubmit}
+          disabled={loading || !selectedResume}
+          className="w-full py-md px-lg bg-primary text-on-primary rounded-lg hover:bg-primary-container disabled:bg-surface-container disabled:text-on-surface-variant disabled:cursor-not-allowed transition-colors font-bold"
         >
-          Generate Interview Questions
+          {loading ? 'Generating Questions...' : 'Generate Interview Questions'}
         </button>
+      </div>
+
+      {/* Output Side */}
+      <div>
+        {result ? (
+          <div className="space-y-lg">
+            {/* Technical Questions */}
+            {result.questions?.technical && result.questions.technical.length > 0 && (
+              <div>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-md flex items-center gap-sm">
+                  <MaterialIcon className="text-primary">code</MaterialIcon>
+                  Technical Questions
+                </h3>
+                <div className="space-y-sm">
+                  {result.questions.technical
+                    .sort((a, b) => {
+                      // Sort: easy → medium → hard
+                      const order = { easy: 0, medium: 1, hard: 2 };
+                      return (order[a.difficulty] || 99) - (order[b.difficulty] || 99);
+                    })
+                    .map((question, index) => (
+                    <div key={index} className="bg-surface-container-low p-md rounded-lg">
+                      <div className="flex items-start gap-sm">
+                        <span className="font-bold text-primary min-w-[24px]">{index + 1}.</span>
+                        <div className="flex-1">
+                          <p className="text-body-base text-on-surface mb-xs">{question.question}</p>
+                          {question.difficulty && (
+                            <span className={`text-label-caps px-sm py-xs rounded ${
+                              question.difficulty === 'easy' ? 'bg-green-600 text-white' :
+                              question.difficulty === 'medium' ? 'bg-orange-500 text-white' :
+                              'bg-red-600 text-white'
+                            }`}>
+                              {question.difficulty}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Behavioral Questions */}
+            {result.questions?.behavioral && result.questions.behavioral.length > 0 && (
+              <div>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-md flex items-center gap-sm">
+                  <MaterialIcon className="text-secondary">psychology</MaterialIcon>
+                  Behavioral Questions
+                </h3>
+                <div className="space-y-sm">
+                  {result.questions.behavioral.map((question, index) => (
+                    <div key={index} className="bg-surface-container-low p-md rounded-lg">
+                      <div className="flex items-start gap-sm">
+                        <span className="font-bold text-secondary min-w-[24px]">{index + 1}.</span>
+                        <div className="flex-1">
+                          <p className="text-body-base text-on-surface mb-xs">{question.question}</p>
+                          {question.category && (
+                            <span className="text-label-caps bg-secondary-container text-on-secondary-container px-sm py-xs rounded">
+                              {question.category}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Project-Based Questions */}
+            {result.questions?.projectBased && result.questions.projectBased.length > 0 && (
+              <div>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-md flex items-center gap-sm">
+                  <MaterialIcon className="text-tertiary">folder</MaterialIcon>
+                  Project-Based Questions
+                </h3>
+                <div className="space-y-sm">
+                  {result.questions.projectBased.map((question, index) => (
+                    <div key={index} className="bg-surface-container-low p-md rounded-lg">
+                      <div className="flex items-start gap-sm">
+                        <span className="font-bold text-tertiary min-w-[24px]">{index + 1}.</span>
+                        <p className="text-body-base text-on-surface flex-1">{question.question}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Follow-Up Questions */}
+            {result.questions?.followUp && result.questions.followUp.length > 0 && (
+              <div>
+                <h3 className="font-headline-md text-headline-md text-on-surface mb-md flex items-center gap-sm">
+                  <MaterialIcon className="text-on-surface-variant">forum</MaterialIcon>
+                  Follow-Up Questions
+                </h3>
+                <div className="space-y-sm">
+                  {result.questions.followUp.map((question, index) => (
+                    <div key={index} className="bg-surface-container-low p-md rounded-lg">
+                      <div className="flex items-start gap-sm">
+                        <span className="font-bold text-on-surface-variant min-w-[24px]">{index + 1}.</span>
+                        <p className="text-body-base text-on-surface flex-1">{question.question}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-surface-container-low rounded-xl p-lg border border-dashed border-outline flex flex-col justify-center items-center text-center h-full">
+            <div className="w-16 h-16 bg-surface-container-highest rounded-full flex items-center justify-center mb-md">
+              <MaterialIcon className="text-primary text-3xl">work</MaterialIcon>
+            </div>
+            <h4 className="font-headline-md text-headline-md text-on-surface">Interview Questions will appear here</h4>
+            <p className="text-body-sm text-on-surface-variant mt-sm max-w-sm">
+              Select a resume and optionally add a job description to generate personalized interview practice questions.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
