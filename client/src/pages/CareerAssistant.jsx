@@ -714,12 +714,12 @@ const InterviewTool = ({
                         <div className="flex-1">
                           <p className="text-body-base text-on-surface mb-xs">{question.question}</p>
                           {question.difficulty && (
-                            <span className={`text-label-caps px-sm py-xs rounded ${
+                            <span className={`text-label-caps px-sm py-xs rounded font-bold ${
                               question.difficulty === 'easy' ? 'bg-green-600 text-white' :
                               question.difficulty === 'medium' ? 'bg-orange-500 text-white' :
                               'bg-red-600 text-white'
                             }`}>
-                              {question.difficulty}
+                              {question.difficulty.charAt(0).toUpperCase() + question.difficulty.slice(1)}
                             </span>
                           )}
                         </div>
@@ -821,50 +821,239 @@ const ProjectsTool = ({
   setSuccess,
   clearMessages,
 }) => {
+  const [existingSkills, setExistingSkills] = useState('');
+  const [missingSkills, setMissingSkills] = useState('');
+  const [careerGoal, setCareerGoal] = useState('');
+  const [result, setResult] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    clearMessages();
+
+    if (!existingSkills.trim() && !missingSkills.trim()) {
+      setError('Please provide at least your current skills or skills you want to learn');
+      return;
+    }
+
+    setLoading(true);
+    setResult(null);
+
+    try {
+      // Parse skills from comma-separated strings
+      const existingSkillsArray = existingSkills
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+
+      const missingSkillsArray = missingSkills
+        .split(',')
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+
+      const response = await careerService.getProjectSuggestions({
+        existingSkills: existingSkillsArray,
+        missingSkills: missingSkillsArray,
+        careerGoal: careerGoal.trim() || null,
+      });
+
+      if (response.success) {
+        setResult(response.data);
+        setSuccess('Project suggestions generated successfully!');
+      } else {
+        setError(response.message || 'Failed to generate project suggestions');
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to generate project suggestions. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getDifficultyColor = (difficulty) => {
+    if (!difficulty) return 'bg-surface-container text-on-surface';
+    const lower = difficulty.toLowerCase();
+    if (lower.includes('beginner') || lower.includes('easy'))
+      return 'bg-green-600 text-white';
+    if (lower.includes('intermediate') || lower.includes('medium'))
+      return 'bg-orange-500 text-white';
+    if (lower.includes('advanced') || lower.includes('hard'))
+      return 'bg-red-600 text-white';
+    return 'bg-surface-container text-on-surface';
+  };
+
+  const getDifficultyLabel = (difficulty) => {
+    if (!difficulty) return '';
+    // Capitalize first letter of the difficulty word
+    return difficulty.charAt(0).toUpperCase() + difficulty.slice(1).toLowerCase();
+  };
+
   return (
-    <div>
-      <div className="bg-tertiary-container/10 border border-tertiary-container rounded-lg p-lg mb-lg">
-        <p className="text-body-sm text-on-surface flex items-center gap-sm">
-          <MaterialIcon className="text-tertiary">construction</MaterialIcon>
-          This tool is coming soon! Backend API endpoint needs to be implemented.
-        </p>
-      </div>
-
-      <div className="space-y-lg opacity-50 pointer-events-none">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-xl">
+      {/* Input Side */}
+      <div className="space-y-lg">
         <div>
-          <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Current Skills</label>
+          <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">
+            Current Skills
+          </label>
           <textarea
-            placeholder="e.g., React, Node.js, MongoDB, Python..."
+            value={existingSkills}
+            onChange={(e) => setExistingSkills(e.target.value)}
+            placeholder="e.g., React, Node.js, MongoDB, Python, Git..."
             rows={3}
-            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-md text-body-base"
+            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-md text-body-base focus:ring-1 focus:ring-primary focus:border-primary"
+            disabled={loading}
           />
+          <p className="text-label-caps text-on-surface-variant mt-xs">
+            Comma-separated list of skills you already have
+          </p>
         </div>
 
         <div>
-          <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Years of Experience</label>
-          <input
-            type="number"
-            placeholder="e.g., 3"
-            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-body-base"
+          <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">
+            Skills to Learn
+          </label>
+          <textarea
+            value={missingSkills}
+            onChange={(e) => setMissingSkills(e.target.value)}
+            placeholder="e.g., TypeScript, Docker, AWS, GraphQL..."
+            rows={3}
+            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg p-md text-body-base focus:ring-1 focus:ring-primary focus:border-primary"
+            disabled={loading}
           />
+          <p className="text-label-caps text-on-surface-variant mt-xs">
+            Comma-separated list of skills you want to develop
+          </p>
         </div>
 
         <div>
-          <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">Career Goal</label>
+          <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">
+            Career Goal (Optional)
+          </label>
           <input
             type="text"
-            placeholder="e.g., Full Stack Developer"
-            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-body-base"
+            value={careerGoal}
+            onChange={(e) => setCareerGoal(e.target.value)}
+            placeholder="e.g., Full Stack Developer, Data Scientist..."
+            className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-md py-sm text-body-base focus:ring-1 focus:ring-primary focus:border-primary"
+            disabled={loading}
           />
         </div>
 
         <button
-          type="button"
-          disabled
-          className="w-full py-md px-lg bg-surface-container text-on-surface-variant rounded-lg cursor-not-allowed font-bold"
+          onClick={handleSubmit}
+          disabled={loading || (!existingSkills.trim() && !missingSkills.trim())}
+          className="w-full py-md px-lg bg-primary text-on-primary rounded-lg hover:bg-primary-container disabled:bg-surface-container disabled:text-on-surface-variant disabled:cursor-not-allowed transition-colors font-bold"
         >
-          Get Project Suggestions
+          {loading ? 'Generating Projects...' : 'Get Project Suggestions'}
         </button>
+      </div>
+
+      {/* Output Side */}
+      <div>
+        {result ? (
+          <div className="space-y-lg">
+            <h3 className="font-headline-md text-headline-md text-on-surface mb-md flex items-center gap-sm">
+              <MaterialIcon className="text-primary">rocket_launch</MaterialIcon>
+              Project Suggestions
+            </h3>
+            {result.projects && result.projects.length > 0 ? (
+              <div className="space-y-lg">
+                {result.projects
+                  .sort((a, b) => {
+                    // Sort by difficulty: beginner → intermediate → advanced
+                    const order = {
+                      beginner: 0,
+                      easy: 0,
+                      intermediate: 1,
+                      medium: 1,
+                      advanced: 2,
+                      hard: 2,
+                    };
+                    const aDiff = (a.difficulty || '').toLowerCase();
+                    const bDiff = (b.difficulty || '').toLowerCase();
+                    return (order[aDiff] || 99) - (order[bDiff] || 99);
+                  })
+                  .map((project, index) => (
+                    <div
+                      key={index}
+                      className="bg-surface-container-low rounded-lg p-lg border border-outline-variant"
+                    >
+                      <div className="flex items-start justify-between gap-md mb-sm">
+                        <h4 className="font-headline-sm text-headline-sm text-on-surface flex items-center gap-sm">
+                          <span className="text-primary">{index + 1}.</span>
+                          {project.name}
+                        </h4>
+                        {project.difficulty && (
+                          <span
+                            className={`text-label-caps px-sm py-xs rounded font-bold ${getDifficultyColor(
+                              project.difficulty
+                            )}`}
+                          >
+                            {getDifficultyLabel(project.difficulty)}
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="text-body-base text-on-surface mb-md">{project.description}</p>
+
+                      {project.skillsUsed && project.skillsUsed.length > 0 && (
+                        <div className="mb-md">
+                          <p className="text-label-caps text-on-surface-variant mb-xs">
+                            Skills You'll Practice:
+                          </p>
+                          <div className="flex flex-wrap gap-xs">
+                            {project.skillsUsed.map((skill, idx) => (
+                              <span
+                                key={idx}
+                                className="text-label-caps bg-primary-container text-on-primary-container px-sm py-xs rounded"
+                              >
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {project.learningOutcomes && project.learningOutcomes.length > 0 && (
+                        <div className="mb-md">
+                          <p className="text-label-caps text-on-surface-variant mb-xs">
+                            What You'll Learn:
+                          </p>
+                          <ul className="list-disc list-inside space-y-xs text-body-sm text-on-surface">
+                            {project.learningOutcomes.map((outcome, idx) => (
+                              <li key={idx}>{outcome}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {project.estimatedTime && (
+                        <div className="flex items-center gap-sm text-body-sm text-on-surface-variant">
+                          <MaterialIcon className="text-sm">schedule</MaterialIcon>
+                          <span>Estimated: {project.estimatedTime}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <p className="text-body-base text-on-surface-variant">No projects generated</p>
+            )}
+          </div>
+        ) : (
+          <div className="bg-surface-container-low rounded-xl p-lg border border-dashed border-outline flex flex-col justify-center items-center text-center h-full">
+            <div className="w-16 h-16 bg-surface-container-highest rounded-full flex items-center justify-center mb-md">
+              <MaterialIcon className="text-primary text-3xl">rocket_launch</MaterialIcon>
+            </div>
+            <h4 className="font-headline-md text-headline-md text-on-surface">
+              Project Suggestions will appear here
+            </h4>
+            <p className="text-body-sm text-on-surface-variant mt-sm max-w-sm">
+              Enter your current skills and skills you want to learn to get personalized project
+              suggestions for your portfolio.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
