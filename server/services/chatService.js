@@ -33,7 +33,8 @@ export const createChatSession = async (userId, resumeId, options = {}) => {
 
     // Check if resume is ready for chat
     if (resume.embeddingStatus !== 'completed') {
-      throw new Error('Resume embeddings are not ready. Please wait for processing to complete.');
+      console.warn(`[ChatService] Resume ${resumeId} embeddings not ready (${resume.embeddingStatus}), proceeding without RAG context`);
+      // Don't throw error, just proceed without embeddings
     }
 
     // Create session

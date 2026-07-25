@@ -29,14 +29,32 @@ const ResumeChat = () => {
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState(null);
   const [showSidebar, setShowSidebar] = useState(true);
-  const [showNewChatModal, setShowNewChatModal] = useState(false);
   const [editingSessionId, setEditingSessionId] = useState(null);
   const [editingTitle, setEditingTitle] = useState('');
   const [copiedMessageId, setCopiedMessageId] = useState(null);
+  const [isCreatingSession, setIsCreatingSession] = useState(false);
 
   // Refs
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const errorTimeoutRef = useRef(null);
+
+  /**
+   * Set error with auto-dismiss
+   */
+  const setErrorWithTimeout = (errorMsg) => {
+    setError(errorMsg);
+    
+    // Clear any existing timeout
+    if (errorTimeoutRef.current) {
+      clearTimeout(errorTimeoutRef.current);
+    }
+    
+    // Auto-dismiss after 5 seconds
+    errorTimeoutRef.current = setTimeout(() => {
+      setError(null);
+    }, 5000);
+  };
 
   /**
    * Auto-scroll to bottom when messages change
@@ -53,6 +71,7 @@ const ResumeChat = () => {
    * Load user's resumes and sessions on mount
    */
   useEffect(() => {
+    setError(null); // Clear any errors on mount
     loadResumes();
     loadSessions();
   }, []);
@@ -72,7 +91,17 @@ const ResumeChat = () => {
   const loadResumes = async () => {
     try {
       const response = await resumeService.getResumes();
-      setUserResumes(response.data || []);
+      const resumes = response.data || [];
+      setUserResumes(resumes);
+      
+      // Filter only resumes that are ready for chat
+      const readyResumes = resumes.filter(r => r.embeddingStatus === 'completed');
+      console.log('[ResumeChat] Loaded resumes:', resumes.length, 'Ready for chat:', readyResumes.length);
+      
+      // Show info message if embeddings aren't ready (but don't block)
+      if (resumes.length > 0 && readyResumes.length === 0) {
+        console.log('[ResumeChat] Note: Chat will work but without AI context until embeddings complete');
+      }
     } catch (err) {
       console.error('Error loading resumes:', err);
     }
@@ -111,21 +140,22 @@ const ResumeChat = () => {
   };
 
   /**
-   * Create new chat session
+   * Create new chat session (simplified - no modal)
    */
-  const handleCreateSession = async () => {
-    // Clear any previous errors
-    setError(null);
+  const handleCreateSession = async (resumeId = null) => {
+    const resumeToUse = resumeId || selectedResume;
     
-    if (!selectedResume) {
-      setError('Please select a resume to chat about');
-      return;
+    if (!resumeToUse) {
+      setErrorWithTimeout('Please select a resume to chat about');
+      return null;
     }
 
     try {
-      setIsLoading(true);
-      setError(null); // Clear error before starting
-      const response = await chatService.createSession(selectedResume);
+      setIsCreatingSession(true);
+      setError(null);
+      console.log('[ResumeChat] Creating session for resume:', resumeToUse);
+      const response = await chatService.createSession(resumeToUse);
+      console.log('[ResumeChat] Session created:', response);
       
       // Add to sessions list
       const newSession = response.session;
@@ -134,14 +164,17 @@ const ResumeChat = () => {
       // Set as current session
       setCurrentSession(newSession);
       setMessages([]);
-      setShowNewChatModal(false);
       setError(null);
-      setIsLoading(false);
+      setIsCreatingSession(false);
+      
+      return newSession;
     } catch (err) {
-      console.error('Error creating session:', err);
-      const errorMsg = err.response?.data?.message || 'Failed to create chat session';
-      setError(errorMsg);
-      setIsLoading(false);
+      console.error('[ResumeChat] Error creating session:', err);
+      console.error('[ResumeChat] Error response:', err.response?.data);
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to create chat session';
+      setErrorWithTimeout(errorMsg);
+      setIsCreatingSession(false);
+      return null;
     }
   };
 
@@ -154,21 +187,60 @@ const ResumeChat = () => {
   };
 
   /**
-   * Send message
+   * Send message (auto-create session if needed)
    */
   const handleSendMessage = async (e) => {
     e?.preventDefault();
     
-    if (!inputMessage.trim() || !currentSession) {
+    const messageToSend = inputMessage.trim();
+    
+    if (!messageToSend) {
       return;
     }
 
-    if (isSending) {
+    // Check if resume is selected
+    if (!selectedResume) {
+      alert('Please select a resume from the dropdown first!');
+      setErrorWithTimeout('Please select a resume first');
       return;
     }
 
-    const userMsg = inputMessage.trim();
-    setInputMessage('');
+    console.log('[ResumeChat] Selected resume ID:', selectedResume);
+    console.log('[ResumeChat] Available resumes:', userResumes);
+
+    if (isSending || isCreatingSession) {
+      return;
+    }
+
+    // Clear any previous errors
+    setError(null);
+
+    // Auto-create session if none exists
+    if (!currentSession) {
+      console.log('[ResumeChat] No current session, creating new session for resume:', selectedResume);
+      const newSession = await handleCreateSession();
+      if (!newSession) {
+        console.error('[ResumeChat] Failed to create session, cannot send message');
+        return; // Error already set by handleCreateSession
+      }
+      console.log('[ResumeChat] Session created successfully, now sending message');
+      // Set the new session and continue with sending
+      // Don't clear input yet, we'll do it after we send
+      // Retry sending with the new session
+      await sendMessageToSession(newSession.id, messageToSend);
+      return;
+    }
+
+    // Session exists, send directly
+    await sendMessageToSession(currentSession.id, messageToSend);
+  };
+
+  /**
+   * Actually send the message to a session
+   */
+  const sendMessageToSession = async (sessionId, userMsg) => {
+    console.log('[ResumeChat] Sending message to session:', sessionId, 'Message:', userMsg);
+    setInputMessage(''); // Clear input now
     setIsSending(true);
     setError(null);
 
@@ -183,7 +255,9 @@ const ResumeChat = () => {
 
     try {
       // Send to API
-      const response = await chatService.sendMessage(currentSession.id, userMsg);
+      console.log('[ResumeChat] Calling API with sessionId:', sessionId);
+      const response = await chatService.sendMessage(sessionId, userMsg);
+      console.log('[ResumeChat] API response received:', response);
 
       // Remove temp message and add real messages
       setMessages((prev) => {
@@ -200,9 +274,10 @@ const ResumeChat = () => {
       // Focus input
       inputRef.current?.focus();
     } catch (err) {
-      console.error('Error sending message:', err);
+      console.error('[ResumeChat] Error sending message:', err);
+      console.error('[ResumeChat] Error response:', err.response?.data);
       const errorMsg = err.response?.data?.message || 'Failed to send message';
-      setError(errorMsg);
+      setErrorWithTimeout(errorMsg);
       setIsSending(false);
 
       // Remove temp message on error
@@ -300,10 +375,11 @@ const ResumeChat = () => {
   };
 
   /**
-   * Auto-resize textarea
+   * Auto-resize textarea and clear errors
    */
   const handleInputChange = (e) => {
     setInputMessage(e.target.value);
+    setError(null); // Clear error when user types
     e.target.style.height = 'auto';
     e.target.style.height = (e.target.scrollHeight) + 'px';
   };
@@ -317,11 +393,16 @@ const ResumeChat = () => {
         <div className="p-md border-b border-outline-variant flex justify-between items-center">
           <span className="text-label-caps font-label-caps uppercase tracking-wider text-on-surface-variant">Sessions</span>
           <button 
-            onClick={() => {
-              setShowNewChatModal(true);
+            onClick={async () => {
+              // Clear current session UI but keep it in history
+              setCurrentSession(null);
+              setMessages([]);
               setError(null);
+              // Don't clear selectedResume - keep it selected so user can immediately start chatting
+              // The session will be auto-created when they send the first message
             }}
             className="flex items-center gap-xs text-primary hover:bg-primary-container/10 p-1 rounded transition-colors"
+            title="Start New Chat"
           >
             <MaterialIcon className="text-md">add_circle</MaterialIcon>
             <span className="text-label-caps font-label-caps">New Chat</span>
@@ -442,21 +523,78 @@ const ResumeChat = () => {
                   <MaterialIcon className="text-primary text-4xl">chat</MaterialIcon>
                 </div>
                 <h2 className="font-headline-md text-headline-md text-on-surface mb-md">
-                  Welcome to AI Resume Chat
+                  AI Resume Chat
                 </h2>
-                <p className="text-on-surface-variant mb-xl font-body-base">
-                  Start a conversation about your resume. Ask questions about your skills,
+                <p className="text-on-surface-variant mb-lg font-body-base">
+                  Select a resume and start chatting. Ask questions about your skills,
                   experience, or get insights to improve your resume.
                 </p>
-                <button
-                  onClick={() => {
-                    setShowNewChatModal(true);
-                    setError(null);
-                  }}
-                  className="bg-primary hover:bg-primary-container text-on-primary py-sm px-xl rounded-lg font-bold transition-colors"
-                >
-                  Start New Chat
-                </button>
+                
+                {/* Resume Selection */}
+                <div className="max-w-md mx-auto mb-lg">
+                  <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs text-left">
+                    Select Resume
+                  </label>
+                  <select
+                    value={selectedResume}
+                    onChange={(e) => {
+                      setSelectedResume(e.target.value);
+                      setError(null);
+                    }}
+                    className="w-full border border-outline-variant rounded-lg px-md py-sm text-body-base focus:outline-none focus:ring-2 focus:ring-primary bg-white"
+                  >
+                    <option value="">Choose a resume to chat about...</option>
+                    {userResumes.map((resume) => {
+                      const isReady = resume.embeddingStatus === 'completed';
+                      const statusLabel = isReady ? '' : ' (Processing - limited AI context)';
+                      return (
+                        <option key={resume._id} value={resume._id}>
+                          {resume.fileName || resume.originalName}{statusLabel}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  {userResumes.length === 0 && (
+                    <p className="text-body-sm text-on-surface-variant mt-sm text-left">
+                      No resumes found. <a href="/upload" className="text-primary hover:underline">Upload a resume</a> to get started.
+                    </p>
+                  )}
+                  {userResumes.length > 0 && userResumes.filter(r => r.embeddingStatus === 'completed').length === 0 && (
+                    <div className="mt-sm p-sm bg-secondary-container rounded-lg text-left">
+                      <p className="text-body-sm text-on-secondary-container mb-xs">
+                        ⚠️ Your resumes are still processing. You can chat now, but AI responses will have limited context until processing completes (~30 seconds).
+                      </p>
+                      <button
+                        onClick={() => window.location.reload()}
+                        className="text-body-sm text-primary hover:underline font-medium"
+                      >
+                        Refresh to check status
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {selectedResume && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
+                    {[
+                      { icon: 'description', text: 'Review my resume' },
+                      { icon: 'edit', text: 'Rewrite my project section' },
+                      { icon: 'search', text: 'What skills am I missing?' },
+                      { icon: 'lightbulb', text: 'Generate interview questions' },
+                    ].map((suggestion, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setInputMessage(suggestion.text)}
+                        className="flex items-center p-md border-2 border-outline-variant rounded-xl hover:border-primary hover:bg-primary-fixed transition-all text-left group"
+                      >
+                        <MaterialIcon className="text-primary text-3xl mr-md group-hover:scale-110 transition-transform">{suggestion.icon}</MaterialIcon>
+                        <span className="text-body-sm font-medium text-on-surface group-hover:text-primary">
+                          {suggestion.text}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ) : messages.length === 0 && !isLoading ? (
@@ -605,16 +743,27 @@ const ResumeChat = () => {
 
         {/* Error Message */}
         {error && (
-          <div className="px-lg py-sm bg-error-container border-t border-error">
+          <div className="px-lg py-sm bg-error-container border-t border-error flex justify-between items-center">
             <p className="text-body-sm text-on-error-container">{error}</p>
+            <button 
+              onClick={() => setError(null)}
+              className="text-on-error-container hover:bg-error/10 p-1 rounded transition-colors"
+              title="Dismiss"
+            >
+              <MaterialIcon className="text-md">close</MaterialIcon>
+            </button>
           </div>
         )}
 
-        {/* Input Area */}
-        {currentSession && (
+        {/* Input Area - Always show if resume is selected */}
+        {selectedResume && (
           <footer className="p-lg md:px-xxl pb-xl pt-0 bg-transparent">
+            {isCreatingSession && (
+              <div className="max-w-4xl mx-auto mb-sm">
+                <p className="text-body-sm text-on-surface-variant text-center">Creating chat session...</p>
+              </div>
+            )}
             <div className="max-w-4xl mx-auto relative group">
-              <div className="absolute inset-0 bg-primary/5 blur-xl group-focus-within:bg-primary/10 transition-all rounded-xl"></div>
               <div className="relative bg-white border border-outline-variant rounded-xl shadow-lg focus-within:border-primary transition-all p-2">
                 <div className="flex items-end gap-sm">
                   <textarea
@@ -627,26 +776,32 @@ const ResumeChat = () => {
                         handleSendMessage(e);
                       }
                     }}
-                    placeholder="Ask about your resume..."
-                    disabled={isSending}
+                    placeholder={currentSession ? "Ask about your resume..." : "Type a message to start chatting..."}
+                    disabled={isSending || isCreatingSession}
                     rows="1"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck="false"
                     className="flex-1 border-none focus:ring-0 text-body-base py-3 resize-none bg-transparent min-h-[48px] max-h-32 disabled:opacity-50"
                     style={{scrollbarWidth: 'thin'}}
                   />
                   <button
                     onClick={handleSendMessage}
-                    disabled={!inputMessage.trim() || isSending}
+                    disabled={!inputMessage.trim() || isSending || isCreatingSession}
                     className="w-10 h-10 bg-primary text-white rounded-lg flex items-center justify-center shadow-md hover:bg-primary-container transition-all active:scale-95 disabled:bg-surface-container disabled:text-on-surface-variant disabled:cursor-not-allowed"
                   >
                     <MaterialIcon>send</MaterialIcon>
                   </button>
                 </div>
                 <div className="px-md pb-sm flex justify-between items-center">
-                  <div className="flex gap-md">
-                    <button className="text-[10px] font-bold text-outline hover:text-primary flex items-center gap-xs uppercase tracking-widest transition-colors">
-                      <MaterialIcon className="text-sm">auto_awesome</MaterialIcon>
-                      Optimize Bullet Points
-                    </button>
+                  <div className="flex gap-md items-center">
+                    {!currentSession && (
+                      <span className="text-[10px] text-primary font-bold uppercase tracking-widest flex items-center gap-xs">
+                        <MaterialIcon className="text-sm">info</MaterialIcon>
+                        Type and send to start chat
+                      </span>
+                    )}
                   </div>
                   <span className="text-[10px] text-outline">Enter to send • Shift+Enter for new line</span>
                 </div>
@@ -655,58 +810,6 @@ const ResumeChat = () => {
           </footer>
         )}
       </section>
-
-      {/* New Chat Modal */}
-      {showNewChatModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-lg">
-          <div className="bg-white rounded-xl max-w-md w-full p-xl">
-            <h3 className="font-headline-md text-headline-md text-on-surface mb-lg">Start New Chat</h3>
-            
-            <div className="mb-lg">
-              <label className="block text-body-sm font-body-sm text-on-surface-variant mb-xs">
-                Select Resume
-              </label>
-              <select
-                value={selectedResume}
-                onChange={(e) => setSelectedResume(e.target.value)}
-                className="w-full border border-outline-variant rounded-lg px-md py-sm text-body-base focus:outline-none focus:ring-2 focus:ring-primary bg-surface"
-              >
-                <option value="">Choose a resume...</option>
-                {userResumes.map((resume) => (
-                  <option key={resume._id} value={resume._id}>
-                    {resume.fileName || resume.originalName}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {error && (
-              <div className="mb-lg p-md bg-error-container border border-error rounded-lg">
-                <p className="text-body-sm text-on-error-container">{error}</p>
-              </div>
-            )}
-
-            <div className="flex gap-md">
-              <button
-                onClick={() => {
-                  setShowNewChatModal(false);
-                  setError(null);
-                }}
-                className="flex-1 py-sm px-lg border border-outline-variant text-on-surface-variant rounded-lg font-bold hover:bg-surface-container transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleCreateSession}
-                disabled={isLoading || !selectedResume}
-                className="flex-1 py-sm px-lg bg-primary text-on-primary rounded-lg font-bold hover:bg-primary-container disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {isLoading ? 'Creating...' : 'Create Chat'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

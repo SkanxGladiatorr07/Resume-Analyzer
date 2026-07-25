@@ -29,8 +29,14 @@ export const createSession = async (req, res) => {
   try {
     const { resumeId } = req.body;
 
+    console.log('[ChatController] createSession called');
+    console.log('[ChatController] Request body:', JSON.stringify(req.body));
+    console.log('[ChatController] resumeId:', resumeId);
+    console.log('[ChatController] user:', req.user?._id);
+
     // Validate input
     if (!resumeId) {
+      console.log('[ChatController] ERROR: No resumeId provided');
       return res.status(400).json({
         success: false,
         message: 'Resume ID is required',
@@ -42,9 +48,11 @@ export const createSession = async (req, res) => {
     // Create session
     const result = await createChatSession(userId, resumeId);
 
+    console.log('[ChatController] Session created successfully:', result.session.id);
     res.status(201).json(result);
   } catch (error) {
     console.error('[ChatController] Error creating session:', error.message);
+    console.error('[ChatController] Error stack:', error.stack);
 
     // Handle specific errors
     if (error.message.includes('not found')) {

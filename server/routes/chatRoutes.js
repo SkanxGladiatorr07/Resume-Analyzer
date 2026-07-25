@@ -28,109 +28,9 @@ const router = express.Router();
 router.use(authenticate);
 
 /**
- * @route   POST /api/chat/:sessionId
- * @desc    Send message and get AI response (RAG Pipeline)
- * @access  Private
- * 
- * @params {
- *   sessionId: string - Session ID
- * }
- * 
- * @body {
- *   message: string (required) - User's question
- * }
- * 
- * @example
- * POST /api/chat/65abc123def456
- * {
- *   "message": "What programming languages do I know?"
- * }
- * 
- * @returns {
- *   success: boolean,
- *   userMessage: {
- *     id: string,
- *     sender: string,
- *     message: string,
- *     timestamp: date
- *   },
- *   aiResponse: {
- *     id: string,
- *     sender: string,
- *     message: string,
- *     timestamp: date,
- *     sourcesUsed: [{
- *       chunkId: string,
- *       sectionName: string,
- *       score: number,
- *       text: string
- *     }],
- *     status: string
- *   },
- *   retrievalStats: {
- *     chunksRetrieved: number,
- *     topScore: number,
- *     processingTime: number
- *   }
- * }
- */
-router.post('/:sessionId', sendMessage);
-
-/**
- * @route   GET /api/chat/:sessionId/stats
- * @desc    Get chat session statistics
- * @access  Private
- * 
- * @params {
- *   sessionId: string - Session ID
- * }
- * 
- * @example
- * GET /api/chat/65abc123def456/stats
- * 
- * @returns {
- *   success: boolean,
- *   statistics: {
- *     totalMessages: number,
- *     userMessages: number,
- *     aiMessages: number,
- *     averageUserMessageLength: number,
- *     averageAIMessageLength: number,
- *     lastMessageAt: date,
- *     sessionAge: number
- *   }
- * }
- */
-router.get('/:sessionId/stats', getStats);
-
-/**
  * @route   POST /api/chat/session
  * @desc    Create a new chat session
  * @access  Private
- * 
- * @body {
- *   resumeId: string (required) - Resume to chat about
- * }
- * 
- * @example
- * POST /api/chat/session
- * {
- *   "resumeId": "65abc123def456"
- * }
- * 
- * @returns {
- *   success: boolean,
- *   session: {
- *     id: string,
- *     title: string,
- *     status: string,
- *     messageCount: number,
- *     lastMessageAt: date,
- *     createdAt: date,
- *     resumeId: string,
- *     resumeFileName: string
- *   }
- * }
  */
 router.post('/session', createSession);
 
@@ -138,40 +38,22 @@ router.post('/session', createSession);
  * @route   GET /api/chat/sessions
  * @desc    Get all chat sessions for authenticated user
  * @access  Private
- * 
- * @query {
- *   status: string (optional) - Filter by status (active, archived, deleted)
- *   limit: number (optional) - Max results (default: 50)
- * }
- * 
- * @example
- * GET /api/chat/sessions?status=active&limit=20
- * 
- * @returns {
- *   success: boolean,
- *   sessions: Array<{
- *     id: string,
- *     title: string,
- *     status: string,
- *     messageCount: number,
- *     lastMessageAt: date,
- *     createdAt: date,
- *     updatedAt: date,
- *     resume: {
- *       id: string,
- *       fileName: string
- *     }
- *   }>,
- *   stats: {
- *     total: number,
- *     active: number,
- *     archived: number,
- *     totalMessages: number
- *   },
- *   total: number
- * }
  */
 router.get('/sessions', getSessions);
+
+/**
+ * @route   POST /api/chat/:sessionId
+ * @desc    Send message and get AI response (RAG Pipeline)
+ * @access  Private
+ */
+router.post('/:sessionId', sendMessage);
+
+/**
+ * @route   GET /api/chat/:sessionId/stats
+ * @desc    Get chat session statistics
+ * @access  Private
+ */
+router.get('/:sessionId/stats', getStats);
 
 /**
  * @route   GET /api/chat/session/:id

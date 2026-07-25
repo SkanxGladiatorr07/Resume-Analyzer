@@ -174,7 +174,8 @@ export const processChatMessage = async (sessionId, userId, question) => {
     }
 
     if (resume.embeddingStatus !== 'completed') {
-      throw new Error('Resume embeddings are not ready. Please wait for processing to complete.');
+      console.warn(`${logPrefix} ⚠️  Resume embeddings not ready (${resume.embeddingStatus}), proceeding without RAG context`);
+      // Don't throw error, just proceed without embeddings
     }
 
     const step1Time = Date.now() - stepStartTime;
@@ -192,67 +193,125 @@ export const processChatMessage = async (sessionId, userId, question) => {
     console.log(`${logPrefix}    • Message ID: ${userMessage._id}`);
     console.log(`${logPrefix}    • Length: ${question.length} characters\n`);
 
-    // Step 3: Generate embedding for question
+    // Step 3: Generate embedding for question (skip if embeddings not available)
     console.log(`${logPrefix} 🔢 Step 3/9: Generating question embedding...`);
     const step3StartTime = Date.now();
-    const questionEmbedding = await generateQueryEmbedding(question);
-    const step3Time = Date.now() - step3StartTime;
-    console.log(`${logPrefix} ✅ Step 3 Complete (${step3Time}ms)`);
-    console.log(`${logPrefix}    • Dimensions: ${questionEmbedding.length}`);
-    console.log(`${logPrefix}    • Model: text-embedding-004\n`);
+    let questionEmbedding = null;
+    
+    try {
+      questionEmbedding = await generateQueryEmbedding(question);
+      const step3Time = Date.now() - step3StartTime;
+      console.log(`${logPrefix} ✅ Step 3 Complete (${step3Time}ms)`);
+      console.log(`${logPrefix}    • Dimensions: ${questionEmbedding.length}`);
+      console.log(`${logPrefix}    • Model: embedding-001\n`);
+    } catch (embeddingError) {
+      const step3Time = Date.now() - step3StartTime;
+      console.warn(`${logPrefix} ⚠️  Step 3 Failed (${step3Time}ms) - Continuing without embedding`);
+      console.warn(`${logPrefix}    • Error: ${embeddingError.message}`);
+      questionEmbedding = null;
+    }
 
     // Step 4: Retrieve relevant chunks (Top K from config)
     console.log(`${logPrefix} 🔍 Step 4/9: Retrieving relevant resume chunks...`);
     const step4StartTime = Date.now();
-    const retrievalResult = await getContextForChat({
-      resumeId: resume._id.toString(),
-      query: question,
-      userId,
-      options: {
-        topK: chatConfig.retrieval.topK,
-        maxContextLength: chatConfig.retrieval.maxContextLength,
-        minSimilarityScore: chatConfig.retrieval.minSimilarityScore,
-        includeScores: true,
-        includeSections: true,
-      },
-    });
+    
+    let retrievalResult = { chunks: [], totalChunks: 0 };
+    
+    // Only retrieve if embeddings are ready AND question embedding was generated
+    if (resume.embeddingStatus === 'completed' && questionEmbedding) {
+      try {
+        retrievalResult = await getContextForChat({
+          resumeId: resume._id.toString(),
+          query: question,
+          userId,
+          options: {
+            topK: chatConfig.retrieval.topK,
+            maxContextLength: chatConfig.retrieval.maxContextLength,
+            minSimilarityScore: chatConfig.retrieval.minSimilarityScore,
+            includeScores: true,
+            includeSections: true,
+          },
+        });
+      } catch (retrievalError) {
+        console.warn(`${logPrefix} ⚠️  Retrieval failed, continuing without context:`, retrievalError.message);
+        retrievalResult = { chunks: [], totalChunks: 0 };
+      }
+    } else {
+      console.log(`${logPrefix} ⚠️  Skipping retrieval - embeddings not ready`);
+    }
 
     const step4Time = Date.now() - step4StartTime;
     console.log(`${logPrefix} ✅ Step 4 Complete (${step4Time}ms)`);
     console.log(`${logPrefix}    • Chunks Retrieved: ${retrievalResult.chunks.length}`);
-    retrievalResult.chunks.forEach((chunk, idx) => {
-      console.log(`${logPrefix}    • Chunk ${idx + 1}: ${chunk.sectionName} (${(chunk.score * 100).toFixed(1)}% match)`);
-    });
+    if (retrievalResult.chunks && retrievalResult.chunks.length > 0) {
+      retrievalResult.chunks.forEach((chunk, idx) => {
+        console.log(`${logPrefix}    • Chunk ${idx + 1}: ${chunk.sectionName} (${(chunk.score * 100).toFixed(1)}% match)`);
+      });
+    }
     console.log();
 
     // Check if we have relevant context
     if (retrievalResult.chunks.length === 0) {
-      console.log(`${logPrefix} ⚠️  No relevant chunks found - returning generic response\n`);
+      console.log(`${logPrefix} ⚠️  No chunks retrieved - using full resume text as fallback\n`);
       
-      // Clear request from cache
-      clearRequest(sessionId, question);
+      // Use the full extracted text from the resume as context
+      const resumeText = resume.extractedText || '';
       
-      // Create AI message with no context response
-      const aiMessage = await ChatMessage.createAIMessage(
-        sessionId,
-        "I don't have enough information in your resume to answer this question.",
-        [],
-        {
-          model: chatConfig.gemini.model,
-          tokensUsed: 0,
-          responseTime: Date.now() - startTime,
-        }
-      );
+      if (!resumeText || resumeText.trim().length === 0) {
+        console.log(`${logPrefix} ❌ No resume text available\n`);
+        
+        // Clear request from cache
+        clearRequest(sessionId, question);
+        
+        // Create AI message with no context response
+        const aiMessage = await ChatMessage.createAIMessage(
+          sessionId,
+          "I don't have access to your resume content yet. Please make sure your resume has been uploaded and processed.",
+          [],
+          {
+            model: chatConfig.gemini.model,
+            tokensUsed: 0,
+            responseTime: Date.now() - startTime,
+          }
+        );
 
-      const totalTime = Date.now() - startTime;
-      console.log(`${logPrefix} ✅ Pipeline Complete (${totalTime}ms) - No context response\n`);
-      console.log(`${'='.repeat(70)}\n`);
+        const totalTime = Date.now() - startTime;
+        console.log(`${logPrefix} ✅ Pipeline Complete (${totalTime}ms) - No resume text\n`);
+        console.log(`${'='.repeat(70)}\n`);
 
-      return {
-        success: true,
-        userMessage: {
-          id: userMessage._id,
-          sender: userMessage.sender,
+        return {
+          success: true,
+          userMessage: {
+            id: userMessage._id,
+            sender: userMessage.sender,
+            message: userMessage.message,
+            timestamp: userMessage.timestamp,
+          },
+          aiResponse: {
+            id: aiMessage._id,
+            sender: aiMessage.sender,
+            message: aiMessage.message,
+            timestamp: aiMessage.timestamp,
+            sourcesUsed: [],
+            status: aiMessage.status,
+          },
+          retrievalStats: {
+            chunksRetrieved: 0,
+            topScore: 0,
+            processingTime: totalTime,
+          },
+        };
+      }
+      
+      // Use full resume text as a single "chunk"
+      retrievalResult.chunks = [{
+        text: resumeText.substring(0, chatConfig.retrieval.maxContextLength),
+        sectionName: 'Full Resume',
+        score: 1.0,
+      }];
+      
+      console.log(`${logPrefix} ✅ Using ${resumeText.length} characters of resume text\n`);
+    }
           message: userMessage.message,
           timestamp: userMessage.timestamp,
         },

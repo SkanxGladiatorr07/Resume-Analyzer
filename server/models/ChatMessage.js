@@ -320,11 +320,11 @@ chatMessageSchema.statics.searchInSession = function (sessionId, searchText) {
  * Pre-save middleware
  * Set timestamp if not set
  */
-chatMessageSchema.pre('save', function (next) {
+chatMessageSchema.pre('save', function () {
   if (!this.timestamp) {
     this.timestamp = new Date();
   }
-  next();
+  // No need to call next() for synchronous hooks
 });
 
 /**

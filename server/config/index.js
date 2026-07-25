@@ -62,7 +62,7 @@ const config = {
 
   // Embedding configuration
   embedding: {
-    model: process.env.EMBEDDING_MODEL || 'text-embedding-004',
+    model: process.env.EMBEDDING_MODEL || 'embedding-001',
     dimension: parseInt(process.env.EMBEDDING_DIMENSION, 10) || 768,
     batchSize: parseInt(process.env.EMBEDDING_BATCH_SIZE, 10) || 100,
     maxRetries: parseInt(process.env.EMBEDDING_MAX_RETRIES, 10) || 3,

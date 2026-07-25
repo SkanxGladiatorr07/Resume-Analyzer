@@ -267,11 +267,11 @@ chatSessionSchema.statics.createSession = async function (userId, resumeId, resu
  * Pre-save middleware
  * Update lastMessageAt if it's null on creation
  */
-chatSessionSchema.pre('save', function (next) {
+chatSessionSchema.pre('save', function () {
   if (this.isNew && !this.lastMessageAt) {
     this.lastMessageAt = this.createdAt || new Date();
   }
-  next();
+  // No need to call next() - just return
 });
 
 const ChatSession = mongoose.model('ChatSession', chatSessionSchema);

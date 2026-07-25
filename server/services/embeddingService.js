@@ -30,7 +30,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
  */
 const getEmbeddingConfig = () => {
   const config = {
-    model: process.env.EMBEDDING_MODEL || 'text-embedding-004',
+    model: process.env.EMBEDDING_MODEL || 'embedding-001',
     dimension: parseInt(process.env.EMBEDDING_DIMENSION || '768', 10),
     batchSize: parseInt(process.env.EMBEDDING_BATCH_SIZE || '100', 10),
     maxRetries: parseInt(process.env.EMBEDDING_MAX_RETRIES || '3', 10),
