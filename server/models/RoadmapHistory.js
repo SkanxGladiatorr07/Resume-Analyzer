@@ -30,17 +30,13 @@ const roadmapHistorySchema = new mongoose.Schema(
       overview: String,
       phases: [
         {
+          name: String,
           phase: String,
           duration: String,
+          description: String,
           topics: [String],
-          resources: [
-            {
-              title: String,
-              type: String, // course, book, article, video, project
-              url: String,
-              description: String,
-            },
-          ],
+          skillsToLearn: [String],
+          resources: [mongoose.Schema.Types.Mixed], // Allow flexible resource structure
           milestones: [String],
         },
       ],
