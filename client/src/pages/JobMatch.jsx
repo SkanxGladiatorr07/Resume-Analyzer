@@ -164,7 +164,7 @@ const JobMatch = () => {
         setStatusMessage('AI is analyzing the match... (this may take 10-20 seconds)');
 
         try {
-          await pollJobMatchStatus(
+          const completedData = await pollJobMatchStatus(
             resumeId,
             jobDescriptionId,
             (statusData, attempts) => {
@@ -176,15 +176,33 @@ const JobMatch = () => {
             60 // 2 minutes max
           );
 
-          // Fetch final results
-          const resultsResponse = await getJobMatch(resumeId, jobDescriptionId);
-          setMatchResults(resultsResponse.data.data);
+          // Use data from polling if available, otherwise fetch
+          if (completedData && completedData.data) {
+            setMatchResults(completedData.data);
+          } else {
+            const resultsResponse = await getJobMatch(resumeId, jobDescriptionId);
+            setMatchResults(resultsResponse.data.data || resultsResponse.data);
+          }
           setStatusMessage('');
         } catch (pollError) {
-          if (pollError.message.includes('timeout')) {
-            setError('The comparison is taking longer than expected. Please check History page later.');
-          } else {
-            throw pollError;
+          console.log('Polling error, attempting to fetch results anyway:', pollError.message);
+          
+          // Even if polling times out, try to fetch results
+          try {
+            const resultsResponse = await getJobMatch(resumeId, jobDescriptionId);
+            if (resultsResponse.data && (resultsResponse.data.data || resultsResponse.data.matchScore !== undefined)) {
+              setMatchResults(resultsResponse.data.data || resultsResponse.data);
+              setStatusMessage('');
+              setError(null);
+            } else {
+              throw new Error('Results not ready yet');
+            }
+          } catch (fetchError) {
+            if (pollError.message.includes('timeout')) {
+              setError('The comparison is taking longer than expected. Please check History page later.');
+            } else {
+              throw pollError;
+            }
           }
         }
       }
@@ -654,7 +672,7 @@ const JobMatch = () => {
                   currentStep >= 3 ? 'bg-primary text-on-primary' : 'bg-surface-container-high text-on-surface-variant'
                 }`}
               >
-                3
+                {matchResults && currentStep >= 3 ? <MaterialIcon>check</MaterialIcon> : '3'}
               </div>
               <span className={`font-label-caps text-label-caps ${currentStep >= 3 ? 'text-primary' : 'text-on-surface-variant'}`}>
                 Results

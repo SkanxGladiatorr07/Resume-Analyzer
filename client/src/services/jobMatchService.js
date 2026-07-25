@@ -78,7 +78,7 @@ export const getJobMatchById = async (matchId) => {
  * @param {function} onUpdate - Callback for status updates
  * @param {number} interval - Polling interval in ms (default: 2000)
  * @param {number} maxAttempts - Maximum polling attempts (default: 60, ~2 minutes)
- * @returns {Promise} Final status
+ * @returns {Promise} Final match data when completed
  */
 export const pollJobMatchStatus = async (
   resumeId,
@@ -107,7 +107,14 @@ export const pollJobMatchStatus = async (
         }
 
         if (status === 'completed') {
-          resolve(response.data);
+          // Fetch the complete match data
+          try {
+            const matchData = await getJobMatch(resumeId, jobDescriptionId);
+            resolve(matchData.data);
+          } catch (fetchError) {
+            // Fallback to status data if fetch fails
+            resolve(response.data);
+          }
         } else if (status === 'failed') {
           reject(new Error(response.data.errorMessage || 'Job match generation failed'));
         } else {
