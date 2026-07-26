@@ -584,19 +584,6 @@ const ResumeChat = () => {
                       No resumes found. <a href="/upload" className="text-primary hover:underline">Upload a resume</a> to get started.
                     </p>
                   )}
-                  {userResumes.length > 0 && userResumes.filter(r => r.embeddingStatus === 'completed').length === 0 && (
-                    <div className="mt-sm p-sm bg-secondary-container rounded-lg text-left">
-                      <p className="text-body-sm text-on-secondary-container mb-xs">
-                        ⚠️ Your resumes are still processing. You can chat now, but AI responses will have limited context until processing completes (~30 seconds).
-                      </p>
-                      <button
-                        onClick={() => window.location.reload()}
-                        className="text-body-sm text-primary hover:underline font-medium"
-                      >
-                        Refresh to check status
-                      </button>
-                    </div>
-                  )}
                 </div>
 
                 {selectedResume && (
