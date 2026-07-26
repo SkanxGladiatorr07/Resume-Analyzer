@@ -678,10 +678,21 @@ const ResumeChat = () => {
                         : 'bg-surface-container-low border border-outline-variant rounded-tl-none'
                     }`}>
                       {message.sender === 'user' ? (
-                        <p className="text-body-base whitespace-pre-wrap">{message.message}</p>
+                        <p className="text-body-base whitespace-pre-wrap leading-relaxed">{message.message}</p>
                       ) : (
                         <>
-                          <div className="prose prose-sm max-w-none text-on-surface">
+                          <div className="prose prose-sm max-w-none text-on-surface
+                            prose-p:leading-relaxed prose-p:mb-4 prose-p:mt-0
+                            prose-headings:font-bold prose-headings:mt-6 prose-headings:mb-3
+                            prose-h1:text-xl prose-h2:text-lg prose-h3:text-base
+                            prose-ul:my-4 prose-ul:space-y-2 prose-ol:my-4 prose-ol:space-y-2
+                            prose-li:leading-relaxed prose-li:my-1
+                            prose-strong:font-bold prose-strong:text-on-surface
+                            prose-code:bg-surface-container-highest prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
+                            prose-pre:bg-surface-container-highest prose-pre:p-4 prose-pre:rounded-lg prose-pre:my-4
+                            prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:my-4
+                            prose-a:text-primary prose-a:underline prose-a:font-medium
+                            first:prose-p:mt-0 last:prose-p:mb-0">
                             <ReactMarkdown>{message.message}</ReactMarkdown>
                           </div>
                           
@@ -780,8 +791,8 @@ const ResumeChat = () => {
           </div>
         )}
 
-        {/* Input Area - Always show if resume is selected */}
-        {selectedResume && (
+        {/* Input Area - Show when resume is selected OR when there's an active session */}
+        {(selectedResume || currentSession) && (
           <footer className="p-lg md:px-xxl pb-xl pt-0 bg-transparent">
             {isCreatingSession && (
               <div className="max-w-4xl mx-auto mb-sm">
@@ -808,7 +819,7 @@ const ResumeChat = () => {
                     autoCorrect="off"
                     autoCapitalize="off"
                     spellCheck="false"
-                    className="flex-1 border-none focus:ring-0 text-body-base py-3 resize-none bg-transparent min-h-[48px] max-h-32 disabled:opacity-50"
+                    className="flex-1 border-none focus:ring-0 text-body-base py-3 resize-none bg-transparent min-h-[48px] max-h-32 disabled:opacity-50 outline-none"
                     style={{scrollbarWidth: 'thin'}}
                   />
                   <button
@@ -816,15 +827,25 @@ const ResumeChat = () => {
                     disabled={!inputMessage.trim() || isSending || isCreatingSession}
                     className="w-10 h-10 bg-primary text-white rounded-lg flex items-center justify-center shadow-md hover:bg-primary-container transition-all active:scale-95 disabled:bg-surface-container disabled:text-on-surface-variant disabled:cursor-not-allowed"
                   >
-                    <MaterialIcon>send</MaterialIcon>
+                    {isSending ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <MaterialIcon>send</MaterialIcon>
+                    )}
                   </button>
                 </div>
                 <div className="px-md pb-sm flex justify-between items-center">
                   <div className="flex gap-md items-center">
-                    {!currentSession && (
+                    {!currentSession && selectedResume && (
                       <span className="text-[10px] text-primary font-bold uppercase tracking-widest flex items-center gap-xs">
                         <MaterialIcon className="text-sm">info</MaterialIcon>
                         Type and send to start chat
+                      </span>
+                    )}
+                    {currentSession && (
+                      <span className="text-[10px] text-on-surface-variant flex items-center gap-xs">
+                        <MaterialIcon className="text-sm">chat</MaterialIcon>
+                        Chat active
                       </span>
                     )}
                   </div>

@@ -629,15 +629,17 @@ const JobMatch = () => {
           </p>
 
           {/* Progress Steps */}
-          <div className="flex items-start justify-between w-full relative px-5">
-            {/* Progress Line Container - positioned at circle center */}
-            <div className="absolute top-5 left-5 right-5 h-[2px] z-0">
-              {/* Background line */}
-              <div className="absolute inset-0 bg-outline-variant"></div>
+          <div className="flex items-start justify-between w-full relative">
+            {/* Progress Line Container - positioned at circle center with proper inset */}
+            <div className="absolute top-5 left-0 right-0 h-[2px] z-0 flex items-center px-5">
+              {/* Background line - only between circles */}
+              <div className="flex-1 bg-outline-variant h-full"></div>
               {/* Active progress line */}
               <div
-                className="absolute left-0 top-0 h-full bg-primary transition-all duration-500"
-                style={{ width: currentStep === 1 ? '0%' : currentStep === 2 ? '50%' : '100%' }}
+                className="absolute left-5 top-0 h-full bg-primary transition-all duration-500"
+                style={{ 
+                  width: currentStep === 1 ? '0%' : currentStep === 2 ? 'calc(50% - 2.5rem)' : 'calc(100% - 5rem)'
+                }}
               ></div>
             </div>
 
