@@ -17,6 +17,32 @@
 
 ---
 
+## 🎉 What's New in v1.0
+
+#### ✨ Complete AI Career Assistant Suite
+All career assistant tools are now fully functional:
+- **Interview Questions Generator**: Generate technical, behavioral, and project-based questions
+- **Project Suggestions**: Get personalized project ideas with learning outcomes
+- **Learning Roadmap**: Create comprehensive skill development plans
+- **Career Roadmap**: Plan your career progression from current to target role
+
+#### 💬 ChatGPT-Style Resume Chat
+- Completely redesigned chat interface
+- Auto-session creation - just select and chat
+- Works without embeddings (fallback to full text)
+- Real-time streaming responses
+- Source attribution with relevance scores
+
+#### 🚀 Performance & Reliability
+- Upgraded to Gemini 2.5 Flash for faster responses
+- Improved error handling and graceful degradation
+- Fixed all Mongoose middleware issues
+- Better timeout handling for AI operations
+- Optimized RAG pipeline with intelligent fallbacks
+
+
+---
+
 ## 📋 Table of Contents
 
 - [Introduction](#introduction)
@@ -74,21 +100,27 @@
 - Technical and soft skills gap analysis
 - Personalized recommendations for improvement
 
-#### 💬 **AI Resume Chat**
-- Interactive chat interface with your resume
-- Context-aware Q&A powered by vector embeddings
-- Source attribution for AI responses
-- Session management and history
-- Multi-resume support
+#### 💬 **AI Resume Chat** ✨ NEW
+- ChatGPT-like interface for resume conversations
+- Context-aware Q&A powered by RAG (Retrieval-Augmented Generation)
+- Vector embeddings with semantic search
+- Source attribution showing relevant resume sections
+- Auto-session creation - just select resume and start chatting
+- Session management with history
+- Multi-resume chat support
+- Real-time message streaming
+- Works even without embeddings (fallback to full resume text)
 
 
-#### 🛠️ **Career Assistant Tools**
-- **Resume Rewriter**: Optimize bullet points with different tones
-- **STAR Generator**: Transform experiences into STAR format stories
-- **Interview Questions**: Generate role-specific practice questions (Coming Soon)
-- **Project Suggestions**: Get portfolio project ideas (Coming Soon)
-- **Learning Roadmap**: Personalized skill development paths (Coming Soon)
-- **Career Roadmap**: 5-year career trajectory planning (Coming Soon)
+#### 🛠️ **Career Assistant Tools** ✨ ENHANCED
+- **Resume Rewriter**: Optimize bullet points with multiple tones (Professional, Creative, Technical, Executive)
+- **STAR Generator**: Transform experiences into compelling STAR format stories
+- **Interview Questions**: Generate role-specific practice questions with difficulty levels (Easy, Medium, Hard) ✅ IMPLEMENTED
+- **Project Suggestions**: Get portfolio project ideas based on skills and career goals (Beginner, Intermediate, Advanced) ✅ IMPLEMENTED
+- **Learning Roadmap**: Personalized skill development paths with phases, resources, and milestones ✅ IMPLEMENTED
+- **Career Roadmap**: 5-year career trajectory planning from current to target role ✅ IMPLEMENTED
+- All tools powered by Gemini 2.0 Flash with improved response times
+- History tracking for all AI-generated content
 
 #### 📈 **Analytics Dashboard**
 - Resume performance metrics and trends
@@ -162,9 +194,11 @@
 
 
 ### AI & Machine Learning
-- **LLM**: Google Gemini AI (gemini-1.5-flash, gemini-1.5-pro)
-- **Embeddings**: Google Generative AI Embeddings
-- **Vector Database**: In-memory vector store with cosine similarity
+- **LLM**: Google Gemini AI (gemini-2.0-flash-exp, gemini-2.5-flash)
+- **Embeddings**: Google Generative AI Embeddings (embedding-001)
+- **Vector Search**: Custom RAG pipeline with cosine similarity
+- **Chunking Strategy**: Intelligent text splitting for optimal context retrieval
+- **Fallback System**: Graceful degradation when embeddings unavailable
 - **Email Service**: Nodemailer with Gmail SMTP
 
 ### Development Tools
@@ -358,6 +392,8 @@ JWT_EXPIRE=7d
 
 # Google Gemini AI
 GEMINI_API_KEY=your_google_gemini_api_key
+GEMINI_MODEL=gemini-2.5-flash
+EMBEDDING_MODEL=embedding-001
 
 # Email Configuration (for password reset)
 EMAIL_HOST=smtp.gmail.com
@@ -531,12 +567,14 @@ Authorization: Bearer <your_jwt_token>
 #### Chat Routes (`/api/chat`)
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/sessions` | Create chat session | Yes |
+| POST | `/session` | Create chat session | Yes |
 | GET | `/sessions` | Get all sessions | Yes |
-| GET | `/sessions/:id` | Get session details | Yes |
-| POST | `/sessions/:id/messages` | Send message | Yes |
-| PUT | `/sessions/:id/title` | Update session title | Yes |
-| DELETE | `/sessions/:id` | Delete session | Yes |
+| GET | `/session/:id` | Get session with messages | Yes |
+| POST | `/:sessionId` | Send message (RAG pipeline) | Yes |
+| PATCH | `/session/:id/title` | Update session title | Yes |
+| PATCH | `/session/:id/archive` | Archive session | Yes |
+| DELETE | `/session/:id` | Delete session | Yes |
+| GET | `/:sessionId/stats` | Get session statistics | Yes |
 
 #### Dashboard Routes (`/api/dashboard`)
 | Method | Endpoint | Description | Auth Required |
@@ -548,10 +586,13 @@ Authorization: Bearer <your_jwt_token>
 #### Career Assistant Routes (`/api/career`)
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|---------------|
-| POST | `/rewrite` | Rewrite content | Yes |
-| POST | `/star` | Generate STAR format | Yes |
-| GET | `/config/rewrite` | Get rewrite config | Yes |
-| GET | `/config/star` | Get STAR config | Yes |
+| POST | `/ai/rewrite` | Rewrite content | Yes |
+| POST | `/ai/star` | Generate STAR format | Yes |
+| POST | `/ai/interview` | Generate interview questions | Yes |
+| POST | `/ai/projects` | Get project suggestions | Yes |
+| POST | `/ai/learning-roadmap` | Create learning roadmap | Yes |
+| POST | `/ai/career-roadmap` | Create career roadmap | Yes |
+| GET | `/ai/history` | Get AI generation history | Yes |
 
 ### Response Format
 

@@ -312,22 +312,6 @@ export const processChatMessage = async (sessionId, userId, question) => {
       
       console.log(`${logPrefix} ✅ Using ${resumeText.length} characters of resume text\n`);
     }
-          message: userMessage.message,
-          timestamp: userMessage.timestamp,
-        },
-        aiResponse: {
-          id: aiMessage._id,
-          sender: aiMessage.sender,
-          message: aiMessage.message,
-          timestamp: aiMessage.timestamp,
-          sourcesUsed: [],
-        },
-        retrievalStats: {
-          chunksRetrieved: 0,
-          processingTime: totalTime,
-        },
-      };
-    }
 
     // Step 5: Build structured prompt with new prompt builder
     console.log(`${logPrefix} 📝 Step 5/9: Building structured prompt...`);
