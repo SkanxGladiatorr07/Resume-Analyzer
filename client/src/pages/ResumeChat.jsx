@@ -9,7 +9,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { chatService, resumeService } from '../services';
 import ReactMarkdown from 'react-markdown';
-import { MaterialIcon } from '../components';
+import { MaterialIcon, ConfirmDialog } from '../components';
 
 const ResumeChat = () => {
   const { user } = useAuth();
@@ -33,6 +33,11 @@ const ResumeChat = () => {
   const [editingTitle, setEditingTitle] = useState('');
   const [copiedMessageId, setCopiedMessageId] = useState(null);
   const [isCreatingSession, setIsCreatingSession] = useState(false);
+  
+  // Delete confirmation dialog
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [sessionToDelete, setSessionToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Refs
   const messagesEndRef = useRef(null);
@@ -286,30 +291,50 @@ const ResumeChat = () => {
   };
 
   /**
-   * Delete session
+   * Delete session - show confirmation dialog
    */
-  const handleDeleteSession = async (sessionId, e) => {
+  const handleDeleteSession = (sessionId, e) => {
     e.stopPropagation();
-    
-    if (!window.confirm('Are you sure you want to delete this chat session?')) {
-      return;
-    }
+    setSessionToDelete(sessionId);
+    setShowDeleteDialog(true);
+  };
+
+  /**
+   * Confirm delete session
+   */
+  const confirmDeleteSession = async () => {
+    if (!sessionToDelete) return;
 
     try {
-      await chatService.deleteSession(sessionId);
+      setIsDeleting(true);
+      await chatService.deleteSession(sessionToDelete);
       
       // Remove from sessions list
-      setSessions((prev) => prev.filter((s) => s.id !== sessionId));
+      setSessions((prev) => prev.filter((s) => s.id !== sessionToDelete));
       
       // If current session, clear it
-      if (currentSession?.id === sessionId) {
+      if (currentSession?.id === sessionToDelete) {
         setCurrentSession(null);
         setMessages([]);
       }
+
+      // Close dialog and reset state
+      setShowDeleteDialog(false);
+      setSessionToDelete(null);
     } catch (err) {
       console.error('Error deleting session:', err);
       setError('Failed to delete session');
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  /**
+   * Cancel delete session
+   */
+  const cancelDeleteSession = () => {
+    setShowDeleteDialog(false);
+    setSessionToDelete(null);
   };
 
   /**
@@ -810,6 +835,18 @@ const ResumeChat = () => {
           </footer>
         )}
       </section>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        title="Delete Chat Session?"
+        message="Are you sure you want to delete this chat session? This action cannot be undone and all messages will be permanently removed."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDeleteSession}
+        onCancel={cancelDeleteSession}
+        isLoading={isDeleting}
+      />
     </div>
   );
 };

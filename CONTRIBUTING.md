@@ -1,6 +1,6 @@
-# Contributing to ResumeAI
+# Contributing to Resume ATS Analyzer
 
-First off, thank you for considering contributing to ResumeAI! It's people like you that make ResumeAI such a great tool.
+Thank you for your interest in contributing to Resume ATS Analyzer! This project helps job seekers optimize their resumes using AI-powered analysis. Every contribution makes this tool better for everyone.
 
 ## Table of Contents
 
@@ -11,32 +11,29 @@ First off, thank you for considering contributing to ResumeAI! It's people like 
 - [Style Guidelines](#style-guidelines)
 - [Commit Messages](#commit-messages)
 - [Pull Request Process](#pull-request-process)
-- [Community](#community)
+- [Testing Guidelines](#testing-guidelines)
+- [Questions & Support](#questions--support)
 
 ---
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by our Code of Conduct. By participating, you are expected to uphold this code.
-
-### Our Pledge
-
-We pledge to make participation in our project a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, nationality, personal appearance, race, religion, or sexual identity and orientation.
+This project follows a Code of Conduct to ensure a welcoming and inclusive environment for all contributors.
 
 ### Our Standards
 
-**Positive behavior includes:**
+**Positive behaviors:**
 - Using welcoming and inclusive language
-- Being respectful of differing viewpoints and experiences
-- Gracefully accepting constructive criticism
-- Focusing on what is best for the community
-- Showing empathy towards other community members
+- Being respectful of different viewpoints and experiences
+- Accepting constructive criticism gracefully
+- Focusing on what's best for the community
+- Showing empathy towards others
 
-**Unacceptable behavior includes:**
-- Trolling, insulting/derogatory comments, and personal or political attacks
-- Public or private harassment
-- Publishing others' private information without explicit permission
-- Other conduct which could reasonably be considered inappropriate
+**Unacceptable behaviors:**
+- Harassment, trolling, or derogatory comments
+- Personal or political attacks
+- Publishing others' private information without permission
+- Any conduct that could reasonably be considered unprofessional
 
 ---
 
@@ -44,177 +41,209 @@ We pledge to make participation in our project a harassment-free experience for 
 
 ### Prerequisites
 
-Before contributing, ensure you have:
-- Node.js (v18+)
-- MongoDB (v6.0+)
-- Git
-- A code editor (VS Code recommended)
-- Basic knowledge of React and Node.js
+Ensure you have the following installed:
+- **Node.js** v18+ ([Download](https://nodejs.org/))
+- **MongoDB** v6.0+ ([Download](https://www.mongodb.com/try/download/community))
+- **Git** ([Download](https://git-scm.com/downloads))
+- **Code Editor** (VS Code recommended)
+- **Google Gemini API Key** ([Get one here](https://makersuite.google.com/app/apikey))
 
 ### Setting Up Development Environment
 
 1. **Fork the repository**
-   ```bash
-   # Click the 'Fork' button on GitHub
-   ```
+   - Click the 'Fork' button on GitHub to create your copy
 
 2. **Clone your fork**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/resumeai.git
-   cd resumeai
+   git clone https://github.com/YOUR_USERNAME/resume-ats-analyzer.git
+   cd resume-ats-analyzer
    ```
 
-3. **Add upstream remote**
+3. **Add upstream remote** (to stay updated with original repo)
    ```bash
-   git remote add upstream https://github.com/original/resumeai.git
+   git remote add upstream https://github.com/ORIGINAL_OWNER/resume-ats-analyzer.git
    ```
 
 4. **Install dependencies**
    ```bash
-   # Backend
+   # Backend dependencies
    cd server
    npm install
 
-   # Frontend
+   # Frontend dependencies
    cd ../client
    npm install
    ```
 
 5. **Set up environment variables**
+   
+   **Backend** (`server/.env`):
    ```bash
-   # Copy example env files
    cp server/.env.example server/.env
+   # Edit server/.env with your values:
+   # - MONGO_URI (your MongoDB connection string)
+   # - JWT_SECRET (random secure string)
+   # - GEMINI_API_KEY (your Google Gemini API key)
+   ```
+
+   **Frontend** (`client/.env`):
+   ```bash
    cp client/.env.example client/.env
-   # Edit with your configurations
+   # Edit client/.env with:
+   # - VITE_API_BASE_URL=http://localhost:5000/api
    ```
 
 6. **Start development servers**
    ```bash
-   # Terminal 1 - Backend
+   # Terminal 1 - Backend (port 5000)
    cd server
    npm run dev
 
-   # Terminal 2 - Frontend
+   # Terminal 2 - Frontend (port 3002)
    cd client
    npm run dev
    ```
+
+7. **Verify setup**
+   - Open browser to `http://localhost:3002`
+   - Register a new account
+   - Upload a test resume to verify everything works
 
 ---
 
 ## How Can I Contribute?
 
-### Reporting Bugs
+### Reporting Bugs 🐛
 
-Before creating bug reports, please check the existing issues to avoid duplicates.
-
-**When creating a bug report, include:**
-- **Clear and descriptive title**
-- **Steps to reproduce** the behavior
-- **Expected behavior** vs **actual behavior**
-- **Screenshots** if applicable
-- **Environment details** (OS, Node version, browser, etc.)
-- **Error messages** or console logs
+Before creating a bug report, please:
+1. Check [existing issues](https://github.com/ORIGINAL_OWNER/resume-ats-analyzer/issues) to avoid duplicates
+2. Update to the latest version to see if the bug persists
 
 **Bug Report Template:**
 ```markdown
-**Describe the bug**
-A clear description of what the bug is.
+**Bug Description**
+Clear description of what the bug is.
 
-**To Reproduce**
-Steps to reproduce:
+**Steps to Reproduce**
 1. Go to '...'
 2. Click on '...'
-3. See error
+3. Upload file '...'
+4. See error
 
-**Expected behavior**
-What you expected to happen.
+**Expected Behavior**
+What should have happened.
+
+**Actual Behavior**
+What actually happened.
 
 **Screenshots**
-If applicable, add screenshots.
+If applicable, attach screenshots.
 
 **Environment:**
-- OS: [e.g., Windows 11, macOS 13, Ubuntu 22.04]
-- Node.js version: [e.g., v18.17.0]
+- OS: [e.g., Windows 11, macOS 14, Ubuntu 22.04]
+- Node.js: [e.g., v18.17.0]
 - Browser: [e.g., Chrome 120, Firefox 121]
-- ResumeAI version: [e.g., 1.0.0]
+- MongoDB: [e.g., v6.0]
 
-**Additional context**
-Any other context about the problem.
+**Console Errors**
+Paste any error messages from browser console or terminal.
+
+**Additional Context**
+Any other relevant information.
 ```
 
-### Suggesting Enhancements
+### Suggesting Features ✨
 
-Enhancement suggestions are welcome! Please provide:
-- **Clear and descriptive title**
-- **Detailed description** of the proposed feature
-- **Use cases** - why this would be useful
-- **Possible implementation** approach (optional)
-- **Mockups or examples** (if applicable)
+We welcome feature suggestions! Please include:
+- **Clear title** describing the feature
+- **Problem statement** - what problem does this solve?
+- **Proposed solution** - how should it work?
+- **Use cases** - who would benefit and how?
+- **Mockups/examples** (optional but helpful)
 
-### Your First Code Contribution
+**Example Feature Request:**
+```markdown
+**Feature**: Resume Template Library
 
-Unsure where to begin? Look for issues labeled:
-- `good first issue` - Good for newcomers
-- `help wanted` - Extra attention needed
-- `beginner friendly` - Easy to tackle
+**Problem**: Users struggle to format their resumes properly.
 
-### Pull Requests
+**Solution**: Provide 5-10 pre-designed ATS-friendly resume templates.
 
-1. **Find or create an issue** for what you want to work on
-2. **Comment on the issue** to let others know you're working on it
-3. **Fork and create a branch** from `main`
-4. **Make your changes** following our guidelines
-5. **Test thoroughly** - ensure all tests pass
-6. **Submit a pull request**
+**Use Cases**: 
+- New graduates can quickly create professional resumes
+- Career changers can adapt templates for their field
+
+**Mockups**: [Attach images or wireframes]
+```
+
+### Your First Code Contribution 🎯
+
+New to the project? Look for issues labeled:
+- `good first issue` - Perfect for newcomers
+- `help wanted` - Community help needed
+- `documentation` - Help improve docs
+
+**First-time contributor workflow:**
+1. Comment on the issue expressing interest
+2. Wait for maintainer to assign you
+3. Ask questions if anything is unclear
+4. Submit your PR when ready
 
 ---
 
 ## Development Workflow
 
-### Branch Naming Convention
+### Branch Naming Conventions
 
-Use descriptive branch names:
-- `feature/add-resume-templates` - New features
-- `bugfix/fix-upload-error` - Bug fixes
-- `hotfix/security-patch` - Urgent fixes
-- `docs/update-readme` - Documentation
-- `refactor/improve-api-structure` - Code refactoring
-- `test/add-unit-tests` - Testing
+Use descriptive, hyphenated branch names:
+
+| Type | Format | Example |
+|------|--------|---------|
+| Feature | `feature/description` | `feature/add-resume-templates` |
+| Bug Fix | `bugfix/description` | `bugfix/fix-upload-validation` |
+| Hotfix | `hotfix/description` | `hotfix/security-patch` |
+| Docs | `docs/description` | `docs/update-api-guide` |
+| Refactor | `refactor/description` | `refactor/improve-auth-flow` |
+| Test | `test/description` | `test/add-resume-upload-tests` |
 
 ### Making Changes
 
-1. **Create a new branch**
+1. **Create a feature branch**
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
-2. **Make your changes**
-   - Write clean, readable code
-   - Follow existing patterns and conventions
+2. **Write clean code**
+   - Follow existing code patterns
    - Add comments for complex logic
-   - Keep functions small and focused
+   - Keep functions small and focused (< 50 lines ideally)
+   - Use meaningful variable names
 
 3. **Test your changes**
    ```bash
-   # Run backend tests
+   # Backend tests
    cd server
    npm test
 
-   # Run frontend tests
+   # Frontend tests
    cd client
    npm test
+
+   # Manual testing
+   # Start both servers and test in browser
    ```
 
-4. **Commit your changes**
+4. **Commit frequently**
    ```bash
    git add .
-   git commit -m "feat: add resume template feature"
+   git commit -m "feat: add resume template selection"
    ```
 
-5. **Keep your branch updated**
+5. **Stay up-to-date with main**
    ```bash
    git fetch upstream
    git rebase upstream/main
+   # Resolve any conflicts
    ```
 
 6. **Push to your fork**
@@ -226,177 +255,153 @@ Use descriptive branch names:
 
 ## Style Guidelines
 
-### JavaScript Style Guide
+### JavaScript/React Best Practices
 
-We follow industry-standard JavaScript practices:
+**General Principles:**
+- Use ES6+ features (const/let, arrow functions, destructuring)
+- Prefer `const` by default, `let` only when reassignment needed
+- Never use `var`
+- Use async/await over Promise chains
+- Handle errors gracefully with try-catch
+- Always validate user input
 
-**General Rules:**
-- Use ES6+ features (arrow functions, destructuring, etc.)
-- Use `const` by default, `let` when reassignment is needed
-- Avoid `var`
-- Use meaningful variable and function names
-- Keep functions pure when possible
-- Handle errors gracefully
-
-**Example:**
+**Good Example:**
 ```javascript
-// Good
-const calculateATSScore = (resume, keywords) => {
-  if (!resume || !keywords) {
-    throw new Error('Invalid input');
+// Clean, readable, handles errors
+const calculateATSScore = async (resumeText, keywords) => {
+  if (!resumeText || !Array.isArray(keywords)) {
+    throw new Error('Invalid input: resume text and keywords array required');
   }
-  
-  const score = keywords.reduce((acc, keyword) => {
-    return resume.includes(keyword) ? acc + 10 : acc;
-  }, 0);
-  
-  return Math.min(score, 100);
-};
 
-// Bad
-var calc = function(r, k) {
-  var s = 0;
-  for(var i=0; i<k.length; i++) {
-    if(r.includes(k[i])) s += 10;
+  try {
+    const matchedKeywords = keywords.filter(keyword => 
+      resumeText.toLowerCase().includes(keyword.toLowerCase())
+    );
+    
+    const score = Math.min((matchedKeywords.length / keywords.length) * 100, 100);
+    return Math.round(score);
+  } catch (error) {
+    console.error('Error calculating ATS score:', error);
+    throw error;
   }
-  return s;
+};
+```
+
+**Bad Example:**
+```javascript
+// Avoid: unclear naming, no error handling, uses var
+var calc = function(txt, arr) {
+  var cnt = 0;
+  for(var i=0; i<arr.length; i++) {
+    if(txt.includes(arr[i])) cnt++;
+  }
+  return (cnt/arr.length)*100;
 }
 ```
 
-
-### React/JSX Style Guide
-
-**Component Structure:**
-```javascript
-// 1. Imports
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ComponentName } from '../components';
-
-// 2. Component Definition
-const MyComponent = ({ prop1, prop2 }) => {
-  // 3. Hooks
-  const navigate = useNavigate();
-  const [state, setState] = useState(null);
-  
-  // 4. Effects
-  useEffect(() => {
-    // Effect logic
-  }, []);
-  
-  // 5. Event Handlers
-  const handleClick = () => {
-    // Handler logic
-  };
-  
-  // 6. Render
-  return (
-    <div className="container">
-      {/* JSX content */}
-    </div>
-  );
-};
-
-// 7. Export
-export default MyComponent;
-```
-
-**JSX Guidelines:**
-- Use self-closing tags when no children: `<Component />`
-- Use double quotes for JSX attributes
-- Use camelCase for event handlers: `onClick`, `onChange`
-- Extract complex JSX into separate components
-- Use fragments `<>` instead of unnecessary divs
-
 ### CSS/Tailwind Guidelines
 
-- Use Tailwind utility classes consistently
-- Follow Material Design 3 color tokens
-- Use responsive modifiers: `md:`, `lg:`, `xl:`
-- Group related utilities: `className="flex items-center gap-md"`
-- Extract repeated patterns into components
+**Material Design 3 Principles:**
+- Use MD3 color tokens: `bg-primary`, `text-on-surface`, `border-outline`
+- Follow spacing scale: `gap-xs`, `gap-sm`, `gap-md`, `gap-lg`, `gap-xl`
+- Use proper elevation: `shadow-sm`, `shadow-md`, `shadow-lg`
+- Responsive design: Always test mobile, tablet, and desktop
+
+**Class Organization:**
+```javascript
+// Group related utilities for readability
+className="
+  flex items-center justify-between gap-md
+  p-lg rounded-xl
+  bg-surface-container-lowest
+  border-2 border-outline
+  hover:border-primary hover:shadow-md
+  transition-all duration-300
+"
+```
 
 ### File Organization
 
-**Backend:**
-- Controllers: Handle HTTP requests/responses
-- Services: Business logic and external integrations
-- Models: Database schemas
-- Routes: API endpoint definitions
-- Middleware: Request processing
-- Utils: Helper functions
-
-**Frontend:**
-- Components: Reusable UI components
-- Pages: Route-level components
-- Hooks: Custom React hooks
-- Services: API calls
-- Utils: Helper functions
-- Context: Global state management
+```
+project-root/
+├── client/
+│   ├── src/
+│   │   ├── components/      # Reusable UI components
+│   │   │   ├── ui/          # Basic UI elements (Button, Card, etc.)
+│   │   │   └── dashboard/   # Feature-specific components
+│   │   ├── pages/           # Route-level components
+│   │   ├── hooks/           # Custom React hooks
+│   │   ├── services/        # API communication
+│   │   ├── utils/           # Helper functions
+│   │   ├── context/         # Global state (Auth, Theme, etc.)
+│   │   └── layouts/         # Page layouts
+│   
+├── server/
+│   ├── controllers/         # HTTP request handlers
+│   ├── services/            # Business logic
+│   ├── models/              # Mongoose schemas
+│   ├── routes/              # API routes
+│   ├── middleware/          # Auth, validation, error handling
+│   ├── utils/               # Helper functions
+│   └── config/              # Configuration files
+```
 
 ---
 
 ## Commit Messages
 
-We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification.
+We follow [Conventional Commits](https://www.conventionalcommits.org/) for consistency and automated changelog generation.
 
 ### Format
 
 ```
 <type>(<scope>): <subject>
 
-<body>
+[optional body]
 
-<footer>
+[optional footer]
 ```
 
 ### Types
 
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, missing semi-colons, etc.)
-- `refactor`: Code refactoring
-- `perf`: Performance improvements
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
-- `ci`: CI/CD changes
-- `build`: Build system changes
+| Type | Description | Example |
+|------|-------------|---------|
+| `feat` | New feature | `feat(upload): add drag-and-drop resume upload` |
+| `fix` | Bug fix | `fix(auth): resolve token expiration issue` |
+| `docs` | Documentation only | `docs(readme): add API documentation` |
+| `style` | Code formatting | `style: format code with prettier` |
+| `refactor` | Code restructuring | `refactor(api): simplify error handling` |
+| `perf` | Performance improvement | `perf(analysis): optimize ATS score calculation` |
+| `test` | Adding tests | `test(auth): add login integration tests` |
+| `chore` | Maintenance | `chore: update dependencies` |
+| `ci` | CI/CD changes | `ci: add GitHub Actions workflow` |
 
 ### Examples
 
 ```bash
-feat(auth): add password reset functionality
+# Simple commit
+feat: add resume template selection
 
-Implement forgot password and reset password endpoints
-with email verification using JWT tokens.
+# With scope
+fix(upload): validate file size before upload
 
-Closes #123
+# With body and footer
+feat(chat): implement AI resume chat feature
+
+Add ChatGPT-style interface for users to ask questions
+about their resume. Uses Gemini AI with RAG pipeline
+for context-aware responses.
+
+Closes #145
 ```
 
-```bash
-fix(upload): resolve file size validation error
+### Commit Guidelines
 
-The file size check was incorrectly rejecting valid files.
-Updated validation logic to properly handle file sizes.
-
-Fixes #456
-```
-
-```bash
-docs(readme): update installation instructions
-
-Added clearer steps for MongoDB setup and environment
-variable configuration.
-```
-
-### Commit Message Guidelines
-
-- Use present tense: "add feature" not "added feature"
-- Use imperative mood: "move cursor to" not "moves cursor to"
-- Limit first line to 72 characters
-- Reference issues and pull requests in the footer
-- Explain **what** and **why**, not **how** (code shows how)
+- ✅ Use present tense: "add feature" not "added feature"
+- ✅ Use imperative mood: "move cursor to" not "moves cursor to"
+- ✅ Limit first line to 72 characters
+- ✅ Reference issues: `Closes #123`, `Fixes #456`, `Relates to #789`
+- ✅ Explain *what* and *why*, not *how* (code shows how)
 
 ---
 
@@ -404,172 +409,179 @@ variable configuration.
 
 ### Before Submitting
 
-**Checklist:**
+Run through this checklist:
+
 - [ ] Code follows the project's style guidelines
-- [ ] Self-review of code completed
-- [ ] Comments added for complex code
-- [ ] Documentation updated (if needed)
-- [ ] No new warnings generated
-- [ ] Tests added/updated and passing
-- [ ] All existing tests pass
-- [ ] Branch is up to date with main
+- [ ] Self-reviewed code for quality and clarity
+- [ ] Added comments for complex or non-obvious code
+- [ ] Updated documentation (README, API docs, etc.)
+- [ ] No new warnings in console or terminal
+- [ ] Added/updated tests for new functionality
+- [ ] All tests pass (`npm test` in both client and server)
+- [ ] Tested manually in browser (all major features work)
+- [ ] Branch is up-to-date with upstream/main
+- [ ] Commit messages follow Conventional Commits format
 
-### Submitting a Pull Request
+### Creating a Pull Request
 
-1. **Push your branch** to your fork on GitHub
+1. **Push your branch**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
 
-2. **Open a Pull Request** from your branch to `main`
+2. **Open Pull Request** on GitHub from your branch to upstream/main
 
-3. **Fill out the PR template** with all required information
+3. **Fill out PR template** completely (see below)
 
-4. **Link related issues** using keywords:
-   - `Closes #123` - Closes the issue when PR is merged
+4. **Link related issues**
+   - `Closes #123` - Automatically closes issue when PR merges
    - `Fixes #456` - Same as Closes
-   - `Resolves #789` - Same as Closes
+   - `Resolves #789` - Same as Closes  
    - `Related to #321` - References without closing
 
 ### Pull Request Template
 
 ```markdown
 ## Description
-Brief description of changes made.
+Brief description of what this PR does.
 
 ## Type of Change
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] Documentation update
+- [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
+- [ ] ✨ New feature (non-breaking change which adds functionality)
+- [ ] 💥 Breaking change (fix or feature that would cause existing functionality to change)
+- [ ] 📝 Documentation update
+- [ ] ♻️ Code refactoring
+- [ ] ⚡ Performance improvement
+
+## Motivation and Context
+Why is this change needed? What problem does it solve?
 
 ## How Has This Been Tested?
-Describe the tests you ran.
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Manual testing
+- [ ] Tested on multiple browsers (Chrome, Firefox, Safari)
+- [ ] Tested responsive design (mobile, tablet, desktop)
+
+**Test Environment:**
+- OS: [e.g., Windows 11]
+- Node.js: [e.g., v18.17.0]
+- Browser: [e.g., Chrome 120]
+
+## Screenshots (if applicable)
+Add screenshots or screen recordings for UI changes.
 
 ## Checklist
 - [ ] My code follows the style guidelines
 - [ ] I have performed a self-review
-- [ ] I have commented my code
-- [ ] I have updated the documentation
+- [ ] I have commented complex code
+- [ ] I have updated documentation
 - [ ] My changes generate no new warnings
-- [ ] I have added tests
-- [ ] New and existing tests pass
-
-## Screenshots (if applicable)
-Add screenshots here.
+- [ ] I have added tests that prove my fix/feature works
+- [ ] New and existing tests pass locally
+- [ ] I have checked my code for security vulnerabilities
 
 ## Related Issues
 Closes #(issue number)
+
+## Additional Notes
+Any additional information reviewers should know.
 ```
 
 ### Review Process
 
-1. **Automated checks** must pass (linting, tests, build)
+1. **Automated checks** run (linting, tests, build)
 2. **Code review** by at least one maintainer
-3. **Address feedback** and push new commits if needed
-4. **Approval** from maintainer(s)
-5. **Merge** by maintainer
+3. **Address feedback** - push new commits if changes requested
+4. **Re-review** if significant changes made
+5. **Approval** from maintainer(s)
+6. **Merge** by maintainer (usually squash and merge)
 
 ### After Merge
 
-- Delete your branch (both locally and on GitHub)
-- Update your local repository:
-  ```bash
-  git checkout main
-  git pull upstream main
-  ```
+Clean up your branches:
+```bash
+# Delete local branch
+git branch -d feature/your-feature-name
+
+# Delete remote branch
+git push origin --delete feature/your-feature-name
+
+# Update your main branch
+git checkout main
+git pull upstream main
+```
 
 ---
 
 ## Testing Guidelines
 
-### Writing Tests
+### Test Coverage Goals
 
-**Backend Tests (Jest):**
-```javascript
-describe('Resume Service', () => {
-  describe('calculateATSScore', () => {
-    it('should return 0 for empty resume', () => {
-      const score = calculateATSScore('', ['keyword']);
-      expect(score).toBe(0);
-    });
+| Component | Target Coverage |
+|-----------|----------------|
+| Critical paths (auth, upload, analysis) | 90%+ |
+| Services and utilities | 80%+ |
+| UI components | 70%+ |
+| Overall project | 75%+ |
 
-    it('should calculate correct score for matching keywords', () => {
-      const resume = 'I have experience with React and Node.js';
-      const keywords = ['React', 'Node.js'];
-      const score = calculateATSScore(resume, keywords);
-      expect(score).toBeGreaterThan(0);
-    });
-  });
-});
+### Running Tests
+
+```bash
+# Backend tests
+cd server
+npm test
+
+# Backend tests with coverage
+npm run test:coverage
+
+# Frontend tests
+cd client
+npm test
+
+# Frontend tests with coverage
+npm run test:coverage
+
+# Watch mode (auto-rerun on file changes)
+npm run test:watch
 ```
-
-**Frontend Tests (Vitest + React Testing Library):**
-```javascript
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
-import Button from './Button';
-
-describe('Button Component', () => {
-  it('renders with correct text', () => {
-    render(<Button>Click Me</Button>);
-    expect(screen.getByText('Click Me')).toBeInTheDocument();
-  });
-
-  it('calls onClick when clicked', () => {
-    const handleClick = vi.fn();
-    render(<Button onClick={handleClick}>Click Me</Button>);
-    fireEvent.click(screen.getByText('Click Me'));
-    expect(handleClick).toHaveBeenCalledTimes(1);
-  });
-});
-```
-
-### Test Coverage
-
-Aim for:
-- **Unit Tests**: 80%+ coverage
-- **Integration Tests**: Critical paths covered
-- **E2E Tests**: Main user flows tested
 
 ---
 
-## Community
+## Questions & Support
 
 ### Getting Help
 
-- **GitHub Discussions**: Ask questions and share ideas
-- **Discord**: Join our community server
-- **Stack Overflow**: Tag questions with `resumeai`
+- 💬 **GitHub Discussions**: Ask questions, share ideas
+- 🐛 **Issues**: Report bugs or request features
+- 📧 **Email**: For sensitive matters, contact project maintainers
+
+### Useful Resources
+
+- [React Documentation](https://react.dev/)
+- [Node.js Documentation](https://nodejs.org/docs/)
+- [MongoDB Documentation](https://docs.mongodb.com/)
+- [Material Design 3](https://m3.material.io/)
+- [Google Gemini AI](https://ai.google.dev/)
+- [Conventional Commits](https://www.conventionalcommits.org/)
 
 ### Recognition
 
 Contributors are recognized in:
-- README.md Contributors section
-- Release notes
-- Annual contributor spotlight
-
-### Core Contributor Guidelines
-
-To become a core contributor:
-1. Consistently contribute quality code
-2. Help review pull requests
-3. Participate in discussions
-4. Mentor new contributors
-5. Demonstrate commitment to the project
+- 🏆 README Contributors section
+- 📝 Release notes for each version
+- 💎 Special shoutouts for significant contributions
 
 ---
 
 ## License
 
-By contributing to ResumeAI, you agree that your contributions will be licensed under the MIT License.
+By contributing to Resume ATS Analyzer, you agree that your contributions will be licensed under the MIT License.
 
 ---
 
-## Questions?
+## Thank You! 🙏
 
-Don't hesitate to ask! We're here to help:
-- Open an issue for questions
-- Join our Discord community
-- Email: contributors@resumeai.com
+Your contributions make Resume ATS Analyzer better for job seekers everywhere. Whether it's code, documentation, bug reports, or feature ideas - every contribution matters!
 
----
-
-**Thank you for contributing to ResumeAI! 🎉**
+**Happy Coding!** 🚀

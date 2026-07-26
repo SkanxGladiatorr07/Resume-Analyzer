@@ -285,7 +285,7 @@ const JobMatch = () => {
             />
             <div
               onClick={() => setSelectedResume(resume)}
-              className="p-lg rounded-xl bg-surface-container-lowest border-2 border-transparent peer-checked:border-primary peer-checked:bg-primary-fixed hover:shadow-md transition-all h-full flex flex-col"
+              className="p-lg rounded-xl bg-surface-container-lowest border-2 border-outline hover:border-outline-variant peer-checked:border-primary peer-checked:bg-primary-fixed peer-checked:shadow-lg hover:shadow-md transition-all h-full flex flex-col cursor-pointer"
             >
               <div className="flex justify-between items-start mb-md">
                 <MaterialIcon className="text-primary text-4xl">description</MaterialIcon>
@@ -310,7 +310,7 @@ const JobMatch = () => {
         {/* Upload New Resume Card */}
         <button
           onClick={() => navigate('/upload')}
-          className="p-lg rounded-xl border-2 border-dashed border-outline-variant hover:border-primary hover:bg-surface-container-low transition-all h-full flex flex-col items-center justify-center group"
+          className="p-lg rounded-xl border-2 border-dashed border-outline hover:border-primary hover:bg-surface-container-low hover:shadow-md transition-all h-full flex flex-col items-center justify-center group"
         >
           <div className="w-12 h-12 rounded-full bg-surface-container-highest group-hover:bg-primary-fixed flex items-center justify-center mb-md transition-colors">
             <MaterialIcon className="text-on-surface-variant group-hover:text-primary">add</MaterialIcon>
@@ -629,24 +629,30 @@ const JobMatch = () => {
           </p>
 
           {/* Progress Steps */}
-          <div className="flex items-start justify-between w-full relative">
-            {/* Progress Line - positioned at circle center (20px from top = 10px radius) */}
-            <div className="absolute top-5 left-0 w-full h-[2px] bg-outline-variant z-0"></div>
-            <div
-              className="absolute top-5 left-0 h-[2px] bg-primary z-0 transition-all duration-500"
-              style={{ width: currentStep === 1 ? '0%' : currentStep === 2 ? '50%' : '100%' }}
-            ></div>
+          <div className="flex items-start justify-between w-full relative px-5">
+            {/* Progress Line Container - positioned at circle center */}
+            <div className="absolute top-5 left-5 right-5 h-[2px] z-0">
+              {/* Background line */}
+              <div className="absolute inset-0 bg-outline-variant"></div>
+              {/* Active progress line */}
+              <div
+                className="absolute left-0 top-0 h-full bg-primary transition-all duration-500"
+                style={{ width: currentStep === 1 ? '0%' : currentStep === 2 ? '50%' : '100%' }}
+              ></div>
+            </div>
 
             {/* Step 1 */}
             <div className="relative z-10 flex flex-col items-center gap-xs">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 ${
-                  currentStep >= 1 ? 'bg-primary text-on-primary' : 'bg-surface-container-high text-on-surface-variant'
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 border-2 ${
+                  currentStep >= 1 
+                    ? 'bg-primary text-on-primary border-primary' 
+                    : 'bg-surface-container-high text-on-surface-variant border-outline-variant'
                 }`}
               >
                 {currentStep > 1 ? <MaterialIcon>check</MaterialIcon> : '1'}
               </div>
-              <span className={`font-label-caps text-label-caps ${currentStep >= 1 ? 'text-primary' : 'text-on-surface-variant'}`}>
+              <span className={`font-label-caps text-label-caps whitespace-nowrap ${currentStep >= 1 ? 'text-primary font-bold' : 'text-on-surface-variant'}`}>
                 Resume
               </span>
             </div>
@@ -654,13 +660,15 @@ const JobMatch = () => {
             {/* Step 2 */}
             <div className="relative z-10 flex flex-col items-center gap-xs">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 ${
-                  currentStep >= 2 ? 'bg-primary text-on-primary' : 'bg-surface-container-high text-on-surface-variant'
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 border-2 ${
+                  currentStep >= 2 
+                    ? 'bg-primary text-on-primary border-primary' 
+                    : 'bg-surface-container-high text-on-surface-variant border-outline-variant'
                 }`}
               >
                 {currentStep > 2 ? <MaterialIcon>check</MaterialIcon> : '2'}
               </div>
-              <span className={`font-label-caps text-label-caps ${currentStep >= 2 ? 'text-primary' : 'text-on-surface-variant'}`}>
+              <span className={`font-label-caps text-label-caps whitespace-nowrap ${currentStep >= 2 ? 'text-primary font-bold' : 'text-on-surface-variant'}`}>
                 Description
               </span>
             </div>
@@ -668,13 +676,15 @@ const JobMatch = () => {
             {/* Step 3 */}
             <div className="relative z-10 flex flex-col items-center gap-xs">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 ${
-                  currentStep >= 3 ? 'bg-primary text-on-primary' : 'bg-surface-container-high text-on-surface-variant'
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 border-2 ${
+                  currentStep >= 3 
+                    ? 'bg-primary text-on-primary border-primary' 
+                    : 'bg-surface-container-high text-on-surface-variant border-outline-variant'
                 }`}
               >
                 {matchResults && currentStep >= 3 ? <MaterialIcon>check</MaterialIcon> : '3'}
               </div>
-              <span className={`font-label-caps text-label-caps ${currentStep >= 3 ? 'text-primary' : 'text-on-surface-variant'}`}>
+              <span className={`font-label-caps text-label-caps whitespace-nowrap ${currentStep >= 3 ? 'text-primary font-bold' : 'text-on-surface-variant'}`}>
                 Results
               </span>
             </div>
