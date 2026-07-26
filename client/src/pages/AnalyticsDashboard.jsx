@@ -90,8 +90,14 @@ const AnalyticsDashboard = () => {
       // Fetch complete dashboard data (includes overview, latest items, etc.)
       const dashboardRes = await dashboardService.getDashboard();
       
-      // Extract overview from dashboard data
-      const dashboardData = dashboardRes.data;
+      console.log('[Analytics] Dashboard response:', dashboardRes);
+      console.log('[Analytics] Dashboard axios data:', dashboardRes.data);
+      
+      // Extract overview from dashboard data (axios response wraps in .data)
+      const dashboardData = dashboardRes.data.data || dashboardRes.data;
+      console.log('[Analytics] Unwrapped dashboard data:', dashboardData);
+      console.log('[Analytics] Overview from data:', dashboardData.overview);
+      
       const overviewData = {
         totalResumes: dashboardData.overview?.totalResumes || 0,
         totalAnalyses: dashboardData.overview?.totalAnalyses || 0,
@@ -102,6 +108,8 @@ const AnalyticsDashboard = () => {
         latestAnalysis: dashboardData.latest?.analysis || null,
         latestJobMatch: dashboardData.latest?.jobMatch || null,
       };
+      
+      console.log('[Analytics] Parsed overview data:', overviewData);
       
       setOverview(overviewData);
       setIsLoading(false);

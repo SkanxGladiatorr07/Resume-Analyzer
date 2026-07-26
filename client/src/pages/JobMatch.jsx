@@ -629,11 +629,11 @@ const JobMatch = () => {
           </p>
 
           {/* Progress Steps */}
-          <div className="flex items-center justify-between w-full relative">
-            {/* Progress Line */}
-            <div className="absolute top-1/2 left-0 w-full h-[2px] bg-outline-variant -translate-y-1/2 z-0"></div>
+          <div className="flex items-start justify-between w-full relative">
+            {/* Progress Line - positioned at circle center (20px from top = 10px radius) */}
+            <div className="absolute top-5 left-0 w-full h-[2px] bg-outline-variant z-0"></div>
             <div
-              className="absolute top-1/2 left-0 h-[2px] bg-primary -translate-y-1/2 z-0 transition-all duration-500"
+              className="absolute top-5 left-0 h-[2px] bg-primary z-0 transition-all duration-500"
               style={{ width: currentStep === 1 ? '0%' : currentStep === 2 ? '50%' : '100%' }}
             ></div>
 
